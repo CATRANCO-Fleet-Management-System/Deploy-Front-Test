@@ -1,13 +1,15 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
+import React, { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation"; // Import useRouter
 
 const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const dropdownRef = useRef(null);
+  const [birthday, setBirthday] = useState<string>(""); // State to hold birthday
+  const [age, setAge] = useState<number | string>(""); // State to hold calculated age
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter(); // Initialize useRouter
 
   const toggleDropdown = () => {
@@ -16,8 +18,8 @@ const DashboardHeader = () => {
 
   // Close dropdown if clicking outside of it
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownVisible(false);
       }
     };
@@ -26,11 +28,27 @@ const DashboardHeader = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const PhotoUpload = () => {
-    const [selectedImage, setSelectedImage] = useState(null);
+  // Function to calculate age based on the birthday
+  useEffect(() => {
+    if (birthday) {
+      const birthDate = new Date(birthday);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      setAge(age);
+    } else {
+      setAge(""); // Clear age if no birthday is provided
+    }
+  }, [birthday]);
 
-    const handleImageChange = (e) => {
-      const file = e.target.files[0];
+  const PhotoUpload = () => {
+    const [selectedImage, setSelectedImage] = useState<string | ArrayBuffer | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -39,7 +57,6 @@ const DashboardHeader = () => {
         reader.readAsDataURL(file);
       }
     };
-
     return (
       <div className="relative w-64 h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
         <input
@@ -51,7 +68,7 @@ const DashboardHeader = () => {
         />
         {selectedImage ? (
           <img
-            src={selectedImage}
+            src={selectedImage as string}
             alt="Profile Preview"
             className="w-full h-full object-cover rounded-full"
           />
@@ -62,13 +79,9 @@ const DashboardHeader = () => {
     );
   };
 
-  // Generate bus numbers
-  const busOptions = Array.from(
-    { length: 11 },
-    (_, i) => `BUS ${String(i + 1).padStart(3, "0")}`
-  );
-
-  const handleCancel = () => {
+ 
+  // Function to handle the cancel button click
+  const handleCancelClick = () => {
     router.push("/personnel"); // Navigate to /personnel
   };
 
@@ -90,88 +103,82 @@ const DashboardHeader = () => {
                     type="text"
                     placeholder="ID number"
                   />
-                  <h1>Name</h1>
+                  <h1>Last Name</h1>
                   <Input
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="Name"
+                    placeholder="ex:Callo"
                   />
+                  <h1>First Name</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="ex: Juan"
+                  />
+                  <h1>Middle Initial</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="ex: V"
+                  />
+                  
                   <h1>Role</h1>
                   <Input
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="Driver"
+                    placeholder="Role"
+                    value="Driver"
                     disabled
                   />
                   <h1>License Number:</h1>
                   <Input
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="License Number"
+                    placeholder="ex: N03-12-123456"
                   />
-                  <h1>Age</h1>
+                  
+                 
+                </div>
+                <div className="2nd-row flex-col m-5 w-96 space-y-4">
+                <h1>Age</h1>
                   <Input
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="Age"
+                    value={age} // Display calculated age
+                    readOnly
                   />
                   <h1>Gender</h1>
                   <select className="h-10 text-lg border-2 rounded-lg p-2">
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                   </select>
-                  <h1>Contact Number</h1>
+                <h1>Contact Number</h1>
                   <Input
                     className="h-10 text-lg"
                     type="text"
                     placeholder="Contact Number"
                   />
-                </div>
-                <div className="2nd-row flex-col m-5 w-96 space-y-4">
-                  <h1>Person to Contact</h1>
+                  <h1>Contact Person</h1>
                   <Input className="h-10 text-lg" type="text" placeholder="" />
-                  <h1>Person to contact phone #</h1>
+                  <h1>Contact Person phone #</h1>
                   <Input
                     className="h-10 text-lg"
                     type="text"
                     placeholder="Phone Number"
                   />
-                  <h1>Designated Bus</h1>
-                  <select className="h-10 text-lg border-2 rounded-lg p-2">
-                    {busOptions.map((bus, index) => (
-                      <option key={index} value={bus}>
-                        {bus}
-                      </option>
-                    ))}
-                  </select>
+                  
                   <h1>Address</h1>
                   <textarea
                     className="h-34 text-lg text-left p-2 border-2 align-top w-96 rounded-lg"
                     placeholder="Address"
                   />
-                  <h1>Username</h1>
-                  <Input
-                    className="h-10 text-lg"
-                    type="text"
-                    placeholder="Username"
-                  />
-                  <h1>Password</h1>
-                  <Input
-                    className="h-10 text-lg"
-                    type="text"
-                    placeholder="Password"
-                  />
+                 
                 </div>
                 <div className="3rd-row ml-14">
                   <div className="flex flex-col items-center m-14">
                     <PhotoUpload />
                   </div>
-                  <h1 className="mb-4">Partnered Person</h1>
-                  <Input
-                    className="h-10 text-lg"
-                    type="text"
-                    placeholder="Partner Name"
-                  />
+                  
                 </div>
                 <div className="relative">
                   <div className="buttons absolute bottom-0 right-0 flex flex-col space-y-5 w-24 mb-8 mr-8">
@@ -179,8 +186,8 @@ const DashboardHeader = () => {
                       Add
                     </button>
                     <button
+                      onClick={handleCancelClick} // Add onClick handler
                       className="flex items-center justify-center px-4 py-2 border-2 border-red-500 rounded-md text-red-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
-                      onClick={handleCancel} // Add onClick handler for cancel button
                     >
                       Cancel
                     </button>
