@@ -39,7 +39,7 @@ const BusAdd = () => {
 
   // Function to handle the cancel button click
   const handleCancelClick = () => {
-    router.push("/personnel");
+    router.push("/bus-profiles");
   };
 
   return (
