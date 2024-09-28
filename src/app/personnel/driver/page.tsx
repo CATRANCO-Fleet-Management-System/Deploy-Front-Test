@@ -136,7 +136,13 @@ const DashboardHeader = () => {
                     type="text"
                     placeholder="ex: N03-12-123456"
                   />
-                  
+                  <h1>Birthday</h1>
+                  <input
+                    type="date"
+                    className="h-10 text-lg border-2 rounded-lg p-2"
+                    value={birthday}
+                    onChange={(e) => setBirthday(e.target.value)}
+                  />
                  
                 </div>
                 <div className="2nd-row flex-col m-5 w-96 space-y-4">
