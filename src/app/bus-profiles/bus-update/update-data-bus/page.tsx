@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const BusAdd = () => {
+const BusUpdate = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useRef(null);
   const router = useRouter();
@@ -44,7 +44,7 @@ const BusAdd = () => {
 
   // Function to handle the next button click
   const handleNextClick = () => {
-    router.push("/bus-profiles/bus-add/assign-personnel"); // Redirect to assign personnel on next
+    router.push("/bus-profiles/bus-update/update-personnel"); // Redirect to assign personnel on next
   };
 
   return (
@@ -52,7 +52,7 @@ const BusAdd = () => {
       <Sidebar />
 
       <section className="w-full bg-slate-200">
-        <Header title="Add Bus Record" />
+        <Header title="Update Bus Record" />
 
         <section className="right w-full overflow-y-hidden">
           <div className="forms-container ml-14">
@@ -149,4 +149,4 @@ const BusAdd = () => {
   );
 };
 
-export default BusAdd;
+export default BusUpdate;

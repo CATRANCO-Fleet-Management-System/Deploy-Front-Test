@@ -106,19 +106,28 @@ const BusRecord: React.FC<BusBoxProps> = ({
           </button>
           {dropdownOpen && (
             <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-4/5 bg-white border border-gray-300 rounded shadow-lg z-10">
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+              <a
+                href={`/bus-profiles/bus-update/update-data-bus?busNumber=${busNumber}`}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
                 Edit Bus Record
-              </button>
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+              </a>
+              <a
+                href={`/bus-profiles/bus-update/update-personnel?busNumber=${busNumber}`}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
                 Edit Personnel Assignment
-              </button>
+              </a>
             </div>
           )}
         </div>
 
-        <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full">
+        <a
+          href={`/bus-profiles/bus-records/${busNumber}`}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full text-center"
+        >
           View Bus Full Record
-        </button>
+        </a>
       </div>
     </div>
   );
