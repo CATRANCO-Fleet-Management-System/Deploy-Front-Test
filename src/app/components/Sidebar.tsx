@@ -31,9 +31,9 @@ export default function Sidebar() {
       label: "Bus Maintenance Management",
     },
     {
-      href: "/dispatch-management",
+      href: "/dispatch-monitoring",
       icon: <FaTruck size={25} />,
-      label: "Dispatch Management",
+      label: "Dispatch Monitoring",
     },
     {
       href: "/fuel-monitoring",
