@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { FaBus, FaCalendar, FaSearch } from "react-icons/fa"; // Import the calendar and search icons
+import { FaBus, FaCalendar } from "react-icons/fa"; // Import the calendar icon
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Sidebar from "../components/Sidebar";
@@ -87,7 +87,7 @@ const FuelMonitoring = () => {
   const itemsPerPage = 9;
   const totalPages = Math.ceil(buses.length / itemsPerPage);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
@@ -98,7 +98,7 @@ const FuelMonitoring = () => {
     currentPage * itemsPerPage
   );
 
-  const handleBusClick = (busNumber: string) => {
+  const handleBusClick = (busNumber) => {
     setSelectedBus(busNumber);
   };
 
@@ -106,7 +106,7 @@ const FuelMonitoring = () => {
     setIsCalendarOpen(!isCalendarOpen);
   };
 
-  const handleDateChange = (date: Date) => {
+  const handleDateChange = (date) => {
     setSelectedDate(date);
     setIsCalendarOpen(false);
   };
@@ -117,8 +117,6 @@ const FuelMonitoring = () => {
       <div className="w-full bg-slate-200">
         <Header title="Fuel Monitoring" />
         <section className="p-4">
-          <div className="flex justify-between mb-3"></div>
-
           <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg mx-auto">
             <div className="absolute inset-0 flex justify-center items-center opacity-10">
               <span className="text-6xl font-bold text-gray-500">{`Bus ${selectedBus}`}</span>
@@ -129,9 +127,7 @@ const FuelMonitoring = () => {
           <div className="chart-options w-5/6 mx-auto flex justify-left space-x-3 mt-3">
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "daily"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
+                timeInterval === "daily" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("daily")}
             >
@@ -139,9 +135,7 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "5days"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
+                timeInterval === "5days" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("5days")}
             >
@@ -149,9 +143,7 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "weekly"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
+                timeInterval === "weekly" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("weekly")}
             >
@@ -159,9 +151,7 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "monthly"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
+                timeInterval === "monthly" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("monthly")}
             >
@@ -169,9 +159,7 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "yearly"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
+                timeInterval === "yearly" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("yearly")}
             >
@@ -196,19 +184,29 @@ const FuelMonitoring = () => {
           </div>
 
           <div className="buses mt-4 grid grid-cols-3 gap-4 w-5/6 mx-auto">
-            {displayedBuses.map((bus) => (
-              <div
-                key={bus.number}
-                className={`flex items-center p-4 rounded-lg shadow cursor-pointer ${
-                  bus.status === "Maintenance" ? "bg-gray-400" : "bg-green-400"
-                } ${selectedBus === bus.number ? "ring-2 ring-blue-500" : ""}`}
-                onClick={() => handleBusClick(bus.number)}
-              >
-                <FaBus size={24} className="mr-2" />
-                <span className="mr-auto">Bus {bus.number}</span>
-                <span>{bus.status}</span>
-              </div>
-            ))}
+            {displayedBuses.map((bus) => {
+              // Determine background color and text color based on bus status
+              const bgColor =
+                bus.status === "Maintenance" ? "bg-gray-400" : "bg-green-400";
+              const textColor =
+                bus.status === "Maintenance" ? "text-red-900" : "text-black";
+
+              return (
+                <div
+                  key={bus.number}
+                  className={`flex items-center p-4 rounded-lg shadow cursor-pointer ${bgColor} ${
+                    selectedBus === bus.number ? "ring-2 ring-blue-500" : ""
+                  }`}
+                  onClick={() => handleBusClick(bus.number)}
+                >
+                  <FaBus size={24} className="mr-2" />
+                  <span className={`mr-auto ${textColor}`}>
+                    Bus {bus.number}
+                  </span>
+                  <span className={textColor}>{bus.status}</span>
+                </div>
+              );
+            })}
           </div>
 
           <div className="w-5/6 mx-auto mt-4 relative">
@@ -231,7 +229,7 @@ const FuelMonitoring = () => {
                   className={`px-3 py-1 border rounded ${
                     currentPage === index + 1
                       ? "bg-blue-500 text-white"
-                      : "bg-white border-gray-500 text-gray-700"
+                      : "bg-white text-gray-700"
                   }`}
                 >
                   {index + 1}
@@ -247,12 +245,6 @@ const FuelMonitoring = () => {
                 }`}
               >
                 &gt; {/* Changed Next to ">" */}
-              </button>
-            </div>
-            <div className="absolute right-0 bottom-0">
-              <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md">
-                <FaSearch className="mr-2" />
-                View Details
               </button>
             </div>
           </div>

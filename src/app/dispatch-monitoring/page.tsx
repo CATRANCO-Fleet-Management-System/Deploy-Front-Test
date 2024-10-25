@@ -89,7 +89,7 @@ const DispatchMonitoring = () => {
 
                   const textColor =
                     bus.status === "Maintenance"
-                      ? "text-red-500"
+                      ? "text-red-900"
                       : "text-black";
                   const isSelected = selectedBus === bus.number;
 
@@ -135,7 +135,7 @@ const DispatchMonitoring = () => {
 
                   const textColor =
                     bus.status === "Maintenance"
-                      ? "text-red-500"
+                      ? "text-red-900"
                       : "text-black";
                   const isSelected = selectedBus === bus.number;
                   const selectedBorder = isSelected
