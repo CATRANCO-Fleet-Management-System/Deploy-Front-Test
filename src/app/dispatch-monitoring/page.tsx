@@ -2,7 +2,7 @@
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import React, { useState, useRef, useEffect } from "react";
-import { FaBus, FaCog, FaUsers, FaAngleDoubleRight } from "react-icons/fa";
+import { FaBus, FaAngleDoubleRight } from "react-icons/fa";
 
 const DispatchMonitoring = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -84,7 +84,7 @@ const DispatchMonitoring = () => {
                     bus.status === "Maintenance"
                       ? "bg-slate-400"
                       : bus.status === "On Road"
-                      ? "bg-yellow-400"
+                      ? "bg-green-400"
                       : "bg-blue-400";
 
                   const textColor =
@@ -92,21 +92,26 @@ const DispatchMonitoring = () => {
                       ? "text-red-500"
                       : "text-black";
                   const isSelected = selectedBus === bus.number;
-                  const selectedBorder = isSelected
-                    ? "border-4 border-green-500"
-                    : "";
 
                   return (
                     <button
                       key={bus.number}
                       onClick={() => setSelectedBus(bus.number)}
-                      className={`container w-96 p-4 rounded-lg flex flex-row space-x-14 ${bgColor} ${selectedBorder}`}
+                      className={`container w-96 p-4 rounded-lg flex flex-row space-x-14 ${bgColor} ${
+                        isSelected ? "ring-2 ring-blue-500 shadow-lg" : ""
+                      } transition-all duration-200`}
                     >
                       <FaBus
                         size={30}
-                        className="ml-2 cursor-pointer text-black"
+                        className={`ml-2 cursor-pointer ${
+                          isSelected ? "text-blue-700" : "text-black"
+                        }`}
                       />
-                      <h1>
+                      <h1
+                        className={`${
+                          isSelected ? "font-bold text-blue-700" : ""
+                        }`}
+                      >
                         Bus{" "}
                         <span id={`bus-number-${bus.number}`}>
                           {bus.number}
@@ -125,7 +130,7 @@ const DispatchMonitoring = () => {
                     bus.status === "Maintenance"
                       ? "bg-slate-400"
                       : bus.status === "On Road"
-                      ? "bg-yellow-400"
+                      ? "bg-green-400"
                       : "bg-blue-400";
 
                   const textColor =
@@ -141,13 +146,21 @@ const DispatchMonitoring = () => {
                     <button
                       key={bus.number}
                       onClick={() => setSelectedBus(bus.number)}
-                      className={`container w-96 p-4 rounded-lg flex flex-row space-x-14 ${bgColor} ${selectedBorder}`}
+                      className={`container w-96 p-4 rounded-lg flex flex-row space-x-14 ${bgColor} ${
+                        isSelected ? "ring-2 ring-blue-500 shadow-lg" : ""
+                      } transition-all duration-200`}
                     >
                       <FaBus
                         size={30}
-                        className="ml-2 cursor-pointer text-black"
+                        className={`ml-2 cursor-pointer ${
+                          isSelected ? "text-blue-700" : "text-black"
+                        }`}
                       />
-                      <h1>
+                      <h1
+                        className={`${
+                          isSelected ? "font-bold text-blue-700" : ""
+                        }`}
+                      >
                         Bus{" "}
                         <span id={`bus-number-${bus.number}`}>
                           {bus.number}
@@ -216,10 +229,7 @@ const DispatchMonitoring = () => {
               <div className="bus-information w-1/4 bg-white h-auto rounded-lg border-2 border-violet-400">
                 <div className="infos flex flex-col ml-5">
                   <div className="header-info flex flex-row mt-4 space-x-5">
-                    <FaBus
-                      size={40}
-                      className="cursor-pointer text-black"
-                    />
+                    <FaBus size={40} className="cursor-pointer text-black" />
                     <h1 className="text-2xl font-bold">
                       {selectedBus ? `Bus ${selectedBus}` : "Bus"}
                     </h1>
@@ -228,13 +238,19 @@ const DispatchMonitoring = () => {
                   <div className="details mt-4">
                     <p>Bus Number: {selectedBus}</p>
                     {selectedBus && (
-                      <p>Status: {
-                        busData.find(bus => bus.number === selectedBus)?.status
-                      }</p>
+                      <p>
+                        Status:{" "}
+                        {
+                          busData.find((bus) => bus.number === selectedBus)
+                            ?.status
+                        }
+                      </p>
                     )}
                     <p className="mt-2">Driver: James Harden</p>
                     <p>Conductor: Stephen Curry</p>
-                    <p className="mt-2">Trips: {/* Add trip details here if needed */}</p>
+                    <p className="mt-2">
+                      Trips: {/* Add trip details here if needed */}
+                    </p>
                   </div>
                 </div>
               </div>

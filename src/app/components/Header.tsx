@@ -55,9 +55,6 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       </div>
       <div className="icon-container flex flex-row mr-14">
         <div className="icons flex flex-row border-r-2 border-gray-400 mr-4 text-violet-700">
-          <Link href="/messages">
-            <FaEnvelope size={25} className="mr-5 mt-2 cursor-pointer" />
-          </Link>
           <Link href="/notification">
             <FaBell size={25} className="mr-5 mt-2 cursor-pointer" />
           </Link>
