@@ -4,12 +4,12 @@ import Header from "@/app/components/Header";
 import React, { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { createProfile } from "@/app/services/userProfile"; // Import createProfile service
+import { createProfile, updateProfile, getUserProfile } from "@/app/services/userProfile"; // Import the updateProfile and getUserProfile services
 
 const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [birthday, setBirthday] = useState<string>(""); // State to hold birthday
-  const [age, setAge] = useState<number | string>(""); // State to hold calculated age
+  const [birthday, setBirthday] = useState<string>("");
+  const [age, setAge] = useState<number | string>("");
   const [formData, setFormData] = useState({
     employeeId: "",
     last_name: "",
@@ -27,12 +27,12 @@ const DashboardHeader = () => {
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const { user_profile_id } = router.query; // Assuming user_profile_id is passed via router query
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
 
-  // Close dropdown if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -44,7 +44,6 @@ const DashboardHeader = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Function to calculate age based on the birthday
   useEffect(() => {
     if (birthday) {
       const birthDate = new Date(birthday);
@@ -56,11 +55,27 @@ const DashboardHeader = () => {
       }
       setAge(calculatedAge);
     } else {
-      setAge(""); // Clear age if no birthday is provided
+      setAge("");
     }
   }, [birthday]);
 
-  // Handle form field changes
+  // Fetch user profile data when the component mounts
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userProfileData = await getUserProfile(user_profile_id); // Fetch the user profile
+        setFormData(userProfileData);
+        setBirthday(userProfileData.date_of_birth); // Set the birthday for age calculation
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    if (user_profile_id) {
+      fetchUserProfile();
+    }
+  }, [user_profile_id]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -69,12 +84,10 @@ const DashboardHeader = () => {
     }));
   };
 
-  // Handle Date of Birth change
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBirthday(e.target.value); // Set birthday to the selected date
+    setBirthday(e.target.value);
   };
 
-  // Photo Upload handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -82,7 +95,7 @@ const DashboardHeader = () => {
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
-          photo: reader.result as string,
+          user_profile_image: reader.result as string, // Update the correct field
         }));
       };
       reader.readAsDataURL(file);
@@ -110,7 +123,7 @@ const DashboardHeader = () => {
     </div>
   );
 
-  // Handle form submission to create profile
+  // Handle form submission to update profile
   const handleSubmit = async () => {
     try {
       const profileData = {
@@ -125,14 +138,13 @@ const DashboardHeader = () => {
         contact_person: formData.contact_person,
         contact_person_number: formData.contact_person_number,
         address: formData.address,
-        date_of_birth: birthday, // Include birthday in the profile data
+        date_of_birth: birthday,
         photo: formData.user_profile_image,
       };
-      await createProfile(profileData); // Call createProfile function
-      router.push("/personnel"); // Redirect after successful submission
+      await updateProfile(user_profile_id, profileData); // Call updateProfile function
+      router.push("/personnel");
     } catch (error) {
-      console.error("Error creating profile:", error);
-      // Optionally handle error feedback to the user
+      console.error("Error updating profile:", error);
     }
   };
 
@@ -145,7 +157,7 @@ const DashboardHeader = () => {
       <Sidebar />
 
       <section className="w-full bg-slate-200">
-        <Header title="Add Driver Record" />
+        <Header title="Edit Driver Record" /> {/* Update title for edit functionality */}
 
         <section className="right w-full overflow-y-hidden">
           <div className="forms-container ml-14">
@@ -209,9 +221,9 @@ const DashboardHeader = () => {
                   <Input
                     name="birthday"
                     value={birthday}
-                    onChange={handleBirthdayChange} // Bind to birthday state
+                    onChange={handleBirthdayChange}
                     className="h-10 text-lg"
-                    type="date" // Date picker input
+                    type="date"
                     placeholder="Select Date of Birth"
                   />
                 </div>
@@ -220,7 +232,7 @@ const DashboardHeader = () => {
                   <Input
                     className="h-10 text-lg"
                     type="text"
-                    value={age} // Display calculated age
+                    value={age}
                     readOnly
                   />
                   <h1>Gender</h1>
@@ -240,7 +252,7 @@ const DashboardHeader = () => {
                     onChange={handleInputChange}
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="Contact Number"
+                    placeholder="ex: 09123456789"
                   />
                   <h1>Contact Person</h1>
                   <Input
@@ -249,46 +261,42 @@ const DashboardHeader = () => {
                     onChange={handleInputChange}
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="Contact Person"
+                    placeholder="ex: Jose"
                   />
-                  <h1>Contact Person phone #</h1>
+                  <h1>Contact Person Number</h1>
                   <Input
                     name="contact_person_number"
                     value={formData.contact_person_number}
                     onChange={handleInputChange}
                     className="h-10 text-lg"
                     type="text"
-                    placeholder="Phone Number"
+                    placeholder="ex: 09123456789"
                   />
                   <h1>Address</h1>
                   <textarea
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="h-34 text-lg text-left p-2 border-2 align-top w-96 rounded-lg"
-                    placeholder="Address"
+                    className="h-20 text-lg border-2 rounded-lg p-2"
+                    placeholder="ex: Brgy. 123, City, Province"
                   />
                 </div>
-                <div className="3rd-row ml-14">
-                  <div className="flex flex-col items-center m-14">
-                    <PhotoUpload />
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="buttons absolute bottom-0 right-0 flex flex-col space-y-5 w-24 mb-8 mr-8">
-                    <button
-                      onClick={handleSubmit} // Add form submission handler
-                      className="flex items-center justify-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
-                    >
-                      Add
-                    </button>
-                    <button
-                      onClick={handleCancelClick}
-                      className="flex items-center justify-center px-4 py-2 border-2 border-red-500 rounded-md text-red-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+              </div>
+              <div className="photo-upload-container flex flex-col items-center space-y-4 mt-10">
+                <PhotoUpload />
+                <div className="flex space-x-4">
+                  <button
+                    onClick={handleSubmit}
+                    className="bg-blue-500 text-white rounded px-4 py-2"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancelClick}
+                    className="bg-red-500 text-white rounded px-4 py-2"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>
