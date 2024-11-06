@@ -64,4 +64,8 @@ const FeedbackRecord: React.FC<FeedbackRecordProps> = ({
   );
 };
 
+<<<<<<< HEAD
 export default FeedbackRecord;
+=======
+export default FeedbackRecord;
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f

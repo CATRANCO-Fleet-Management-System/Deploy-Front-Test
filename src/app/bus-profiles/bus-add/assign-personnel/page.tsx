@@ -1,6 +1,7 @@
 "use client";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAllProfiles } from "@/app/services/userProfile";
@@ -40,6 +41,36 @@ const BusAdd = () => {
     };
 
     fetchProfilesAndVehicles();
+=======
+import React, { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+const BusAdd = () => {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const dropdownRef = useRef(null);
+  const router = useRouter();
+  const [TPLValidity, setTPLValidity] = useState(new Date());
+  const [CIValidity, setCIValidity] = useState(new Date());
+  const [DatePurchased, setDatePurchased] = useState(new Date());
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  // Close dropdown if clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownVisible(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
   }, []);
 
   // Function to handle the cancel button click
@@ -47,6 +78,7 @@ const BusAdd = () => {
     router.push("/bus-profiles");
   };
 
+<<<<<<< HEAD
   // Function to handle the done button click
   const handleDoneClick = async () => {
     if (!selectedDriver || !selectedPAO || !selectedVehicle) {
@@ -72,6 +104,8 @@ const BusAdd = () => {
     }
   };
 
+=======
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
   return (
     <section className="h-screen flex flex-row bg-white">
       <Sidebar />
@@ -81,6 +115,7 @@ const BusAdd = () => {
 
         <section className="right w-full flex justify-center items-center">
           <div className="forms-container">
+<<<<<<< HEAD
             <div className="forms flex flex-col items-center w-[500px] bg-white min-h-[500px] rounded-lg border border-gray-300 p-8 space-y-6 mt-20">
               <h1 className="text-xl mt-10">Driver Assignment</h1>
               {loading ? (
@@ -145,6 +180,33 @@ const BusAdd = () => {
                     className="px-4 py-2 w-24 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
                     disabled={loading} // Disable while loading
                   >
+=======
+            <div className="forms flex flex-col  items-center w-[500px] bg-white min-h-[500px] rounded-lg border border-gray-300 p-8 space-y-6 mt-20">
+              <h1 className="text-xl mt-10">Driver Assignment</h1>
+              <select className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full">
+                <option value="">Select a Driver</option>
+                {Array.from({ length: 10 }, (_, i) => (
+                  <option key={i} value={`Driver ${i + 1}`}>
+                    {`Driver name ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+
+              <h1 className="text-xl mt-4">
+                Passenger Officer Assistant Assignment
+              </h1>
+              <select className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full">
+                <option value="">Select a PAO</option>
+                {Array.from({ length: 10 }, (_, i) => (
+                  <option key={i} value={`PAO ${i + 1}`}>
+                    {`PAO name ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+              <div className="buttons mt-6">
+                <div className="buttons flex justify-center space-x-4 w-full mt-6">
+                  <button className="px-4 py-2 w-24 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                     Done
                   </button>
                   <button

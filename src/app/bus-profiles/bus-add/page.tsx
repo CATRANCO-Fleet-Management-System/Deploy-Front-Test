@@ -64,6 +64,7 @@ const BusAdd = () => {
   // Function to handle the next button click
   const handleNextClick = () => {
     router.push("/bus-profiles/bus-add/assign-personnel"); // Redirect to assign personnel on next
+<<<<<<< HEAD
   };
 
   // Function to handle the submit action for creating a vehicle
@@ -95,6 +96,8 @@ const BusAdd = () => {
       console.error("Error creating vehicle:", error);
       // Handle error (e.g., show an error message)
     }
+=======
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
   };
 
   return (
@@ -221,10 +224,17 @@ const BusAdd = () => {
                 <div className="relative">
                   <div className="buttons absolute bottom-0 right-0 flex flex-col space-y-5 w-24 mb-8 mr-8">
                     <button
+<<<<<<< HEAD
                       type="submit" // Set button type to submit
                       className="flex items-center justify-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
                     >
                       Add
+=======
+                      onClick={handleNextClick} // Call handleNextClick on Next button
+                      className="flex items-center justify-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
+                    >
+                      Next
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                     </button>
                     <button
                       onClick={handleCancelClick} // Call handleCancelClick on Cancel button

@@ -88,4 +88,8 @@ const UpdatePersonnel = () => {
   );
 };
 
+<<<<<<< HEAD
 export default UpdatePersonnel;
+=======
+export default UpdatePersonnel;
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f

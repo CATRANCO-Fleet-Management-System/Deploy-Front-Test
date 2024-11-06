@@ -10,6 +10,7 @@ const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [birthday, setBirthday] = useState<string>(""); // State to hold birthday
   const [age, setAge] = useState<number | string>(""); // State to hold calculated age
+<<<<<<< HEAD
   const [formData, setFormData] = useState({
     employeeId: "",
     last_name: "",
@@ -26,6 +27,10 @@ const DashboardHeader = () => {
   });
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+=======
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter(); // Initialize useRouter
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -48,6 +53,7 @@ const DashboardHeader = () => {
     if (birthday) {
       const birthDate = new Date(birthday);
       const today = new Date();
+<<<<<<< HEAD
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDifference = today.getMonth() - birthDate.getMonth();
       if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
@@ -135,6 +141,56 @@ const DashboardHeader = () => {
     }
   };
 
+=======
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      setAge(age);
+    } else {
+      setAge(""); // Clear age if no birthday is provided
+    }
+  }, [birthday]);
+
+  const PhotoUpload = () => {
+    const [selectedImage, setSelectedImage] = useState<string | ArrayBuffer | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setSelectedImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    return (
+      <div className="relative w-64 h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
+        <input
+          type="file"
+          id="photoUpload"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="absolute inset-0 opacity-0"
+        />
+        {selectedImage ? (
+          <img
+            src={selectedImage as string}
+            alt="Profile Preview"
+            className="w-full h-full object-cover rounded-full"
+          />
+        ) : (
+          <span className="text-gray-500 text-center">Add Profile Photo</span>
+        )}
+      </div>
+    );
+  };
+
+ 
+  // Function to handle the cancel button click
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
   const handleCancelClick = () => {
     router.push("/personnel");
   };
@@ -153,24 +209,43 @@ const DashboardHeader = () => {
                 <div className="1st-row flex-col m-5 ml-14 w-96 space-y-4">
                   <h1>Employee ID number</h1>
                   <Input
+<<<<<<< HEAD
                     name="employeeId"
                     value={formData.employeeId}
                     onChange={handleInputChange}
+=======
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                     className="h-10 text-lg"
                     type="text"
                     placeholder="ID number"
                   />
                   <h1>Last Name</h1>
                   <Input
+<<<<<<< HEAD
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleInputChange}
+=======
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="Name"
+                  />
+                  <h1>First Name</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="Name"
+                  />
+                  <h1>Middle Initial</h1>
+                  <Input
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                     className="h-10 text-lg"
                     type="text"
                     placeholder="ex: Callo"
                   />
                   <h1>First Name</h1>
                   <Input
+<<<<<<< HEAD
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleInputChange}
@@ -191,10 +266,13 @@ const DashboardHeader = () => {
                   <Input
                     name="position"
                     value="passenger assistant officer "
+=======
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                     className="h-10 text-lg"
                     type="text"
                     disabled
                   />
+<<<<<<< HEAD
                   <h1>License Number:</h1>
                   <Input
                     name="license_number"
@@ -267,11 +345,62 @@ const DashboardHeader = () => {
                     className="h-34 text-lg text-left p-2 border-2 align-top w-96 rounded-lg"
                     placeholder="Address"
                   />
+=======
+                  
+                  <h1>Birthday</h1>
+                  <input
+                    type="date"
+                    className="h-10 text-lg border-2 rounded-lg p-2"
+                    value={birthday}
+                    onChange={(e) => setBirthday(e.target.value)}
+                  />
+                  
+                 
+                </div>
+                <div className="2nd-row flex-col m-5 w-96 space-y-4">
+                <h1>Age</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    value={age} // Display calculated age
+                    readOnly
+                  />
+                  <h1>Gender</h1>
+                  <select className="h-10 text-lg border-2 rounded-lg p-2">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                <h1>Contact Number</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="Contact Number"
+                  />
+                  <h1>Contact Person</h1>
+                  <Input className="h-10 text-lg" type="text" placeholder="" />
+                  <h1>Contact Person phone #</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="Phone Number"
+                  />
+                  
+                  <h1>Address</h1>
+                  <textarea
+                    className="h-34 text-lg text-left p-2 border-2 align-top w-96 rounded-lg"
+                    placeholder="Address"
+                  />
+                 
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                 </div>
                 <div className="3rd-row ml-14">
                   <div className="flex flex-col items-center m-14">
                     <PhotoUpload />
                   </div>
+<<<<<<< HEAD
+=======
+                  
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                 </div>
                 <div className="relative">
                   <div className="buttons absolute bottom-0 right-0 flex flex-col space-y-5 w-24 mb-8 mr-8">

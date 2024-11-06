@@ -155,4 +155,8 @@ const FeedbackRecordDisplay = () => {
   );
 };
 
+<<<<<<< HEAD
 export default FeedbackRecordDisplay;
+=======
+export default FeedbackRecordDisplay;
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f

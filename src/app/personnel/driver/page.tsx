@@ -10,6 +10,7 @@ const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [birthday, setBirthday] = useState<string>(""); // State to hold birthday
   const [age, setAge] = useState<number | string>(""); // State to hold calculated age
+<<<<<<< HEAD
   const [formData, setFormData] = useState({
     employeeId: "",
     last_name: "",
@@ -27,6 +28,10 @@ const DashboardHeader = () => {
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+=======
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter(); // Initialize useRouter
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -49,6 +54,7 @@ const DashboardHeader = () => {
     if (birthday) {
       const birthDate = new Date(birthday);
       const today = new Date();
+<<<<<<< HEAD
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDifference = today.getMonth() - birthDate.getMonth();
       if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
@@ -138,6 +144,58 @@ const DashboardHeader = () => {
 
   const handleCancelClick = () => {
     router.push("/personnel");
+=======
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      setAge(age);
+    } else {
+      setAge(""); // Clear age if no birthday is provided
+    }
+  }, [birthday]);
+
+  const PhotoUpload = () => {
+    const [selectedImage, setSelectedImage] = useState<string | ArrayBuffer | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setSelectedImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    return (
+      <div className="relative w-64 h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
+        <input
+          type="file"
+          id="photoUpload"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="absolute inset-0 opacity-0"
+        />
+        {selectedImage ? (
+          <img
+            src={selectedImage as string}
+            alt="Profile Preview"
+            className="w-full h-full object-cover rounded-full"
+          />
+        ) : (
+          <span className="text-gray-500 text-center">Add Profile Photo</span>
+        )}
+      </div>
+    );
+  };
+
+ 
+  // Function to handle the cancel button click
+  const handleCancelClick = () => {
+    router.push("/personnel"); // Navigate to /personnel
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
   };
 
   return (
@@ -168,9 +226,28 @@ const DashboardHeader = () => {
                     onChange={handleInputChange}
                     className="h-10 text-lg"
                     type="text"
+<<<<<<< HEAD
                     placeholder="ex: Callo"
                   />
                   <h1>First Name</h1>
+=======
+                    placeholder="ex:Callo"
+                  />
+                  <h1>First Name</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="ex: Juan"
+                  />
+                  <h1>Middle Initial</h1>
+                  <Input
+                    className="h-10 text-lg"
+                    type="text"
+                    placeholder="ex: V"
+                  />
+                  
+                  <h1>Role</h1>
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                   <Input
                     name="first_name"
                     value={formData.first_name}
@@ -194,6 +271,11 @@ const DashboardHeader = () => {
                     value="Driver"
                     className="h-10 text-lg"
                     type="text"
+<<<<<<< HEAD
+=======
+                    placeholder="Role"
+                    value="Driver"
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                     disabled
                   />
                   <h1>License Number:</h1>
@@ -205,6 +287,7 @@ const DashboardHeader = () => {
                     type="text"
                     placeholder="ex: N03-12-123456"
                   />
+<<<<<<< HEAD
                   <h1>Date of Birth</h1>
                   <Input
                     name="birthday"
@@ -217,6 +300,19 @@ const DashboardHeader = () => {
                 </div>
                 <div className="2nd-row flex-col m-5 w-96 space-y-4">
                   <h1>Age</h1>
+=======
+                  <h1>Birthday</h1>
+                  <input
+                    type="date"
+                    className="h-10 text-lg border-2 rounded-lg p-2"
+                    value={birthday}
+                    onChange={(e) => setBirthday(e.target.value)}
+                  />
+                 
+                </div>
+                <div className="2nd-row flex-col m-5 w-96 space-y-4">
+                <h1>Age</h1>
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                   <Input
                     className="h-10 text-lg"
                     type="text"
@@ -233,7 +329,7 @@ const DashboardHeader = () => {
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                   </select>
-                  <h1>Contact Number</h1>
+                <h1>Contact Number</h1>
                   <Input
                     name="contact_number"
                     value={formData.contact_number}
@@ -243,6 +339,11 @@ const DashboardHeader = () => {
                     placeholder="Contact Number"
                   />
                   <h1>Contact Person</h1>
+<<<<<<< HEAD
+=======
+                  <Input className="h-10 text-lg" type="text" placeholder="" />
+                  <h1>Contact Person phone #</h1>
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                   <Input
                     name="contact_person"
                     value={formData.contact_person}
@@ -260,6 +361,10 @@ const DashboardHeader = () => {
                     type="text"
                     placeholder="Phone Number"
                   />
+<<<<<<< HEAD
+=======
+                  
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                   <h1>Address</h1>
                   <textarea
                     name="address"
@@ -268,11 +373,19 @@ const DashboardHeader = () => {
                     className="h-34 text-lg text-left p-2 border-2 align-top w-96 rounded-lg"
                     placeholder="Address"
                   />
+<<<<<<< HEAD
+=======
+                 
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                 </div>
                 <div className="3rd-row ml-14">
                   <div className="flex flex-col items-center m-14">
                     <PhotoUpload />
                   </div>
+<<<<<<< HEAD
+=======
+                  
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                 </div>
                 <div className="relative">
                   <div className="buttons absolute bottom-0 right-0 flex flex-col space-y-5 w-24 mb-8 mr-8">
@@ -283,7 +396,11 @@ const DashboardHeader = () => {
                       Add
                     </button>
                     <button
+<<<<<<< HEAD
                       onClick={handleCancelClick}
+=======
+                      onClick={handleCancelClick} // Add onClick handler
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
                       className="flex items-center justify-center px-4 py-2 border-2 border-red-500 rounded-md text-red-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
                     >
                       Cancel

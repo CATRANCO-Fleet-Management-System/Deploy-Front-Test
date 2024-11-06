@@ -260,4 +260,8 @@ const styles = {
   },
 };
 
+<<<<<<< HEAD
 export default FeedbackForm;
+=======
+export default FeedbackForm;
+>>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f
