@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the base API URL for vehicle assignments
 const API_URL = 'http://192.168.68.154:8000/api/user/admin/assignments';
