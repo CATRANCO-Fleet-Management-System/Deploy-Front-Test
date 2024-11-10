@@ -262,8 +262,4 @@ const DispatchMonitoring = () => {
   );
 };
 
-<<<<<<< HEAD
 export default DispatchMonitoring;
-=======
-export default DispatchMonitoring;
->>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f

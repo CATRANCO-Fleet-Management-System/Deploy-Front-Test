@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { FaBus, FaCalendar } from "react-icons/fa"; // Import the calendar icon
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { FaBus, FaCalendar } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Sidebar from "../components/Sidebar";
@@ -9,6 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const FuelMonitoring = () => {
+  const router = useRouter(); // Initialize router
   const [currentPage, setCurrentPage] = useState(1);
   const [timeInterval, setTimeInterval] = useState("daily");
   const [selectedBus, setSelectedBus] = useState("001");
@@ -111,10 +113,20 @@ const FuelMonitoring = () => {
     setIsCalendarOpen(false);
   };
 
+  const navigateToViewRecord = () => {
+    const selectedBusData = buses.find((bus) => bus.number === selectedBus);
+    const status = selectedBusData ? selectedBusData.status : "On Operation";
+    router.push(
+      `/fuel-monitoring/view-record?bus=${selectedBus}&status=${encodeURIComponent(
+        status
+      )}`
+    );
+  };
+
   return (
-    <section className="h-screen flex flex-row bg-white">
+    <section className="min-h-screen flex bg-gray-100">
       <Sidebar />
-      <div className="w-full bg-slate-200">
+      <div className="flex-1 flex flex-col bg-slate-200">
         <Header title="Fuel Monitoring" />
         <section className="p-4">
           <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg mx-auto">
@@ -127,7 +139,9 @@ const FuelMonitoring = () => {
           <div className="chart-options w-5/6 mx-auto flex justify-left space-x-3 mt-3">
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "daily" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
+                timeInterval === "daily"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("daily")}
             >
@@ -135,7 +149,9 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "5days" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
+                timeInterval === "5days"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("5days")}
             >
@@ -143,7 +159,9 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "weekly" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
+                timeInterval === "weekly"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("weekly")}
             >
@@ -151,7 +169,9 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "monthly" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
+                timeInterval === "monthly"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("monthly")}
             >
@@ -159,7 +179,9 @@ const FuelMonitoring = () => {
             </button>
             <button
               className={`px-2 py-1 rounded ${
-                timeInterval === "yearly" ? "bg-blue-500 text-white" : "bg-gray-500 text-white"
+                timeInterval === "yearly"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-500 text-white"
               }`}
               onClick={() => setTimeInterval("yearly")}
             >
@@ -185,7 +207,6 @@ const FuelMonitoring = () => {
 
           <div className="buses mt-4 grid grid-cols-3 gap-4 w-5/6 mx-auto">
             {displayedBuses.map((bus) => {
-              // Determine background color and text color based on bus status
               const bgColor =
                 bus.status === "Maintenance" ? "bg-gray-400" : "bg-green-400";
               const textColor =
@@ -208,43 +229,50 @@ const FuelMonitoring = () => {
               );
             })}
           </div>
-
-          <div className="w-5/6 mx-auto mt-4 relative">
-            <div className="flex justify-center space-x-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 border rounded ${
-                  currentPage === 1
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-white border-gray-500 text-gray-700"
-                }`}
-              >
-                &lt; {/* Changed Previous to "<" */}
-              </button>
-              {[...Array(totalPages)].map((_, index) => (
+          <div className="footer flex justify-center">
+            <div className="w-10/12 mx-auto mt-4 flex items-center relative">
+              <div className="flex-grow flex justify-center space-x-2">
                 <button
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
                   className={`px-3 py-1 border rounded ${
-                    currentPage === index + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-white text-gray-700"
+                    currentPage === 1
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-white border-gray-500 text-gray-700"
                   }`}
                 >
-                  {index + 1}
+                  &lt;
                 </button>
-              ))}
+                {[...Array(totalPages)].map((_, index) => (
+                  <button
+                    key={index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={`px-3 py-1 border rounded ${
+                      currentPage === index + 1
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-gray-700"
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 border rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-white border-gray-500 text-gray-700"
+                  }`}
+                >
+                  &gt;
+                </button>
+              </div>
               <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 border rounded ${
-                  currentPage === totalPages
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-white border-gray-500 text-gray-700"
-                }`}
+                onClick={navigateToViewRecord}
+                className="px-4 py-1 border border-blue-500 text-blue-500 rounded bg-transparent ml-4"
               >
-                &gt; {/* Changed Next to ">" */}
+                View Record
               </button>
             </div>
           </div>
@@ -254,8 +282,4 @@ const FuelMonitoring = () => {
   );
 };
 
-<<<<<<< HEAD
 export default FuelMonitoring;
-=======
-export default FuelMonitoring;
->>>>>>> 8d751dc8934f66c89608192fabadfa7720e00d4f

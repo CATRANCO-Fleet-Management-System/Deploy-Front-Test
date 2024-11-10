@@ -47,7 +47,7 @@ export default function Sidebar() {
   const isActive = (href) => pathname.startsWith(href);
 
   return (
-    <section className="left w-full sm:w-1/5 flex flex-col bg-gray-100">
+    <section className="left w-full sm:w-1/5 flex flex-col h-screen bg-gray-100">
       <div className="header">
         <Link href="/dashboard">
           <img
