@@ -8,6 +8,7 @@ import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import FuelAddModal from "@/app/components/FuelAddModal"; // Import the modal
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
@@ -19,25 +20,14 @@ const ViewRecord = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+  const [editData, setEditData] = useState(null); // Stores data for editing
 
   const menuRef = useRef(null);
 
   const chartData = {
     daily: {
-      labels: [
-        "Jun",
-        "5",
-        "19",
-        "Jul",
-        "7",
-        "21",
-        "Aug",
-        "12",
-        "24",
-        "Sept",
-        "15",
-        "22",
-      ],
+      labels: ["Jun", "5", "19", "Jul", "7", "21", "Aug", "12", "24", "Sept", "15", "22"],
       distance: [10, 50, 30, 70, 20, 50, 60, 30, 40, 60, 20, 30],
       liters: [70, 40, 60, 10, 30, 60, 40, 20, 50, 70, 20, 50],
     },
@@ -66,21 +56,18 @@ const ViewRecord = () => {
   const options = { responsive: true, maintainAspectRatio: false };
 
   const tableData = [
-    { date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
+    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
+    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
+    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
+    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
+    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
+    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
+    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
+    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
+    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
+    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
+    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
+    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
     // Add more records as needed
   ];
 
@@ -107,8 +94,9 @@ const ViewRecord = () => {
   };
 
   const handleEdit = (record) => {
-    console.log("Edit record", record);
-    setOpenMenu(null);
+    setEditData(record); // Set the data to be edited
+    setIsModalOpen(true); // Open the modal in edit mode
+    setOpenMenu(null); // Close the menu
   };
 
   const handleRemove = (record) => {
@@ -116,10 +104,35 @@ const ViewRecord = () => {
     setOpenMenu(null);
   };
 
+  const handleViewDetails = (record) => {
+    console.log("View details for:", record);
+    setOpenMenu(null);
+  };
+
   const displayedRecords = tableData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const openModal = () => {
+    setEditData(null); // Clear edit data when opening for a new record
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleAddOrUpdateRecord = (data) => {
+    if (editData) {
+      console.log("Updating record:", data);
+      // Update logic here
+    } else {
+      console.log("Adding new record:", data);
+      // Add logic here
+    }
+    closeModal();
+  };
 
   // Close menu if clicked outside
   useEffect(() => {
@@ -138,9 +151,8 @@ const ViewRecord = () => {
   return (
     <div className="min-h-screen flex bg-gray-100">
       <Sidebar />
-      <div className="flex-1 flex flex-col bg-slate-200">
+      <div className="flex-1 flex flex-col bg-slate-200 pb-10">
         <Header title="Fuel Monitoring" />
-        {/* Display the selected bus */}
         <section className="p-4 flex flex-col items-center">
           {/* Bus Info */}
           <div className="flex items-center w-5/6 mb-4">
@@ -230,6 +242,12 @@ const ViewRecord = () => {
                           className="absolute right-0 mt-2 w-32 bg-white border border-gray-300 rounded shadow-lg z-10"
                         >
                           <button
+                            onClick={() => handleViewDetails(entry)}
+                            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
+                          >
+                            View Details
+                          </button>
+                          <button
                             onClick={() => handleEdit(entry)}
                             className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
                           >
@@ -250,10 +268,10 @@ const ViewRecord = () => {
             </table>
           </div>
 
-          {/* Centered Pagination and Right-Aligned Add Button */}
+          {/* Pagination and Add Button */}
           <div className="footer flex items-center w-5/6 mt-4 justify-between">
-            {/* Pagination - Centered */}
             <div className="flex space-x-2 justify-center flex-grow">
+              {/* Pagination Logic */}
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -291,15 +309,28 @@ const ViewRecord = () => {
               </button>
             </div>
 
-            {/* Add Button - Right-Aligned */}
+            {/* Add Button */}
             <div>
-              <button className="px-4 py-1 border border-blue-500 text-blue-500 rounded bg-transparent ml-4">
+              <button
+                onClick={openModal}
+                className="px-4 py-1 border border-blue-500 text-blue-500 rounded bg-transparent ml-4"
+              >
                 Add
               </button>
             </div>
           </div>
         </section>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <FuelAddModal
+          selectedBus={selectedBus}
+          onClose={closeModal}
+          onAdd={handleAddOrUpdateRecord}
+          editData={editData} // Pass the data to be edited if available
+        />
+      )}
     </div>
   );
 };
