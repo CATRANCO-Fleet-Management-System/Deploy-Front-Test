@@ -8,7 +8,8 @@ import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import FuelAddModal from "@/app/components/FuelAddModal"; // Import the modal
+import FuelAddModal from "@/app/components/FuelAddModal";
+import FuelViewDetailsModal from "@/app/components/FuelViewDetailsModal"; // Import the modal
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
@@ -22,12 +23,27 @@ const ViewRecord = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
   const [editData, setEditData] = useState(null); // Stores data for editing
+  const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
+  const [viewData, setViewData] = useState(null); // Holds data to display in view details
 
   const menuRef = useRef(null);
 
   const chartData = {
     daily: {
-      labels: ["Jun", "5", "19", "Jul", "7", "21", "Aug", "12", "24", "Sept", "15", "22"],
+      labels: [
+        "Jun",
+        "5",
+        "19",
+        "Jul",
+        "7",
+        "21",
+        "Aug",
+        "12",
+        "24",
+        "Sept",
+        "15",
+        "22",
+      ],
       distance: [10, 50, 30, 70, 20, 50, 60, 30, 40, 60, 20, 30],
       liters: [70, 40, 60, 10, 30, 60, 40, 20, 50, 70, 20, 50],
     },
@@ -56,18 +72,90 @@ const ViewRecord = () => {
   const options = { responsive: true, maintainAspectRatio: false };
 
   const tableData = [
-    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
-    { id: 1, date: "01-01-24", distance: "160KM", liters: "70L", amount: "7896PHP" },
-    { id: 2, date: "05-15-24", distance: "180KM", liters: "59L", amount: "8896PHP" },
-    { id: 3, date: "03-27-24", distance: "115KM", liters: "56L", amount: "4896PHP" },
+    {
+      id: 1,
+      date: "01-01-24",
+      distance: "160KM",
+      liters: "70L",
+      amount: "7896PHP",
+    },
+    {
+      id: 2,
+      date: "05-15-24",
+      distance: "180KM",
+      liters: "59L",
+      amount: "8896PHP",
+    },
+    {
+      id: 3,
+      date: "03-27-24",
+      distance: "115KM",
+      liters: "56L",
+      amount: "4896PHP",
+    },
+    {
+      id: 1,
+      date: "01-01-24",
+      distance: "160KM",
+      liters: "70L",
+      amount: "7896PHP",
+    },
+    {
+      id: 2,
+      date: "05-15-24",
+      distance: "180KM",
+      liters: "59L",
+      amount: "8896PHP",
+    },
+    {
+      id: 3,
+      date: "03-27-24",
+      distance: "115KM",
+      liters: "56L",
+      amount: "4896PHP",
+    },
+    {
+      id: 1,
+      date: "01-01-24",
+      distance: "160KM",
+      liters: "70L",
+      amount: "7896PHP",
+    },
+    {
+      id: 2,
+      date: "05-15-24",
+      distance: "180KM",
+      liters: "59L",
+      amount: "8896PHP",
+    },
+    {
+      id: 3,
+      date: "03-27-24",
+      distance: "115KM",
+      liters: "56L",
+      amount: "4896PHP",
+    },
+    {
+      id: 1,
+      date: "01-01-24",
+      distance: "160KM",
+      liters: "70L",
+      amount: "7896PHP",
+    },
+    {
+      id: 2,
+      date: "05-15-24",
+      distance: "180KM",
+      liters: "59L",
+      amount: "8896PHP",
+    },
+    {
+      id: 3,
+      date: "03-27-24",
+      distance: "115KM",
+      liters: "56L",
+      amount: "4896PHP",
+    },
     // Add more records as needed
   ];
 
@@ -105,8 +193,13 @@ const ViewRecord = () => {
   };
 
   const handleViewDetails = (record) => {
-    console.log("View details for:", record);
-    setOpenMenu(null);
+    setViewData(record); // Set data for view details modal
+    setIsViewDetailsOpen(true); // Open the view details modal
+    setOpenMenu(null); // Close the menu
+  };
+  const closeViewDetailsModal = () => {
+    setIsViewDetailsOpen(false);
+    setViewData(null); // Clear view data when closing modal
   };
 
   const displayedRecords = tableData.slice(
@@ -329,6 +422,14 @@ const ViewRecord = () => {
           onClose={closeModal}
           onAdd={handleAddOrUpdateRecord}
           editData={editData} // Pass the data to be edited if available
+        />
+      )}
+      {/* View Details Modal */}
+      {isViewDetailsOpen && (
+        <FuelViewDetailsModal
+          selectedBus={selectedBus}
+          viewData={viewData} // Pass data to the modal
+          onClose={closeViewDetailsModal}
         />
       )}
     </div>
