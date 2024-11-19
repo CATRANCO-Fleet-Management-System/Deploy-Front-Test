@@ -1,43 +1,68 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; 
+import "react-datepicker/dist/react-datepicker.css";
+import { getAllVehicles } from "@/app/services/vehicleService";  // Import vehicle service
+import { createMaintenanceScheduling } from "@/app/services/maintenanceService";  // Import maintenance service
 
 const AddPage = () => {
-  const router = useRouter(); 
+  const router = useRouter();
+
+  const [vehicles, setVehicles] = useState([]);  // State for storing vehicles
   const [maintenanceNumber, setMaintenanceNumber] = useState("");
-  const [vehicleNumber, setVehicleNumber] = useState("Bus 01");
+  const [vehicleId, setVehicleId] = useState("");  // Store selected vehicle ID
   const [maintenanceCost, setMaintenanceCost] = useState("");
-  const [maintenanceDate, setMaintenanceDate] = useState(new Date()); 
+  const [maintenanceDate, setMaintenanceDate] = useState(new Date());
   const [maintenanceAddress, setMaintenanceAddress] = useState("");
   const [description, setDescription] = useState("");
   const [attendingMechanic, setAttendingMechanic] = useState("");
 
-  const handleSave = () => {
-    
-    console.log("Maintenance #:", maintenanceNumber);
-    console.log("Vehicle #:", vehicleNumber);
-    console.log("Maintenance Cost:", maintenanceCost);
-    console.log("Maintenance Date:", maintenanceDate);
-    console.log("Maintenance Address:", maintenanceAddress);
-    console.log("Description:", description);
-    console.log("Attending Mechanic:", attendingMechanic); 
-    router.push("/dashboard");
+  // Fetch all vehicles on component mount
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const vehicleData = await getAllVehicles();  // Fetch all vehicles
+        setVehicles(vehicleData);  // Store fetched vehicles
+      } catch (error) {
+        console.error("Error fetching vehicles:", error);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+const handleSave = async () => {
+  const formattedDate = `${maintenanceDate.toLocaleDateString('en-CA')} ${new Date().toLocaleTimeString('en-GB', { hour12: false })}`; // e.g., 2024-10-14 17:01:31
+  const data = {
+    maintenance_number: maintenanceNumber,
+    vehicle_id: vehicleId,  // Send selected vehicle ID
+    maintenance_cost: maintenanceCost,
+    maintenance_date: formattedDate,
+    maintenance_address: maintenanceAddress,
+    maintenance_type: description,
+    attending_mechanic: attendingMechanic,
+    maintenance_status: "active", // Set the maintenance status to active
   };
+
+  try {
+    await createMaintenanceScheduling(data);  // POST request to create maintenance
+    router.push("/bus-maintenance");
+  } catch (error) {
+    console.error("Error creating maintenance scheduling:", error);
+  }
+};
 
   return (
     <section className="flex flex-row h-screen bg-white">
       <Sidebar />
       <div className="w-full flex flex-col bg-slate-200">
-        <Header title="Add New Record" />
+        <Header title="Add New Maintenance Record" />
         <div className="content flex flex-col flex-1 p-10 items-center">
-          <div
-            className="form grid grid-cols-2 gap-6 bg-white p-12 rounded-md shadow-md w-[1000px] mr-14"
-          >
+          <div className="form grid grid-cols-2 gap-6 bg-white p-12 rounded-md shadow-md w-[1000px] mr-14">
             <div className="col-span-1">
               <label htmlFor="maintenanceNumber" className="block text-sm font-medium text-gray-700">Maintenance #</label>
               <Input
@@ -69,23 +94,19 @@ const AddPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="vehicleNumber" className="block text-sm font-medium text-gray-700">Vehicle #</label>
+              <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700">Vehicle</label>
               <select
-                id="vehicleNumber"
+                id="vehicleId"
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
-                value={vehicleNumber}
-                onChange={(e) => setVehicleNumber(e.target.value)}
+                value={vehicleId}
+                onChange={(e) => setVehicleId(e.target.value)}
               >
-                <option value="Bus 01">Bus 01</option>
-                <option value="Bus 02">Bus 02</option>
-                <option value="Bus 03">Bus 03</option>
-                <option value="Bus 04">Bus 04</option>
-                <option value="Bus 05">Bus 05</option>
-                <option value="Bus 06">Bus 06</option>
-                <option value="Bus 07">Bus 07</option>
-                <option value="Bus 08">Bus 08</option>
-                <option value="Bus 09">Bus 09</option>
-                <option value="Bus 10">Bus 10</option>
+                <option value="">Select a vehicle</option>
+                {vehicles.map((vehicle) => (
+                  <option key={vehicle.vehicle_id} value={vehicle.vehicle_id}>
+                    {vehicle.plate_number} - {vehicle.vehicle_id}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-span-1">

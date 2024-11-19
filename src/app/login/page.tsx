@@ -1,36 +1,37 @@
 "use client"; // Ensure this file is treated as a client-side component
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { login, register } from "../services/authService"; // Import auth service
+import { login, register } from "../services/authService";
 
 export default function LoginPage() {
   const [isRegisterVisible, setRegisterVisible] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+    confirmPassword: "",
     firstName: "",
     lastName: "",
     email: "",
-    key: "",
+    position: "",
   });
   const [formErrors, setFormErrors] = useState({});
-  const [loading, setLoading] = useState(false); // Loading state for buttons
-  const router = useRouter(); // Initialize useRouter from next/navigation
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const toggleRegister = () => {
     setRegisterVisible(!isRegisterVisible);
-    // Clear form errors and data when toggling
     setFormErrors({});
     setFormData({
       username: "",
       password: "",
+      confirmPassword: "",
       firstName: "",
       lastName: "",
       email: "",
-      key: "",
+      position: "",
     });
   };
 
@@ -55,24 +56,30 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true); // Start loading state
+    setLoading(true);
 
     try {
       const response = await login({
-        email: formData.username, // Assuming username is the email
+        username: formData.username,
         password: formData.password,
       });
-      console.log("Login successful", response);
 
-      // After successful login, redirect to the dashboard
-      router.push("/dashboard");
+      if (response && response.message === "User is already logged in") {
+        setFormErrors({ global: "User is already logged in. Redirecting..." });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1000);
+      } else if (response && response.token) {
+        router.push("/dashboard");
+      } else {
+        throw new Error("Token not found in response");
+      }
     } catch (error) {
-      console.error("Login failed", error);
       setFormErrors({
-        global: "Login failed. Please check your credentials.",
+        global: error.message || "Login failed. Please check your credentials.",
       });
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
 
@@ -80,10 +87,12 @@ export default function LoginPage() {
     const errors = {};
     if (!formData.username) errors.username = "Username is required";
     if (!formData.password) errors.password = "Password is required";
+    if (formData.password !== formData.confirmPassword)
+      errors.confirmPassword = "Passwords do not match";
     if (!formData.firstName) errors.firstName = "First name is required";
     if (!formData.lastName) errors.lastName = "Last name is required";
     if (!formData.email) errors.email = "Email is required";
-    if (!formData.key) errors.key = "Key is required";
+    if (!formData.position) errors.position = "Position is required";
     return errors;
   };
 
@@ -94,7 +103,7 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true); // Start loading state
+    setLoading(true);
 
     try {
       const response = await register({
@@ -103,38 +112,32 @@ export default function LoginPage() {
         email: formData.email,
         username: formData.username,
         password: formData.password,
-        key: formData.key,
+        position: formData.position,
       });
-      console.log("Registration successful", response);
 
-      // Optionally redirect to login or another page
       setRegisterVisible(false);
       setFormData({
         username: "",
         password: "",
+        confirmPassword: "",
         firstName: "",
         lastName: "",
         email: "",
-        key: "",
+        position: "",
       });
     } catch (error) {
-      console.error("Registration failed", error);
       setFormErrors({
-        global: "Registration failed. Please try again.",
+        global: error.response?.data?.message || "Registration failed. Please try again.",
       });
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
 
   return (
     <section className="h-screen flex flex-row bg-white">
       <div className="left w-1/2 h-full flex justify-center items-center">
-        <img
-          src="/logo.png"
-          alt="Image Logo"
-          className="w-4/5 object-contain ml-20"
-        />
+        <img src="/logo.png" alt="Image Logo" className="w-4/5 object-contain ml-20" />
       </div>
       <div className="right w-1/2 h-full flex ml-10 items-center">
         <div className="form-container h-3/4 w-4/5 bg-slate-200 rounded-xl shadow-lg shadow-cyan-500/50 flex flex-col items-center">
@@ -147,9 +150,7 @@ export default function LoginPage() {
               value={formData.username}
               onChange={handleChange}
             />
-            {formErrors.username && (
-              <p className="text-red-500">{formErrors.username}</p>
-            )}
+            {formErrors.username && <p className="text-red-500">{formErrors.username}</p>}
             <Input
               className="h-16 text-lg"
               type="password"
@@ -158,27 +159,18 @@ export default function LoginPage() {
               value={formData.password}
               onChange={handleChange}
             />
-            {formErrors.password && (
-              <p className="text-red-500">{formErrors.password}</p>
-            )}
-            {formErrors.global && (
-              <p className="text-red-500">{formErrors.global}</p>
-            )}
+            {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
+            {formErrors.global && <p className="text-red-500">{formErrors.global}</p>}
           </div>
           <div className="btn-container mt-12 w-full flex flex-col items-center space-y-10">
             <Button
               className="h-16 w-4/5 text-white text-2xl font-bold bg-gradient-to-r from-blue-500 to-red-500"
               onClick={handleLogin}
-              disabled={loading} // Disable button when loading
+              disabled={loading}
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
-            <Button
-              onClick={toggleRegister}
-              className="h-16 w-4/5 text-blue-500 text-2xl font-bold bg-white border border-blue-500 rounded-lg"
-            >
-              Create Account
-            </Button>
+            
           </div>
         </div>
       </div>
@@ -194,91 +186,30 @@ export default function LoginPage() {
             </button>
             <h2 className="text-3xl font-bold mb-8 text-center">Register</h2>
             <div className="space-y-6">
-              <Input
-                className="h-12 text-lg"
-                type="text"
-                placeholder="Firstname"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-              {formErrors.firstName && (
-                <p className="text-red-500">{formErrors.firstName}</p>
-              )}
-              <Input
-                className="h-12 text-lg"
-                type="text"
-                placeholder="Lastname"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-              {formErrors.lastName && (
-                <p className="text-red-500">{formErrors.lastName}</p>
-              )}
-              <Input
-                className="h-12 text-lg"
-                type="email"
-                placeholder="Email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              {formErrors.email && (
-                <p className="text-red-500">{formErrors.email}</p>
-              )}
-              <Input
-                className="h-12 text-lg"
-                type="text"
-                placeholder="Username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-              {formErrors.username && (
-                <p className="text-red-500">{formErrors.username}</p>
-              )}
-              <Input
-                className="h-12 text-lg"
-                type="password"
-                placeholder="Password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              {formErrors.password && (
-                <p className="text-red-500">{formErrors.password}</p>
-              )}
-              <Input
-                className="h-12 text-lg"
-                type="password"
-                placeholder="Re-type Password"
-              />
-              <Input
-                className="h-12 text-lg"
-                type="text"
-                placeholder="Key"
-                name="key"
-                value={formData.key}
-                onChange={handleChange}
-              />
-              {formErrors.key && (
-                <p className="text-red-500">{formErrors.key}</p>
-              )}
+              {["firstName", "lastName", "email", "username", "password", "confirmPassword", "position"].map((field) => (
+                <div key={field}>
+                  <Input
+                    className="h-12 text-lg"
+                    type={field.includes("password") ? "password" : "text"}
+                    placeholder={field.charAt(0).toUpperCase() + field.slice(1).replace("confirmPassword", "Re-type Password")}
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleChange}
+                  />
+                  {formErrors[field] && <p className="text-red-500">{formErrors[field]}</p>}
+                </div>
+              ))}
             </div>
-            <Button
-              className="mt-8 h-12 w-full text-white text-xl font-bold bg-gradient-to-r from-blue-500 to-red-500"
-              onClick={handleRegister}
-              disabled={loading} // Disable button when loading
-            >
-              {loading ? "Registering..." : "Create Account"}
-            </Button>
-            <Button
-              onClick={toggleRegister}
-              className="mt-4 h-12 w-full text-blue-500 text-xl font-bold bg-white border border-blue-500 rounded-lg"
-            >
-              Cancel
-            </Button>
+            {formErrors.global && <p className="text-red-500 mt-4">{formErrors.global}</p>}
+            <div className="flex justify-center mt-10">
+              <Button
+                className="h-12 w-full text-white text-xl font-bold bg-gradient-to-r from-blue-500 to-red-500"
+                onClick={handleRegister}
+                disabled={loading}
+              >
+                {loading ? "Registering..." : "Register"}
+              </Button>
+            </div>
           </div>
         </div>
       )}

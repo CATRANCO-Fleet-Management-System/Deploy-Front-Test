@@ -31,9 +31,9 @@ export default function Sidebar() {
       label: "Bus Maintenance Management",
     },
     {
-      href: "/dispatch-management",
+      href: "/dispatch-monitoring",
       icon: <FaTruck size={25} />,
-      label: "Dispatch Management",
+      label: "Dispatch Monitoring",
     },
     {
       href: "/fuel-monitoring",
@@ -47,7 +47,7 @@ export default function Sidebar() {
   const isActive = (href) => pathname.startsWith(href);
 
   return (
-    <section className="left w-full sm:w-1/5 flex flex-col bg-gray-100">
+    <section className="left w-full sm:w-1/5 flex flex-col h-screen bg-gray-100">
       <div className="header">
         <Link href="/dashboard">
           <img
