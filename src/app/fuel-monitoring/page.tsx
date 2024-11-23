@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import Layout from "../components/Layout"; // Import Layout component
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import { FaBus, FaCalendar } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
-import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -124,161 +124,158 @@ const FuelMonitoring = () => {
   };
 
   return (
-    <section className="min-h-screen flex bg-gray-100">
-      <Sidebar />
-      <div className="flex-1 flex flex-col bg-slate-200">
-        <Header title="Fuel Monitoring" />
-        <section className="p-4">
-          <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg mx-auto">
-            <div className="absolute inset-0 flex justify-center items-center opacity-10">
-              <span className="text-6xl font-bold text-gray-500">{`Bus ${selectedBus}`}</span>
+    <Layout>
+      <Header title="Fuel Monitoring" />
+      <section className="p-4">
+        <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg mx-auto">
+          <div className="absolute inset-0 flex justify-center items-center opacity-10">
+            <span className="text-6xl font-bold text-gray-500">{`Bus ${selectedBus}`}</span>
+          </div>
+          <Line data={data} options={options} />
+        </div>
+
+        <div className="chart-options w-5/6 mx-auto flex justify-left space-x-3 mt-3">
+          <button
+            className={`px-2 py-1 rounded ${
+              timeInterval === "daily"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+            onClick={() => setTimeInterval("daily")}
+          >
+            D
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${
+              timeInterval === "5days"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+            onClick={() => setTimeInterval("5days")}
+          >
+            5D
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${
+              timeInterval === "weekly"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+            onClick={() => setTimeInterval("weekly")}
+          >
+            W
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${
+              timeInterval === "monthly"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+            onClick={() => setTimeInterval("monthly")}
+          >
+            M
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${
+              timeInterval === "yearly"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+            onClick={() => setTimeInterval("yearly")}
+          >
+            Y
+          </button>
+          <FaCalendar
+            className="text-gray-500 cursor-pointer mt-1"
+            size={24}
+            onClick={handleCalendarToggle}
+          />
+
+          {isCalendarOpen && (
+            <div className="absolute z-10 mt-2 w-40">
+              <DatePicker
+                selected={selectedDate}
+                onChange={handleDateChange}
+                inline
+                className="bg-white border border-gray-300 rounded-md shadow-lg"
+              />
             </div>
-            <Line data={data} options={options} />
-          </div>
+          )}
+        </div>
 
-          <div className="chart-options w-5/6 mx-auto flex justify-left space-x-3 mt-3">
-            <button
-              className={`px-2 py-1 rounded ${
-                timeInterval === "daily"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
-              }`}
-              onClick={() => setTimeInterval("daily")}
-            >
-              D
-            </button>
-            <button
-              className={`px-2 py-1 rounded ${
-                timeInterval === "5days"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
-              }`}
-              onClick={() => setTimeInterval("5days")}
-            >
-              5D
-            </button>
-            <button
-              className={`px-2 py-1 rounded ${
-                timeInterval === "weekly"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
-              }`}
-              onClick={() => setTimeInterval("weekly")}
-            >
-              W
-            </button>
-            <button
-              className={`px-2 py-1 rounded ${
-                timeInterval === "monthly"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
-              }`}
-              onClick={() => setTimeInterval("monthly")}
-            >
-              M
-            </button>
-            <button
-              className={`px-2 py-1 rounded ${
-                timeInterval === "yearly"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
-              }`}
-              onClick={() => setTimeInterval("yearly")}
-            >
-              Y
-            </button>
-            <FaCalendar
-              className="text-gray-500 cursor-pointer mt-1"
-              size={24}
-              onClick={handleCalendarToggle}
-            />
+        <div className="buses mt-4 grid grid-cols-3 gap-4 w-5/6 mx-auto">
+          {displayedBuses.map((bus) => {
+            const bgColor =
+              bus.status === "Maintenance" ? "bg-gray-400" : "bg-green-400";
+            const textColor =
+              bus.status === "Maintenance" ? "text-red-900" : "text-black";
 
-            {isCalendarOpen && (
-              <div className="absolute z-10 mt-2 w-40">
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={handleDateChange}
-                  inline
-                  className="bg-white border border-gray-300 rounded-md shadow-lg"
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="buses mt-4 grid grid-cols-3 gap-4 w-5/6 mx-auto">
-            {displayedBuses.map((bus) => {
-              const bgColor =
-                bus.status === "Maintenance" ? "bg-gray-400" : "bg-green-400";
-              const textColor =
-                bus.status === "Maintenance" ? "text-red-900" : "text-black";
-
-              return (
-                <div
-                  key={bus.number}
-                  className={`flex items-center p-4 rounded-lg shadow cursor-pointer ${bgColor} ${
-                    selectedBus === bus.number ? "ring-2 ring-blue-500" : ""
-                  }`}
-                  onClick={() => handleBusClick(bus.number)}
-                >
-                  <FaBus size={24} className="mr-2" />
-                  <span className={`mr-auto ${textColor}`}>
-                    Bus {bus.number}
-                  </span>
-                  <span className={textColor}>{bus.status}</span>
-                </div>
-              );
-            })}
-          </div>
-          <div className="footer flex justify-center">
-            <div className="w-10/12 mx-auto mt-4 flex items-center relative">
-              <div className="flex-grow flex justify-center space-x-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 border rounded ${
-                    currentPage === 1
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-white border-gray-500 text-gray-700"
-                  }`}
-                >
-                  &lt;
-                </button>
-                {[...Array(totalPages)].map((_, index) => (
-                  <button
-                    key={index + 1}
-                    onClick={() => handlePageChange(index + 1)}
-                    className={`px-3 py-1 border rounded ${
-                      currentPage === index + 1
-                        ? "bg-blue-500 text-white"
-                        : "bg-white text-gray-700"
-                    }`}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 border rounded ${
-                    currentPage === totalPages
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-white border-gray-500 text-gray-700"
-                  }`}
-                >
-                  &gt;
-                </button>
-              </div>
-              <button
-                onClick={navigateToViewRecord}
-                className="px-4 py-1 border border-blue-500 text-blue-500 rounded bg-transparent ml-4"
+            return (
+              <div
+                key={bus.number}
+                className={`flex items-center p-4 rounded-lg shadow cursor-pointer ${bgColor} ${
+                  selectedBus === bus.number ? "ring-2 ring-blue-500" : ""
+                }`}
+                onClick={() => handleBusClick(bus.number)}
               >
-                View Record
+                <FaBus size={24} className="mr-2" />
+                <span className={`mr-auto ${textColor}`}>
+                  Bus {bus.number}
+                </span>
+                <span className={textColor}>{bus.status}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="footer flex justify-center">
+          <div className="w-10/12 mx-auto mt-4 flex items-center relative">
+            <div className="flex-grow flex justify-center space-x-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === 1
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-white border-gray-500 text-gray-700"
+                }`}
+              >
+                &lt;
+              </button>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-3 py-1 border rounded ${
+                    currentPage === index + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-white text-gray-700"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === totalPages
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-white border-gray-500 text-gray-700"
+                }`}
+              >
+                &gt;
               </button>
             </div>
+            <button
+              onClick={navigateToViewRecord}
+              className="px-4 py-1 border border-blue-500 text-blue-500 rounded bg-transparent ml-4"
+            >
+              View Record
+            </button>
           </div>
-        </section>
-      </div>
-    </section>
+        </div>
+      </section>
+    </Layout>
   );
 };
 

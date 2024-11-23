@@ -16,7 +16,6 @@ import Link from "next/link";
 export default function Sidebar() {
   const pathname = usePathname();
 
-  // Define menu items
   const menuItems = [
     { href: "/dashboard", icon: <FaChartBar size={25} />, label: "Dashboard" },
     {
@@ -43,17 +42,16 @@ export default function Sidebar() {
     { href: "/feedback", icon: <FaCommentDots size={25} />, label: "Feedback" },
   ];
 
-  // Helper function to check if current path is under the personnel route
   const isActive = (href) => pathname.startsWith(href);
 
   return (
-    <section className="left w-full sm:w-1/5 flex flex-col h-screen bg-gray-100">
+    <section className="left w-1/5 flex flex-col h-screen bg-gray-100">
       <div className="header">
         <Link href="/dashboard">
           <img
             src="/logo.png"
             alt="Image Logo"
-            className="object-contain -mt-14 cursor-pointer"
+            className="object-contain mx-auto mt-4 cursor-pointer"
           />
         </Link>
       </div>

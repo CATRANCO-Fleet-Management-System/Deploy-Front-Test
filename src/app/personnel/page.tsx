@@ -1,25 +1,26 @@
 "use client";
-import React, { useState, useEffect, useRef  } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect, useRef } from "react";
+import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import PersonnelRecord from "@/app/components/PersonnelRecord";
-import { getAllProfiles, deleteProfile, updateProfile } from "@/app/services/userProfile";
-//import EditModal from "../components/EditModal";
-
-
+import { deleteProfile, updateProfile } from "@/app/services/userProfile";
 
 const ButtonGroup = ({ activeButton, onClick }) => (
   <div className="button-type-employee-container flex flex-row space-x-10 m-12">
     <button
-      className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${activeButton === "drivers" ? "border-blue-500 text-blue-500" : "border-transparent text-gray-700"}`}
+      className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${
+        activeButton === "drivers" ? "border-blue-500 text-blue-500" : "border-transparent text-gray-700"
+      }`}
       onClick={() => onClick("drivers")}
     >
       Drivers
     </button>
     <button
-      className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${activeButton === "Passenger Assistant Officer" ? "border-blue-500 text-blue-500" : "border-transparent text-gray-700"}`}
+      className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${
+        activeButton === "Passenger Assistant Officer" ? "border-blue-500 text-blue-500" : "border-transparent text-gray-700"
+      }`}
       onClick={() => onClick("conductors")}
     >
       Passenger Assistant Officer
@@ -36,15 +37,33 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <div className="pagination flex items-center justify-center space-x-2 mt-12">
-      <button className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${currentPage === 1 ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-gray-300 text-gray-700 hover:bg-gray-100"}`} onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+      <button
+        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
+          currentPage === 1 ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-gray-300 text-gray-700 hover:bg-gray-100"
+        }`}
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
         &lt;
       </button>
       {Array.from({ length: totalPages }, (_, i) => (
-        <button key={i} className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${i + 1 === currentPage ? "bg-blue-500 text-white border-blue-500" : "border-gray-300 text-gray-700 hover:bg-gray-100"}`} onClick={() => handlePageChange(i + 1)}>
+        <button
+          key={i}
+          className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
+            i + 1 === currentPage ? "bg-blue-500 text-white border-blue-500" : "border-gray-300 text-gray-700 hover:bg-gray-100"
+          }`}
+          onClick={() => handlePageChange(i + 1)}
+        >
           {i + 1}
         </button>
       ))}
-      <button className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${currentPage === totalPages ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-gray-300 text-gray-700 hover:bg-gray-100"}`} onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+      <button
+        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
+          currentPage === totalPages ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-gray-300 text-gray-700 hover:bg-gray-100"
+        }`}
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
         &gt;
       </button>
     </div>
@@ -58,63 +77,89 @@ const calculateAge = (birthday) => {
 };
 
 const Personnel = () => {
-  const [activeButton, setActiveButton] = useState<string>("drivers");
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(4);
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
-  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
-  const [editRecordId, setEditRecordId] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState<any>({});
-  const [addNewUrl, setAddNewUrl] = useState<string>("/personnel/driver");
-  const [profiles, setProfiles] = useState<any[]>([]);
+  const [activeButton, setActiveButton] = useState("drivers");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [deleteRecordId, setDeleteRecordId] = useState(null);
+  const [editRecordId, setEditRecordId] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
+  const [addNewUrl, setAddNewUrl] = useState("/personnel/driver");
+  const [profiles, setProfiles] = useState([
+    {
+      profile: {
+        user_profile_id: 1,
+        first_name: "John",
+        last_name: "Doe",
+        position: "driver",
+        date_of_birth: "1990-05-15",
+        license_number: "LIC-1234",
+        address: "123 Main Street, Cityville",
+        contact_number: "+639123456789",
+        contact_person: "Jane Doe",
+      },
+    },
+    {
+      profile: {
+        user_profile_id: 2,
+        first_name: "Alice",
+        last_name: "Smith",
+        position: "passenger_assistant_officer",
+        date_of_birth: "1985-10-20",
+        license_number: "LIC-5678",
+        address: "456 Elm Street, Townsville",
+        contact_number: "+639987654321",
+        contact_person: "Bob Smith",
+      },
+    },
+    {
+      profile: {
+        user_profile_id: 3,
+        first_name: "Robert",
+        last_name: "Brown",
+        position: "driver",
+        date_of_birth: "1995-03-10",
+        license_number: "LIC-9101",
+        address: "789 Oak Avenue, Villageton",
+        contact_number: "+639112233445",
+        contact_person: "Emily Brown",
+      },
+    },
+    {
+      profile: {
+        user_profile_id: 4,
+        first_name: "Linda",
+        last_name: "Taylor",
+        position: "passenger_assistant_officer",
+        date_of_birth: "1992-07-25",
+        license_number: "LIC-3141",
+        address: "101 Pine Lane, Metrocity",
+        contact_number: "+639556677889",
+        contact_person: "Michael Taylor",
+      },
+    },
+  ]);
 
-  // Using useRef to define dropdownRef
-const dropdownRef = useRef<HTMLDivElement>(null);
-const [dropdownVisible, setDropdownVisible] = useState(false);;
+  const dropdownRef = useRef(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
-useEffect(() => {
-  const fetchProfiles = async () => {
-    try {
-      console.log("Fetching profiles...");
-      const data = await getAllProfiles();
-      console.log("Fetched profiles:", data); // Check the structure of the data
-      setProfiles(data);
-    } catch (error) {
-      console.error("Error fetching profiles:", error);
-    }
-  };
-
-  fetchProfiles();
-}, []);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current && 
-      !dropdownRef.current.contains(event.target as Node) 
-    ) {
-      setDropdownVisible(false);
-    }
-  };
-
-
-  // Add event listener for click outside
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownVisible(false);
+    }
+  };
 
-  // Update URL based on active button
   useEffect(() => {
-    setAddNewUrl(
-      activeButton === "drivers"
-        ? "/personnel/driver"
-        : "/personnel/conductor"
-    );
+    setAddNewUrl(activeButton === "drivers" ? "/personnel/driver" : "/personnel/conductor");
   }, [activeButton]);
 
-  const handleDelete = (recordId: string) => {
+  const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true);
   };
@@ -122,7 +167,6 @@ useEffect(() => {
   const confirmDelete = async () => {
     if (deleteRecordId) {
       try {
-        await deleteProfile(deleteRecordId);
         setProfiles((prevProfiles) => prevProfiles.filter((profile) => profile.profile.user_profile_id !== deleteRecordId));
         setDeleteRecordId(null);
         setIsDeletePopupOpen(false);
@@ -137,7 +181,7 @@ useEffect(() => {
     setIsDeletePopupOpen(false);
   };
 
-  const handleEdit = (recordId: string) => {
+  const handleEdit = (recordId) => {
     const profileToEdit = profiles.find((profile) => profile.profile.user_profile_id === recordId);
     if (profileToEdit) {
       setEditFormData(profileToEdit);
@@ -145,9 +189,9 @@ useEffect(() => {
     }
   };
 
-  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditFormChange = (e) => {
     const { name, value } = e.target;
-    setEditFormData((prev: any) => ({
+    setEditFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -156,7 +200,6 @@ useEffect(() => {
   const handleUpdate = async () => {
     try {
       if (editRecordId) {
-        await updateProfile(editRecordId, editFormData);
         setProfiles((prevProfiles) =>
           prevProfiles.map((profile) =>
             profile.profile.user_profile_id === editRecordId ? { ...profile, ...editFormData } : profile
@@ -173,9 +216,9 @@ useEffect(() => {
     setEditRecordId(null);
   };
 
-  const handleButtonClick = (buttonId: string) => {
+  const handleButtonClick = (buttonId) => {
     setActiveButton(buttonId);
-    setCurrentPage(1); // Reset to the first page when changing types
+    setCurrentPage(1);
   };
 
   const filteredProfiles = profiles.filter((profile) =>
@@ -192,13 +235,10 @@ useEffect(() => {
 
   const totalPages = Math.ceil(finalFilteredProfiles.length / itemsPerPage);
 
-  const paginatedProfiles = finalFilteredProfiles.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedProfiles = finalFilteredProfiles.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
-    <section className="flex flex-row h-screen bg-white">
-      <Sidebar />
+    <Layout>
       <div className="w-full flex flex-col bg-slate-200">
         <Header title="Bus Personnel Management" />
         <div className="content flex flex-col flex-1">
@@ -238,33 +278,16 @@ useEffect(() => {
                   contactPerson={profile.profile.contact_person}
                   onDelete={() => handleDelete(profile.profile.user_profile_id)}
                   onEdit={() => handleEdit(profile.profile.user_profile_id)}
-                  onView={() => console.log(`View bio for ${profile.profile.user_profile_id}`)} // Implement this if needed
+                  onView={() => console.log(`View bio for ${profile.profile.user_profile_id}`)}
                 />
               ))}
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           </div>
         </div>
       </div>
-      <Confirmpopup
-        isOpen={isDeletePopupOpen}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-      />
-      {editRecordId && (
-  <EditModal
-    isOpen={!!editRecordId}
-    formData={editFormData}
-    onChange={handleEditFormChange}
-    onClose={cancelEdit}
-    onSubmit={handleUpdate}
-  />
-)}
-    </section>
+      <Confirmpopup isOpen={isDeletePopupOpen} onClose={cancelDelete} onConfirm={confirmDelete} />
+    </Layout>
   );
 };
 

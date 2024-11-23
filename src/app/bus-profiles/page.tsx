@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout"; // Import Layout component
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch, FaPlus } from "react-icons/fa";
@@ -148,23 +148,32 @@ const BusRecordDisplay = () => {
     const assignments = vehicleAssignments.filter(
       (assignment) => assignment.vehicle_id === vehicleId
     );
-  
+
     if (assignments.length === 0) {
       return { driver: "N/A", conductor: "N/A" };
     }
-  
-    // Since user_profiles is an array, directly map them
-    const driverAssignment = assignments.find(assignment => assignment.user_profiles.some(profile => profile.position === "driver"));
-    const conductorAssignment = assignments.find(assignment => assignment.user_profiles.some(profile => profile.position === "passenger_assistant_officer"));
-  
+
+    const driverAssignment = assignments.find((assignment) =>
+      assignment.user_profiles.some((profile) => profile.position === "driver")
+    );
+    const conductorAssignment = assignments.find((assignment) =>
+      assignment.user_profiles.some(
+        (profile) => profile.position === "passenger_assistant_officer"
+      )
+    );
+
     const driver = driverAssignment
-      ? driverAssignment.user_profiles.find(profile => profile.position === "driver")
+      ? driverAssignment.user_profiles.find(
+          (profile) => profile.position === "driver"
+        )
       : null;
-  
+
     const conductor = conductorAssignment
-      ? conductorAssignment.user_profiles.find(profile => profile.position === "passenger_assistant_officer")
+      ? conductorAssignment.user_profiles.find(
+          (profile) => profile.position === "passenger_assistant_officer"
+        )
       : null;
-  
+
     return {
       driver: driver ? `${driver.first_name} ${driver.last_name}` : "N/A",
       conductor: conductor ? `${conductor.first_name} ${conductor.last_name}` : "N/A",
@@ -172,8 +181,7 @@ const BusRecordDisplay = () => {
   };
 
   return (
-    <section className="flex flex-row h-screen bg-white">
-      <Sidebar />
+    <Layout>
       <div className="w-full flex flex-col bg-slate-200">
         <Header title="Bus" />
         <div className="content flex flex-col flex-1">
@@ -206,16 +214,16 @@ const BusRecordDisplay = () => {
                   <BusRecord
                     key={record.vehicle_id}
                     vehicle_id={record.vehicle_id}
-                    busNumber={record.vehicle_id} // Or use another field if needed
+                    busNumber={record.vehicle_id}
                     ORNumber={record.or_id}
                     CRNumber={record.cr_id}
                     plateNumber={record.plate_number}
                     thirdLBI={record.third_pli}
-                    comprehensiveInsurance={null} // Or any other logic if applicable
-                    assignedDriver={driver} // Use the driver from getAssignedProfiles
-                    assignedPAO={conductor} // Use the conductor from getAssignedProfiles
-                    route={null} // Or provide actual route if available
-                    onDelete={() => handleDelete(record.vehicle_id)} // Your delete logic
+                    comprehensiveInsurance={null}
+                    assignedDriver={driver}
+                    assignedPAO={conductor}
+                    route={null}
+                    onDelete={() => handleDelete(record.vehicle_id)}
                   />
                 );
               })}
@@ -235,7 +243,7 @@ const BusRecordDisplay = () => {
           )}
         </div>
       </div>
-    </section>
+    </Layout>
   );
 };
 

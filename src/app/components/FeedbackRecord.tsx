@@ -54,7 +54,7 @@ const FeedbackRecord: React.FC<FeedbackRecordProps> = ({
       </table>
       <div className="flex space-y-2 mt-4 flex-col">
         <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
+          className="px-4 py-2 border-2 border-red-500 text-red-500 bg-transparent rounded hover:bg-red-100 w-full transition-colors duration-300"
           onClick={onDelete}
         >
           Remove

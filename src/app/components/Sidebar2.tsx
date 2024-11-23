@@ -5,7 +5,7 @@ import { FaArrowLeft, FaEnvelope, FaBell, FaPen } from "react-icons/fa";
 import Link from "next/link";
 
 export default function Sidebar2() {
-  const pathname = usePathname(); // Get the current path
+  const pathname = usePathname();
 
   const menuItems = [
     { href: "/editprofile", icon: <FaPen size={25} />, label: "Edit Profile" },
@@ -18,7 +18,7 @@ export default function Sidebar2() {
   ];
 
   return (
-    <section className="left w-full sm:w-1/5 flex flex-col bg-gray-100">
+    <section className="left w-1/5 flex flex-col h-screen bg-gray-100">
       <div className="header2 relative">
         <div className="back m-4">
           <Link href="/dashboard">
@@ -33,7 +33,7 @@ export default function Sidebar2() {
             <img
               src="/logo.png"
               alt="Image Logo"
-              className="object-contain -mt-16 cursor-pointer"
+              className="object-contain mx-auto mt-4 cursor-pointer"
             />
           </Link>
         </div>

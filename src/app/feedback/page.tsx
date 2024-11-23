@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout"; // Import the Layout component
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch } from "react-icons/fa";
@@ -12,7 +12,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       onPageChange(page);
     }
   };
-  
+
   const createPageButtons = () => {
     const pageButtons = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -107,43 +107,40 @@ const FeedbackRecordDisplay = () => {
   );
 
   return (
-    <section className="flex flex-row h-screen bg-white">
-      <Sidebar />
-      <div className="w-full flex flex-col bg-slate-200">
-        <Header title="Feedback" />
-        <div className="content flex flex-col flex-1">
-          <div className="options flex items-center space-x-10 p-4 w-9/12 ml-8">
-            <input
-              type="text"
-              placeholder="Find feedback via phone number"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
-              <FaSearch size={22} className="mr-2" />
-              Search
-            </button>
+    <Layout>
+      <Header title="Feedback" />
+      <div className="content flex flex-col flex-1">
+        <div className="options flex items-center space-x-10 p-4 w-9/12 ml-8">
+          <input
+            type="text"
+            placeholder="Find feedback via phone number"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
+            <FaSearch size={22} className="mr-2" />
+            Search
+          </button>
+        </div>
+        <div className="records flex flex-col h-full">
+          <div className="output flex mt-2 items-center ml-8">
+            {paginatedRecords.map((record) => (
+              <FeedbackRecord
+                key={record.id}
+                phoneNumber={record.phoneNumber}
+                rating={record.rating}
+                comment={record.comment}
+                date={record.date}
+                onDelete={() => handleDelete(record.id)}
+              />
+            ))}
           </div>
-          <div className="records flex flex-col h-full">
-            <div className="output flex mt-2 items-center ml-8">
-              {paginatedRecords.map((record) => (
-                <FeedbackRecord
-                  key={record.id}
-                  phoneNumber={record.phoneNumber}
-                  rating={record.rating}
-                  comment={record.comment}
-                  date={record.date}
-                  onDelete={() => handleDelete(record.id)}
-                />
-              ))}
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
       <Confirmpopup
@@ -151,8 +148,8 @@ const FeedbackRecordDisplay = () => {
         onClose={cancelDelete}
         onConfirm={confirmDelete}
       />
-    </section>
+    </Layout>
   );
 };
 
-export default FeedbackRecordDisplay;
+export default FeedbackRecordDisplay; 
