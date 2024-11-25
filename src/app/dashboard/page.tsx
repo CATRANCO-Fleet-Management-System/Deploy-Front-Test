@@ -1,11 +1,11 @@
 "use client";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
 import React, { useState, useRef, useEffect } from "react";
+import Layout from "../components/Layout"; 
+import Header from "../components/Header";
 import { FaBus, FaCog, FaUsers, FaAngleDoubleRight } from "react-icons/fa";
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import vehicle service
-import { getAllMaintenanceScheduling } from "@/app//services/maintenanceService"; // Import maintenance scheduling service
-import { getAllProfiles } from "@/app//services/userProfile"; // Import profile service
+import { getAllMaintenanceScheduling } from "@/app/services/maintenanceService"; // Import maintenance scheduling service
+import { getAllProfiles } from "@/app/services/userProfile"; // Import profile service
 
 const DashboardHeader = () => {
   const [busesInOperation, setBusesInOperation] = useState(0);
@@ -19,7 +19,7 @@ const DashboardHeader = () => {
     const fetchVehicles = async () => {
       try {
         const vehicles = await getAllVehicles();
-        const inOperation = vehicles.filter(vehicle => vehicle.vehicle_id).length;
+        const inOperation = vehicles.filter((vehicle) => vehicle.vehicle_id).length;
         setBusesInOperation(inOperation);
       } catch (error) {
         console.error("Error fetching vehicles:", error);
@@ -29,12 +29,13 @@ const DashboardHeader = () => {
     const fetchMaintenance = async () => {
       try {
         const maintenance = await getAllMaintenanceScheduling();
-        const inMaintenance = maintenance.filter(maintenance => maintenance.maintenance_scheduling_id).length;
+        const inMaintenance = maintenance.filter((maintenance) => maintenance.maintenance_scheduling_id).length;
         setBusesInMaintenance(inMaintenance);
       } catch (error) {
         console.error("Error fetching vehicles:", error);
       }
     };
+
     // Fetch current employees
     const fetchEmployees = async () => {
       try {
@@ -64,11 +65,10 @@ const DashboardHeader = () => {
   }, []);
 
   return (
-    <section className="h-screen flex flex-row bg-white ">
-      <Sidebar />
+    <Layout>
       <div className="w-full bg-slate-200">
         <Header title="Dashboard" />
-        <section className="right w-full  overflow-y-hidden">
+        <section className="right w-full overflow-y-hidden">
           <div className="content flex flex-col h-full">
             <div className="statuses flex flex-row space-x-10 m-12">
               {/* Buses in Operation */}
@@ -149,11 +149,10 @@ const DashboardHeader = () => {
                 </div>
               </div>
             </div>
-
           </div>
         </section>
       </div>
-    </section>
+    </Layout>
   );
 };
 
