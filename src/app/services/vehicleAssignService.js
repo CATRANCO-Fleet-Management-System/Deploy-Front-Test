@@ -54,7 +54,7 @@ export const getAllVehicleAssignments = async () => {
 // Function to get a vehicle assignment by ID
 export const getVehicleAssignmentById = async (id) => {
   try {
-    const response = await api.get(`/${id}`);
+    const response = await api.get(`/${id}`); // Correct URL format
     return response.data;
   } catch (error) {
     console.error('Get vehicle assignment by ID error:', error);

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { getVehicleAssignmentById, createVehicleAssignment } from "@/app/services/vehicleAssignService";
 
 interface BusBoxProps {
   vehicle_id: string;
-  busNumber: string; // Assuming this is the same as vehicle_id
+  busNumber: string;
   ORNumber: string;
   CRNumber: string;
   plateNumber: string;
@@ -11,8 +12,8 @@ interface BusBoxProps {
   comprehensiveInsurance?: string;
   assignedDriver: string;
   assignedPAO: string;
-  assignmentId: string;
-  route?: string; // Optional if not always provided
+  assignmentId: string | null; // Allow null for cases where it's not preloaded
+  route?: string;
   onDelete: () => void;
 }
 
@@ -25,39 +26,75 @@ const BusRecord: React.FC<BusBoxProps> = ({
   thirdLBI,
   comprehensiveInsurance,
   assignedDriver,
-  assignmentId,
   assignedPAO,
+  assignmentId: initialAssignmentId,
   route,
   onDelete,
 }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [assignmentId, setAssignmentId] = useState<string | null>(initialAssignmentId);
+  const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
+  // Toggle the dropdown menu
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setDropdownOpen(false);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch or create assignment ID dynamically
+useEffect(() => {
+  const fetchOrCreateAssignment = async () => {
+    if (!assignmentId) {
+      setLoading(true);
+      try {
+        // Attempt to fetch the assignment by vehicle_id
+        const response = await getVehicleAssignmentById(vehicle_id);
+
+        if (response && response.vehicle_assignment_id) {
+          // If assignment exists, use it
+          setAssignmentId(response.vehicle_assignment_id);
+        } else {
+          // If no assignment exists, create one with default profiles
+          const newAssignment = await createVehicleAssignment({
+            vehicle_id,
+            user_profile_ids: [assignedDriver, assignedPAO].filter(Boolean), // Include current driver and PAO if they exist
+          });
+          setAssignmentId(newAssignment.vehicle_assignment_id);
+        }
+      } catch (error) {
+        console.error("Error fetching or creating assignment ID:", error);
+        // Set assignment ID to null and leave it for retry or handling
+        setAssignmentId(null);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  fetchOrCreateAssignment();
+}, [assignmentId, vehicle_id, assignedDriver, assignedPAO]);
 
+  // Navigate to Edit Bus Record page
   const handleEditBus = () => {
-    // Navigate to the update page with the vehicle ID
     router.push(`/bus-profiles/bus-update/update-data-bus?vehicle_id=${vehicle_id}`);
   };
 
+  // Navigate to Edit Personnel Assignment page
   const handleEditPersonnel = () => {
-    // Navigate to the personnel assignment update page with vehicle ID
+    if (!assignmentId) {
+      console.warn("Assignment ID is not available yet.");
+      return;
+    }
     router.push(`/bus-profiles/bus-update/update-personnel?assignment_id=${assignmentId}`);
   };
 
@@ -105,7 +142,8 @@ const BusRecord: React.FC<BusBoxProps> = ({
           </tr>
         </tbody>
       </table>
-      <div className="flex space-y-2 mt-4 flex-col">
+
+      <div className="flex flex-col space-y-2 mt-4">
         <button
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
           onClick={onDelete}

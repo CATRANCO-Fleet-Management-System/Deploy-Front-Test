@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Layout from "../components/Layout"; 
+import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch, FaPlus } from "react-icons/fa";
@@ -10,32 +10,6 @@ import { getAllProfiles } from "@/app/services/userProfile";
 import { getAllVehicleAssignments } from "@/app/services/vehicleAssignService";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page);
-    }
-  };
-
-  const createPageButtons = () => {
-    const pageButtons = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageButtons.push(
-        <button
-          key={i}
-          className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-            i === currentPage
-              ? "bg-blue-500 text-white border-blue-500"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pageButtons;
-  };
-
   return (
     <div className="pagination flex items-center justify-center space-x-2 mt-8">
       <button
@@ -44,19 +18,31 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             ? "border-gray-300 text-gray-400 cursor-not-allowed"
             : "border-gray-300 text-gray-700 hover:bg-gray-100"
         }`}
-        onClick={() => handlePageChange(currentPage - 1)}
+        onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
         &lt;
       </button>
-      {createPageButtons()}
+      {Array.from({ length: totalPages }, (_, i) => (
+        <button
+          key={i + 1}
+          className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
+            i + 1 === currentPage
+              ? "bg-blue-500 text-white border-blue-500"
+              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+          }`}
+          onClick={() => onPageChange(i + 1)}
+        >
+          {i + 1}
+        </button>
+      ))}
       <button
         className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
           currentPage === totalPages
             ? "border-gray-300 text-gray-400 cursor-not-allowed"
             : "border-gray-300 text-gray-700 hover:bg-gray-100"
         }`}
-        onClick={() => handlePageChange(currentPage + 1)}
+        onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
         &gt;
@@ -72,42 +58,26 @@ const BusRecordDisplay = () => {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [busRecords, setBusRecords] = useState([]);
-  const [profiles, setProfiles] = useState([]);
   const [vehicleAssignments, setVehicleAssignments] = useState([]);
 
+  // Function to fetch the latest data
+  const fetchData = async () => {
+    try {
+      const vehicles = await getAllVehicles();
+      const assignments = await getAllVehicleAssignments();
+      setBusRecords(vehicles);
+      setVehicleAssignments(assignments);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // Fetch data on component mount
   useEffect(() => {
-    const fetchBusRecords = async () => {
-      try {
-        const data = await getAllVehicles();
-        setBusRecords(data);
-      } catch (error) {
-        console.error("Error fetching bus records:", error);
-      }
-    };
-
-    const fetchProfiles = async () => {
-      try {
-        const data = await getAllProfiles();
-        setProfiles(data);
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-      }
-    };
-
-    const fetchVehicleAssignments = async () => {
-      try {
-        const data = await getAllVehicleAssignments();
-        setVehicleAssignments(data);
-      } catch (error) {
-        console.error("Error fetching vehicle assignments:", error);
-      }
-    };
-
-    fetchBusRecords();
-    fetchProfiles();
-    fetchVehicleAssignments();
+    fetchData();
   }, []);
 
+  // Handle deleting a vehicle
   const handleDelete = (recordId: string) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true);
@@ -117,9 +87,7 @@ const BusRecordDisplay = () => {
     if (deleteRecordId) {
       try {
         await deleteVehicle(deleteRecordId);
-        setBusRecords((prevRecords) =>
-          prevRecords.filter((record) => record.vehicle_id !== deleteRecordId)
-        );
+        fetchData(); // Refetch data after deletion
       } catch (error) {
         console.error("Error deleting vehicle:", error);
       } finally {
@@ -134,46 +102,27 @@ const BusRecordDisplay = () => {
     setIsDeletePopupOpen(false);
   };
 
+  // Filter bus records by search term
   const filteredRecords = busRecords.filter((record) =>
-    record.plate_number &&
-    record.plate_number.toLowerCase().includes(searchTerm.toLowerCase())
+    record.plate_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
-  const paginatedRecords = filteredRecords.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const getAssignedProfiles = (vehicleId) => {
-    const assignments = vehicleAssignments.filter(
+  // Get the assigned profiles for a vehicle
+  const getAssignedProfiles = (vehicleId: string) => {
+    const assignment = vehicleAssignments.find(
       (assignment) => assignment.vehicle_id === vehicleId
     );
 
-    if (assignments.length === 0) {
+    if (!assignment) {
       return { driver: "N/A", conductor: "N/A" };
     }
 
-    const driverAssignment = assignments.find((assignment) =>
-      assignment.user_profiles.some((profile) => profile.position === "driver")
+    const driver = assignment.user_profiles.find(
+      (profile) => profile.position === "driver"
     );
-    const conductorAssignment = assignments.find((assignment) =>
-      assignment.user_profiles.some(
-        (profile) => profile.position === "passenger_assistant_officer"
-      )
+    const conductor = assignment.user_profiles.find(
+      (profile) => profile.position === "passenger_assistant_officer"
     );
-
-    const driver = driverAssignment
-      ? driverAssignment.user_profiles.find(
-          (profile) => profile.position === "driver"
-        )
-      : null;
-
-    const conductor = conductorAssignment
-      ? conductorAssignment.user_profiles.find(
-          (profile) => profile.position === "passenger_assistant_officer"
-        )
-      : null;
 
     return {
       driver: driver ? `${driver.first_name} ${driver.last_name}` : "N/A",
@@ -182,6 +131,13 @@ const BusRecordDisplay = () => {
         : "N/A",
     };
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
+  const paginatedRecords = filteredRecords.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <Layout>
@@ -207,11 +163,9 @@ const BusRecordDisplay = () => {
         </a>
       </div>
       <div className="records flex flex-col h-full">
-        <div className="output flex mt-2 items-center ml-8">
+        <div className="output flex mt-2 items-center ml-8 flex-wrap gap-4">
           {paginatedRecords.map((record) => {
-            const { driver, conductor } = getAssignedProfiles(
-              record.vehicle_id
-            );
+            const { driver, conductor } = getAssignedProfiles(record.vehicle_id);
 
             return (
               <BusRecord
@@ -222,11 +176,12 @@ const BusRecordDisplay = () => {
                 CRNumber={record.cr_id}
                 plateNumber={record.plate_number}
                 thirdLBI={record.third_pli}
-                comprehensiveInsurance={null}
+                comprehensiveInsurance={record.comprehensive_insurance || "N/A"}
                 assignedDriver={driver}
                 assignedPAO={conductor}
-                route={null}
+                route={record.route || "Not Assigned"}
                 onDelete={() => handleDelete(record.vehicle_id)}
+                refreshData={fetchData} // Pass the refetch function
               />
             );
           })}
@@ -249,3 +204,4 @@ const BusRecordDisplay = () => {
 };
 
 export default BusRecordDisplay;
+
