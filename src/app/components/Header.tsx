@@ -34,17 +34,27 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   }, []);
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      console.error("No token found, cannot log out.");
-      return;
-    }
-
     try {
+      const token = localStorage.getItem("auth_token");
+
+      // If there's no token, log the user out immediately (or redirect them to login)
+      if (!token) {
+        console.error("No token found, cannot log out.");
+        router.push("/login");
+        return;
+      }
+
+      // Proceed with logout from the server (if applicable)
       await logout(); // Call the logout function from authService
-      router.push("/login"); // Redirect to the login page
+
+      // Clear the token from localStorage
+      localStorage.removeItem("auth_token");
+
+      // Redirect to the login page after logout
+      router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Optionally, show a notification or error message to the user
     }
   };
 
@@ -60,10 +70,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           </Link>
         </div>
         <div className="profile ml-3 flex items-center justify-center relative">
-          <FaUser
-            size={42}
-            className="rounded-full border border-gray-400 p-2"
-          />
+          <FaUser size={42} className="rounded-full border border-gray-400 p-2" />
           <FaCaretDown
             size={20}
             className="ml-2 cursor-pointer"

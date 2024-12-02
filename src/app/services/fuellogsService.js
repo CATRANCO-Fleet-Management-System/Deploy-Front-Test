@@ -1,5 +1,4 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the base API URL
 const API_URL = 'http://192.168.68.154:8000/api';
@@ -16,9 +15,12 @@ const api = axios.create({
 // Add request interceptor to include the token in the headers
 api.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('authToken'); // Ensure 'authToken' is used
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (typeof window !== "undefined") {  // Make sure this is running in the browser
+      const token = localStorage.getItem('authToken'); // Fetch token from localStorage
+      console.log('Token being sent with request:', token); // Log the token for debugging
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`; // Fixed the syntax
+      }
     }
     return config;
   },
@@ -50,10 +52,10 @@ export const fetchAllFuelLogs = async () => {
  */
 export const fetchFuelLogById = async (id) => {
   try {
-    const response = await api.get(`/user/admin/fuel-logs/${id}`);
+    const response = await api.get(`/user/admin/fuel-logs/${id}`);  // Fixed string concatenation
     return response.data;
   } catch (error) {
-    console.error(`Error fetching fuel log with ID ${id}:`, error);
+    console.error(`Error fetching fuel log with ID ${id}:`, error);  // Fixed error message formatting
     throw error.response ? error.response.data : error;
   }
 };
@@ -85,14 +87,14 @@ export const createFuelLog = async (fuelLogData) => {
  */
 export const updateFuelLog = async (id, fuelLogData) => {
   try {
-    const response = await api.patch(`/user/admin/fuel-logs/update/${id}`, fuelLogData, {
+    const response = await api.patch(`/user/admin/fuel-logs/update/${id}`, fuelLogData, {  // Fixed string concatenation
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
   } catch (error) {
-    console.error(`Error updating fuel log with ID ${id}:`, error);
+    console.error(`Error updating fuel log with ID ${id}:`, error);  // Fixed error message formatting
     throw error.response ? error.response.data : error;
   }
 };
@@ -104,10 +106,10 @@ export const updateFuelLog = async (id, fuelLogData) => {
  */
 export const deleteFuelLog = async (id) => {
   try {
-    const response = await api.delete(`/user/admin/fuel-logs/delete/${id}`);
+    const response = await api.delete(`/user/admin/fuel-logs/delete/${id}`);  // Fixed string concatenation
     return response.data;
   } catch (error) {
-    console.error(`Error deleting fuel log with ID ${id}:`, error);
+    console.error(`Error deleting fuel log with ID ${id}:`, error);  // Fixed error message formatting
     throw error.response ? error.response.data : error;
   }
 };

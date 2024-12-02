@@ -63,6 +63,7 @@ const FuelMonitoring = () => {
     }
   };
 
+  // Handle time interval change for chart
   const chartData = {
     daily: {
       labels: fuelLogs
@@ -75,6 +76,7 @@ const FuelMonitoring = () => {
         .filter((log) => log.vehicle_id === selectedBus)
         .map((log) => log.fuel_liters_quantity),
     },
+    // Additional time intervals can be added here (e.g., weekly, monthly)
   };
 
   const currentData = chartData[timeInterval] || chartData.daily;
@@ -141,6 +143,10 @@ const FuelMonitoring = () => {
     setSelectedDate(date);
     setIsCalendarOpen(false);
   };
+
+  if (loading) {
+    return <div className="text-gray-500">Loading...</div>;
+  }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;

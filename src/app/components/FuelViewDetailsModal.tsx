@@ -5,7 +5,6 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
   const {
     purchase_date = "N/A",
     odometer_km = "N/A",
-    fuel_liters_quantity = "N/A",
     fuel_price = "N/A",
     fuel_type = "N/A",
     odometer_distance_proof = null,
@@ -53,15 +52,6 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium">Liters Consumed</label>
-              <input
-                type="text"
-                value={fuel_liters_quantity}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded bg-gray-100"
-              />
-            </div>
-            <div className="mb-4">
               <label className="block font-medium">Fuel Type</label>
               <input
                 type="text"
@@ -71,7 +61,7 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium">Total Expense (PHP)</label>
+              <label className="block font-medium">Fuel Price (PHP)</label>
               <input
                 type="text"
                 value={fuel_price}

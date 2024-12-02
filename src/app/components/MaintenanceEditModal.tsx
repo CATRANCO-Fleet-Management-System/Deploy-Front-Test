@@ -12,7 +12,8 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
   const [maintenanceDate, setMaintenanceDate] = useState(new Date());
   const [maintenanceAddress, setMaintenanceAddress] = useState("");
   const [maintenanceType, setMaintenanceType] = useState("");
-  const [attendingMechanic, setAttendingMechanic] = useState("");
+  const [mechanicCompany, setMechanicCompany] = useState("");
+  const [mechanicCompanyAddress, setMechanicCompanyAddress] = useState("");
   const [status, setStatus] = useState("active");
 
   // Maintenance types list
@@ -47,7 +48,8 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
       setMaintenanceDate(new Date(record.maintenance_date || new Date()));
       setMaintenanceAddress(record.maintenance_address || "");
       setMaintenanceType(record.maintenance_type || "");
-      setAttendingMechanic(record.attending_mechanic || "");
+      setMechanicCompany(record.mechanic_company || "");
+      setMechanicCompanyAddress(record.mechanic_company_address || "");
       setStatus(record.maintenance_status || "active");
     }
   }, [record]);
@@ -64,7 +66,8 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
       maintenance_date: formattedDate,
       maintenance_address: maintenanceAddress,
       maintenance_type: maintenanceType,
-      attending_mechanic: attendingMechanic,
+      mechanic_company: mechanicCompany,
+      mechanic_company_address: mechanicCompanyAddress,
       maintenance_status: status,
     };
     await onSave(record?.maintenance_scheduling_id, updatedRecord);
@@ -91,14 +94,26 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="attendingMechanic" className="block text-sm font-medium text-gray-700">
-              Attending Mechanic
+            <label htmlFor="mechanicCompany" className="block text-sm font-medium text-gray-700">
+              Mechanic Company
             </label>
             <input
-              id="attendingMechanic"
-              placeholder="Attending Mechanic"
-              value={attendingMechanic}
-              onChange={(e) => setAttendingMechanic(e.target.value)}
+              id="mechanicCompany"
+              placeholder="Mechanic Company"
+              value={mechanicCompany}
+              onChange={(e) => setMechanicCompany(e.target.value)}
+              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label htmlFor="mechanicCompanyAddress" className="block text-sm font-medium text-gray-700">
+              Mechanic Company Address
+            </label>
+            <input
+              id="mechanicCompanyAddress"
+              placeholder="Mechanic Company Address"
+              value={mechanicCompanyAddress}
+              onChange={(e) => setMechanicCompanyAddress(e.target.value)}
               className="border border-gray-500 p-3 rounded-md w-full mt-1"
             />
           </div>

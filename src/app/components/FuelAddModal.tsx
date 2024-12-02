@@ -6,9 +6,8 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
   const [formData, setFormData] = useState({
     date: "",
     distanceTraveled: "",
-    litersConsumed: "",
-    totalExpense: "",
     fuelType: "",
+    fuelPrice: "",
     odometerProof: null,
     fuelReceiptProof: null,
   });
@@ -30,9 +29,8 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
     if (
       !formData.date ||
       !formData.distanceTraveled ||
-      !formData.litersConsumed ||
-      !formData.totalExpense ||
-      !formData.fuelType
+      !formData.fuelType ||
+      !formData.fuelPrice
     ) {
       alert("Please fill in all required fields.");
       return;
@@ -41,8 +39,8 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("purchase_date", formData.date);
     formDataToSubmit.append("odometer_km", formData.distanceTraveled);
-    formDataToSubmit.append("fuel_liters_quantity", formData.litersConsumed);
-    formDataToSubmit.append("fuel_price", formData.totalExpense);
+    formDataToSubmit.append("fuel_liters_quantity", formData.fuelPrice); // Assuming fuel price is in liters
+    formDataToSubmit.append("fuel_price", formData.fuelPrice);
     formDataToSubmit.append("fuel_type", formData.fuelType);
     formDataToSubmit.append("vehicle_id", selectedBus);
 
@@ -103,26 +101,6 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium">Liters Consumed</label>
-              <input
-                type="number"
-                name="litersConsumed"
-                value={formData.litersConsumed}
-                onChange={handleChange}
-                className="w-full border border-gray-300 p-2 rounded"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">Total Expense (PHP)</label>
-              <input
-                type="number"
-                name="totalExpense"
-                value={formData.totalExpense}
-                onChange={handleChange}
-                className="w-full border border-gray-300 p-2 rounded"
-              />
-            </div>
-            <div className="mb-4">
               <label className="block font-medium">Fuel Type</label>
               <select
                 name="fuelType"
@@ -135,6 +113,16 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
                 <option value="premium">Premium</option>
                 <option value="diesel">Diesel</option>
               </select>
+            </div>
+            <div className="mb-4">
+              <label className="block font-medium">Fuel Price (PHP)</label>
+              <input
+                type="number"
+                name="fuelPrice"
+                value={formData.fuelPrice}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-2 rounded"
+              />
             </div>
           </div>
           {/* Right Section */}

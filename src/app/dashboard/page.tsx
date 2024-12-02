@@ -1,21 +1,48 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import Layout from "../components/Layout"; 
+import Layout from "../components/Layout";
 import Header from "../components/Header";
 import { FaBus, FaCog, FaUsers, FaAngleDoubleRight } from "react-icons/fa";
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import vehicle service
 import { getAllMaintenanceScheduling } from "@/app/services/maintenanceService"; // Import maintenance scheduling service
 import { getAllProfiles } from "@/app/services/userProfile"; // Import profile service
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import mqtt from "mqtt";
+
+// Custom Marker Icon for buses
+const busIcon = new L.Icon({
+  iconUrl: "/bus-icon.png", // Ensure this path points to a valid icon file
+  iconSize: [30, 40],
+  iconAnchor: [15, 40], // Anchor for the icon position
+  popupAnchor: [0, -40],
+});
+
+// Define types for state variables
+interface BusData {
+  number: string;
+  name: string;
+  status: string;
+  latitude: number;
+  longitude: number;
+  time: string; // Added time property to store the timestamp
+  speed: number; // Added speed property
+}
 
 const DashboardHeader = () => {
   const [busesInOperation, setBusesInOperation] = useState(0);
   const [busesInMaintenance, setBusesInMaintenance] = useState(0);
   const [currentEmployees, setCurrentEmployees] = useState(0);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [loading, setLoading] = useState(true); // Loader state for map data
+  const [error, setError] = useState<string | null>(null); // Error state for MQTT connection
+  const [busData, setBusData] = useState<BusData[]>([]); // Array of BusData for live updates
+  const [pathData, setPathData] = useState<[number, number][]>([]); // Array of [latitude, longitude]
+  const [selectedBus, setSelectedBus] = useState<string | null>(null); // Selected bus ID
   const dropdownRef = useRef(null);
 
+  // Fetch vehicles and related data (buses, maintenance, and profiles)
   useEffect(() => {
-    // Fetch all vehicles and categorize them
     const fetchVehicles = async () => {
       try {
         const vehicles = await getAllVehicles();
@@ -32,7 +59,7 @@ const DashboardHeader = () => {
         const inMaintenance = maintenance.filter((maintenance) => maintenance.maintenance_scheduling_id).length;
         setBusesInMaintenance(inMaintenance);
       } catch (error) {
-        console.error("Error fetching vehicles:", error);
+        console.error("Error fetching maintenance:", error);
       }
     };
 
@@ -46,23 +73,93 @@ const DashboardHeader = () => {
       }
     };
 
-    // Call functions to fetch data
     fetchVehicles();
     fetchMaintenance();
     fetchEmployees();
   }, []);
 
-  // Close dropdown if clicking outside of it
+  // Connect to the MQTT broker to get live bus data
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownVisible(false);
-      }
-    };
+    const client = mqtt.connect("wss://mqtt.flespi.io", {
+      username: process.env.NEXT_PUBLIC_FLESPI_TOKEN || "", // Use your Flespi token as the username
+    });
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    client.on("connect", () => {
+      console.log("Connected to Flespi MQTT broker");
+
+      // Subscribe to all device messages
+      client.subscribe("flespi/message/gw/devices/#", (err) => {
+        if (err) {
+          console.error("Failed to subscribe to MQTT topic", err);
+        } else {
+          console.log("Subscribed to Flespi MQTT topic");
+          setLoading(false); // Set loading to false after successful subscription
+        }
+      });
+    });
+
+    client.on("message", (topic, message) => {
+      console.log("Received MQTT message:", topic, message.toString());
+      try {
+        const parsedMessage = JSON.parse(message.toString());
+
+        const deviceId = parsedMessage["device.id"];
+        const latitude = parsedMessage["position.latitude"];
+        const longitude = parsedMessage["position.longitude"];
+        const speed = parsedMessage["position.speed"];
+        const time = new Date(parsedMessage["timestamp"] * 1000).toISOString(); // Convert timestamp to ISO string
+
+        // Update pathData for the selected bus
+        if (selectedBus === deviceId.toString()) {
+          setPathData((prevPath) => [
+            ...prevPath,
+            [latitude, longitude], // Add position even if speed is 0
+          ]);
+        }
+
+        // Update bus data with live info
+        setBusData((prevData) => {
+          const updatedData = prevData.map((bus) =>
+            bus.number === deviceId.toString()
+              ? {
+                  ...bus,
+                  status: `Speed: ${speed} km/h`,
+                  latitude,
+                  longitude,
+                  time,
+                  speed,
+                }
+              : bus
+          );
+
+          if (!updatedData.some((bus) => bus.number === deviceId.toString())) {
+            updatedData.push({
+              number: deviceId.toString(),
+              name: `Bus ${deviceId}`,
+              status: `Speed: ${speed} km/h`,
+              latitude,
+              longitude,
+              time,
+              speed,
+            });
+          }
+
+          return updatedData;
+        });
+      } catch (error) {
+        console.error("Error processing MQTT message", error);
+      }
+    });
+
+    client.on("error", (err) => {
+      console.error("MQTT error", err);
+      setError("Failed to connect to MQTT broker.");
+    });
+
+    return () => {
+      client.end(); // Disconnect MQTT client
+    };
+  }, [selectedBus]);
 
   return (
     <Layout>
@@ -116,13 +213,36 @@ const DashboardHeader = () => {
               <h1 className="text-violet-700 text-xl">Live Bus Locations</h1>
               <div className="output flex flex-row space-x-2 mt-8">
                 <div className="locations w-2/4 bg-white h-120 rounded-lg border-2 border-violet-400">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7892.321899533787!2d124.64926600265497!3d8.483726629425787!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32fff2d03e021631%3A0xbb1fd9c6cf6f9de!2sCogon%20Public%20Market!5e0!3m2!1sen!2sph!4v1723521548337!5m2!1sen!2sph"
-                    className="w-full h-full border-0"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
+                  {loading ? (
+                    <p>Loading map...</p>
+                  ) : error ? (
+                    <p>{error}</p>
+                  ) : (
+                    <MapContainer center={[8.48325558794408, 124.5866112118501]} zoom={13} style={{ height: "100%", width: "100%" }}>
+                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                      {busData.map((bus) => (
+                        <Marker
+                          key={bus.number}
+                          position={[bus.latitude, bus.longitude]}
+                          icon={busIcon}
+                          eventHandlers={{
+                            click: () => setSelectedBus(bus.number),
+                          }}
+                        >
+                          <Popup>
+                            <div>
+                              <h3>{bus.name}</h3>
+                              <p>Status: {bus.status}</p>
+                              <p>Time: {bus.time}</p>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      ))}
+                      {selectedBus && pathData.length > 0 && (
+                        <Polyline positions={pathData} color="blue" />
+                      )}
+                    </MapContainer>
+                  )}
                 </div>
 
                 <div className="arrow">
@@ -134,7 +254,7 @@ const DashboardHeader = () => {
                   <div className="infos flex flex-col ml-5">
                     <div className="header-info flex flex-row mt-10 space-x-5">
                       <FaBus size={80} className="ml-2 cursor-pointer text-violet-600" />
-                      <h1 className="text-red-600 text-3xl font-bold">BUS 03</h1>
+                      <h1 className="text-red-600 text-3xl font-bold">{selectedBus ? `BUS ${selectedBus}` : "Select a Bus"}</h1>
                     </div>
                     <div className="info-text mt-10">
                       <ul className="list-disc list-inside space-y-4 text-xl">
@@ -142,7 +262,7 @@ const DashboardHeader = () => {
                         <li><strong>Conductor:</strong> Stephen Curry</li>
                         <li><strong>Plate number:</strong> KVJ-232-2313</li>
                         <li><strong>Trips:</strong> 5</li>
-                        <li><strong>Status:</strong> In Operation</li>
+                        <li><strong>Status:</strong> {selectedBus ? "In Operation" : "Not Selected"}</li>
                       </ul>
                     </div>
                   </div>

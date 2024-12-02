@@ -1,5 +1,4 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the base API URL
 const API_URL = 'http://192.168.68.154:8000/api/user/admin';
@@ -16,7 +15,7 @@ const api = axios.create({
 // Add request interceptor to include the token in the headers
 api.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken'); // Use 'auth_token' from localStorage
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,7 +26,13 @@ api.interceptors.request.use(
   }
 );
 
-// Function to create maintenance scheduling
+// **Maintenance Scheduling Service Functions**
+
+/**
+ * Create maintenance scheduling.
+ * @param {Object} data - The scheduling data.
+ * @returns {Promise<Object>} - The created maintenance scheduling.
+ */
 export const createMaintenanceScheduling = async (data) => {
   try {
     const response = await api.post('/maintenance-scheduling/create', data);
@@ -38,7 +43,10 @@ export const createMaintenanceScheduling = async (data) => {
   }
 };
 
-// Function to get all maintenance scheduling records
+/**
+ * Get all maintenance scheduling records.
+ * @returns {Promise<Object[]>} - An array of maintenance schedules.
+ */
 export const getAllMaintenanceScheduling = async () => {
   try {
     const response = await api.get('/maintenance-scheduling/all');
@@ -49,7 +57,11 @@ export const getAllMaintenanceScheduling = async () => {
   }
 };
 
-// Function to get maintenance scheduling by ID
+/**
+ * Get maintenance scheduling by ID.
+ * @param {number} id - The ID of the maintenance schedule.
+ * @returns {Promise<Object>} - The maintenance schedule data.
+ */
 export const getMaintenanceSchedulingById = async (id) => {
   try {
     const response = await api.get(`/maintenance-scheduling/${id}`);
@@ -60,7 +72,12 @@ export const getMaintenanceSchedulingById = async (id) => {
   }
 };
 
-// Function to update maintenance scheduling
+/**
+ * Update maintenance scheduling.
+ * @param {number} id - The ID of the maintenance schedule.
+ * @param {Object} data - The updated scheduling data.
+ * @returns {Promise<Object>} - The updated maintenance schedule.
+ */
 export const updateMaintenanceScheduling = async (id, data) => {
   try {
     const response = await api.patch(`/maintenance-scheduling/update/${id}`, data);
@@ -71,7 +88,11 @@ export const updateMaintenanceScheduling = async (id, data) => {
   }
 };
 
-// Function to delete maintenance scheduling
+/**
+ * Delete maintenance scheduling.
+ * @param {number} id - The ID of the maintenance schedule.
+ * @returns {Promise<Object>} - The result of the deletion.
+ */
 export const deleteMaintenanceScheduling = async (id) => {
   try {
     const response = await api.delete(`/maintenance-scheduling/delete/${id}`);
@@ -82,7 +103,11 @@ export const deleteMaintenanceScheduling = async (id) => {
   }
 };
 
-// Function to toggle maintenance scheduling status
+/**
+ * Toggle the status of maintenance scheduling.
+ * @param {number} id - The ID of the maintenance schedule.
+ * @returns {Promise<Object>} - The updated status of the schedule.
+ */
 export const toggleMaintenanceSchedulingStatus = async (id) => {
   try {
     const response = await api.patch(`/maintenance-scheduling/toggle-status/${id}`);

@@ -1,7 +1,6 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define the base API URL
+// Define the base API URL for vehicles
 const API_URL = 'http://192.168.68.154:8000/api';
 
 // Create an instance of axios with default settings
@@ -14,13 +13,13 @@ const api = axios.create({
 });
 
 // Add request interceptor to include the token in the headers
-api.interceptors.request.use(async config => {
-  const token = await AsyncStorage.getItem('authToken');
+api.interceptors.request.use(async (config) => {
+  const token = localStorage.getItem('authToken');  // Use localStorage for token
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-}, error => {
+}, (error) => {
   return Promise.reject(error);
 });
 

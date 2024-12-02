@@ -75,17 +75,22 @@ const BusUpdate = () => {
   // Update handler
   const handleUpdate = async () => {
     try {
+      // Prepare the updated data (avoid updating vehicle_id and plate_number if they aren't changed)
       const updatedData = {
-        ...busDetails,
-        third_pli_validity: third_pli_validity
-          ? third_pli_validity.toISOString().split("T")[0]
-          : null,
+        or_id: busDetails.or_id,
+        cr_id: busDetails.cr_id,
+        engine_number: busDetails.engine_number,
+        chasis_number: busDetails.chasis_number,
+        third_pli: busDetails.third_pli,
+        third_pli_policy_no: busDetails.third_pli_policy_no,
+        ci: busDetails.ci,
+        supplier: busDetails.supplier,
+        third_pli_validity: third_pli_validity ? third_pli_validity.toISOString().split("T")[0] : null,
         ci_validity: ci_validity ? ci_validity.toISOString().split("T")[0] : null,
-        date_purchased: date_purchased
-          ? date_purchased.toISOString().split("T")[0]
-          : null,
+        date_purchased: date_purchased ? date_purchased.toISOString().split("T")[0] : null,
       };
 
+      // Update the vehicle record
       await updateVehicle(vehicle_id, updatedData);
       alert("Bus record updated successfully!");
       router.push("/bus-profiles");
@@ -93,6 +98,7 @@ const BusUpdate = () => {
       console.error("Error updating vehicle:", err);
 
       if (err.response?.data?.errors) {
+        // Handle specific validation errors (e.g., duplicate vehicle_id or plate_number)
         const validationErrors = err.response.data.errors;
         const errorMessages = Object.values(validationErrors).flat().join("\n");
         alert(`Update failed:\n${errorMessages}`);
@@ -136,6 +142,7 @@ const BusUpdate = () => {
                     onChange={(e) =>
                       setBusDetails({ ...busDetails, vehicle_id: e.target.value })
                     }
+                    disabled // Disable vehicle_id since it should not be updated
                   />
                   <h1>OR Number</h1>
                   <Input
@@ -166,6 +173,7 @@ const BusUpdate = () => {
                     onChange={(e) =>
                       setBusDetails({ ...busDetails, plate_number: e.target.value })
                     }
+                    disabled // Disable plate_number since it should not be updated
                   />
                 </div>
                 <div className="2nd-row flex-col m-5 w-96 space-y-4 mt-10">

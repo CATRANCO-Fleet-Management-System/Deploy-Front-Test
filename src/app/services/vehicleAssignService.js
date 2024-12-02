@@ -1,5 +1,4 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the base API URL for vehicle assignments
 const API_URL = 'http://192.168.68.154:8000/api/user/admin/assignments';
@@ -14,17 +13,26 @@ const api = axios.create({
 });
 
 // Add request interceptor to include the token in the headers
-api.interceptors.request.use(async config => {
-  const token = await AsyncStorage.getItem('authToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  async (config) => {
+    const token = localStorage.getItem('authToken'); // Fetch token from localStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
+);
 
-// Function to create a new vehicle assignment
+// **Vehicle Assignment Service Functions**
+
+/**
+ * Create a new vehicle assignment.
+ * @param {Object} assignmentData - The assignment data to create a new vehicle assignment.
+ * @returns {Promise<Object>} - The created vehicle assignment data.
+ */
 export const createVehicleAssignment = async (assignmentData) => {
   try {
     const response = await api.post('/create', assignmentData);
@@ -35,7 +43,10 @@ export const createVehicleAssignment = async (assignmentData) => {
   }
 };
 
-// Function to get all vehicle assignments
+/**
+ * Get all vehicle assignments.
+ * @returns {Promise<Object[]>} - An array of vehicle assignments.
+ */
 export const getAllVehicleAssignments = async () => {
   try {
     const response = await api.get('/all');
@@ -51,7 +62,11 @@ export const getAllVehicleAssignments = async () => {
   }
 };
 
-// Function to get a vehicle assignment by ID
+/**
+ * Get a vehicle assignment by ID.
+ * @param {number} id - The ID of the vehicle assignment.
+ * @returns {Promise<Object>} - The vehicle assignment data.
+ */
 export const getVehicleAssignmentById = async (id) => {
   try {
     const response = await api.get(`/${id}`); // Correct URL format
@@ -62,7 +77,12 @@ export const getVehicleAssignmentById = async (id) => {
   }
 };
 
-// Function to update a vehicle assignment by ID
+/**
+ * Update a vehicle assignment by ID.
+ * @param {number} id - The ID of the vehicle assignment.
+ * @param {Object} assignmentData - The updated vehicle assignment data.
+ * @returns {Promise<Object>} - The updated vehicle assignment data.
+ */
 export const updateVehicleAssignment = async (id, assignmentData) => {
   try {
     const response = await api.patch(`/update/${id}`, assignmentData);
@@ -73,7 +93,11 @@ export const updateVehicleAssignment = async (id, assignmentData) => {
   }
 };
 
-// Function to delete a vehicle assignment by ID
+/**
+ * Delete a vehicle assignment by ID.
+ * @param {number} id - The ID of the vehicle assignment.
+ * @returns {Promise<Object>} - The result of the deletion.
+ */
 export const deleteVehicleAssignment = async (id) => {
   try {
     const response = await api.delete(`/delete/${id}`);

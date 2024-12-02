@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { FaBus, FaCalendar, FaEllipsisV, FaTrash } from "react-icons/fa";
+import { FaBus, FaCalendar, FaTrash } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Sidebar from "@/app/components/Sidebar";
@@ -10,10 +10,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import FuelAddModal from "@/app/components/FuelAddModal";
 import FuelViewDetailsModal from "@/app/components/FuelViewDetailsModal";
-import {
-  fetchAllFuelLogs,
-  deleteFuelLog,
-} from "@/app/services/fuellogsService";
+import { fetchAllFuelLogs, deleteFuelLog } from "@/app/services/fuellogsService";
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
@@ -76,7 +73,7 @@ const ViewRecord = () => {
       // Add new record
       return [...prevLogs, updatedRecord];
     });
-    closeModal();
+    setSelectedBus(updatedRecord.vehicle_id); // Ensures correct data is fetched on next render
   };
 
   const closeModal = () => {
@@ -98,7 +95,7 @@ const ViewRecord = () => {
   const chartData = {
     daily: {
       labels: fuelLogs.map((log) => log.purchase_date),
-      distance: fuelLogs.map((log) => log.odometer_km || 0),
+      distance: fuelLogs.map((log) => log.distance_travelled || log.distance_traveled || 0), // Fixing to check both fields
       liters: fuelLogs.map((log) => log.fuel_liters_quantity || 0),
     },
   };
@@ -148,9 +145,7 @@ const ViewRecord = () => {
             <FaBus size={24} className="mr-2" />
             <span className="text-lg font-bold">BUS {selectedBus}</span>
             <span
-              className={`ml-2 ${
-                busStatus === "Maintenance" ? "text-red-500" : "text-green-500"
-              }`}
+              className={`ml-2 ${busStatus === "Maintenance" ? "text-red-500" : "text-green-500"}`}
             >
               {busStatus}
             </span>
@@ -196,7 +191,7 @@ const ViewRecord = () => {
                         <FaTrash />
                       </button>
                     </td>
-                  </tr>
+                    </tr>
                 ))}
               </tbody>
             </table>
@@ -220,11 +215,12 @@ const ViewRecord = () => {
               onClick={() => setIsModalOpen(true)}
               className="px-4 py-2 bg-blue-500 text-white rounded"
             >
-              Add
+              Add New Record
             </button>
           </div>
         </section>
       </div>
+
       {isModalOpen && (
         <FuelAddModal
           selectedBus={selectedBus}
@@ -233,6 +229,7 @@ const ViewRecord = () => {
           editData={editData}
         />
       )}
+
       {isViewDetailsOpen && (
         <FuelViewDetailsModal
           selectedBus={selectedBus}
@@ -245,3 +242,4 @@ const ViewRecord = () => {
 };
 
 export default ViewRecord;
+

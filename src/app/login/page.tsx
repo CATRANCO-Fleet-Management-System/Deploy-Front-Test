@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { login, register } from "../services/authService";
 
-export default function LoginPage() {
+export default function AuthPage() {
   const [isRegisterVisible, setRegisterVisible] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Toggle the register form visibility
   const toggleRegister = () => {
     setRegisterVisible(!isRegisterVisible);
     setFormErrors({});
@@ -35,6 +36,7 @@ export default function LoginPage() {
     });
   };
 
+  // Handle form field changes
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -42,6 +44,7 @@ export default function LoginPage() {
     });
   };
 
+  // Validate login form
   const validateLoginForm = () => {
     const errors = {};
     if (!formData.username) errors.username = "Username is required";
@@ -49,6 +52,7 @@ export default function LoginPage() {
     return errors;
   };
 
+  // Handle login form submission
   const handleLogin = async () => {
     const errors = validateLoginForm();
     if (Object.keys(errors).length > 0) {
@@ -64,12 +68,12 @@ export default function LoginPage() {
         password: formData.password,
       });
 
-      if (response && response.message === "User is already logged in") {
+      if (response?.message === "User is already logged in") {
         setFormErrors({ global: "User is already logged in. Redirecting..." });
         setTimeout(() => {
           router.push("/dashboard");
         }, 1000);
-      } else if (response && response.token) {
+      } else if (response?.token) {
         router.push("/dashboard");
       } else {
         throw new Error("Token not found in response");
@@ -83,6 +87,7 @@ export default function LoginPage() {
     }
   };
 
+  // Validate register form
   const validateRegisterForm = () => {
     const errors = {};
     if (!formData.username) errors.username = "Username is required";
@@ -96,6 +101,7 @@ export default function LoginPage() {
     return errors;
   };
 
+  // Handle register form submission
   const handleRegister = async () => {
     const errors = validateRegisterForm();
     if (Object.keys(errors).length > 0) {
@@ -136,12 +142,16 @@ export default function LoginPage() {
 
   return (
     <section className="h-screen flex flex-row bg-white">
+      {/* Left Side - Logo */}
       <div className="left w-1/2 h-full flex justify-center items-center">
-        <img src="/logo.png" alt="Image Logo" className="w-4/5 object-contain ml-20" />
+        <img src="/logo.png" alt="Logo" className="w-4/5 object-contain ml-20" />
       </div>
+
+      {/* Right Side - Form */}
       <div className="right w-1/2 h-full flex ml-10 items-center">
         <div className="form-container h-3/4 w-4/5 bg-slate-200 rounded-xl shadow-lg shadow-cyan-500/50 flex flex-col items-center">
           <div className="forms space-y-10 w-4/5 mt-24">
+            {/* Login Form Fields */}
             <Input
               className="h-16 text-lg"
               type="text"
@@ -162,6 +172,8 @@ export default function LoginPage() {
             {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
             {formErrors.global && <p className="text-red-500">{formErrors.global}</p>}
           </div>
+
+          {/* Login Button */}
           <div className="btn-container mt-12 w-full flex flex-col items-center space-y-10">
             <Button
               className="h-16 w-4/5 text-white text-2xl font-bold bg-gradient-to-r from-blue-500 to-red-500"
@@ -170,11 +182,17 @@ export default function LoginPage() {
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
-            
+            <Button
+              className="h-16 w-4/5 text-white text-2xl font-bold bg-gradient-to-r from-green-500 to-yellow-500"
+              onClick={toggleRegister}
+            >
+              Register
+            </Button>
           </div>
         </div>
       </div>
 
+      {/* Register Form Modal */}
       {isRegisterVisible && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
           <div className="relative bg-white p-10 rounded-xl shadow-lg w-1/3">
@@ -186,6 +204,7 @@ export default function LoginPage() {
             </button>
             <h2 className="text-3xl font-bold mb-8 text-center">Register</h2>
             <div className="space-y-6">
+              {/* Register Form Fields */}
               {["firstName", "lastName", "email", "username", "password", "confirmPassword", "position"].map((field) => (
                 <div key={field}>
                   <Input

@@ -69,6 +69,7 @@ const MaintenanceManagement = () => {
   const handleSave = async (id, data) => {
     try {
       if (id) {
+        // Update existing record
         await updateMaintenanceScheduling(id, data);
         setRecords((prev) =>
           prev.map((record) =>
@@ -76,6 +77,7 @@ const MaintenanceManagement = () => {
           )
         );
       } else {
+        // Create new record
         const newRecord = await createMaintenanceScheduling(data);
         setRecords((prev) => [...prev, newRecord]);
       }
@@ -90,7 +92,7 @@ const MaintenanceManagement = () => {
       setRecords((prev) =>
         prev.map((record) =>
           record.maintenance_scheduling_id === id
-            ? { ...record, maintenance_status: updatedRecord.maintenance_status }
+            ? { ...record, maintenance_status: updatedRecord.schedule.maintenance_status }
             : record
         )
       );
@@ -154,8 +156,11 @@ const MaintenanceManagement = () => {
                   <td className="border p-2 font-bold">Type:</td>
                   <td className="border p-2">
                     {record.maintenance_type
-                      .replace(/_/g, " ")
-                      .replace(/\b\w/g, (char) => char.toUpperCase())}
+                      ? record.maintenance_type
+                          .split("_")
+                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(" ")
+                      : "N/A"}
                   </td>
                 </tr>
                 <tr>
@@ -167,12 +172,12 @@ const MaintenanceManagement = () => {
                   <td className="border p-2">{record.maintenance_date}</td>
                 </tr>
                 <tr>
-                  <td className="border p-2 font-bold">Mechanic:</td>
-                  <td className="border p-2">{record.attending_mechanic || "N/A"}</td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Address:</td>
-                  <td className="border p-2">{record.maintenance_address || "N/A"}</td>
+                <td className="border p-2 font-bold">Company:</td>
+  <td className="border p-2">{record.mechanic_company || "N/A"}</td>
+</tr>
+<tr>
+  <td className="border p-2 font-bold">Address:</td>
+  <td className="border p-2">{record.mechanic_company_address || "N/A"}</td>
                 </tr>
               </tbody>
             </table>

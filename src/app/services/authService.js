@@ -1,5 +1,4 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the base API URL
 const API_URL = 'http://192.168.68.154:8000/api';
@@ -14,10 +13,12 @@ const api = axios.create({
 });
 
 // Add request interceptor to include the token in the headers
-api.interceptors.request.use(async config => {
-  const token = await AsyncStorage.getItem('authToken'); // Ensure 'authToken' is used
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(config => {
+  if (typeof window !== "undefined") { // Check if in the browser environment
+    const token = localStorage.getItem('authToken'); // Ensure 'authToken' is used
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 }, error => {
@@ -28,13 +29,15 @@ api.interceptors.request.use(async config => {
 export const login = async (credentials) => {
   try {
     const response = await api.post('/user/login', {
-      username: credentials.username, // Adjusted for "username" field
+      username: credentials.username,
       password: credentials.password,
     });
 
     if (response.data && response.data.token) {
       const token = response.data.token;
-      await AsyncStorage.setItem('authToken', token); // Save token in AsyncStorage
+
+      // Save token in localStorage
+      localStorage.setItem('authToken', token);
     }
 
     return response.data;
@@ -51,20 +54,20 @@ export const register = async (userData) => {
     return response.data;
   } catch (error) {
     console.error('Registration error:', error);
-    if (error.response) {
-      throw new Error(error.response.data.message || 'Registration failed');
-    } else if (error.request) {
-      throw new Error('No response received from server');
-    } else {
-      throw new Error('An unexpected error occurred');
-    }
+    throw error.response ? error.response.data : error;
   }
 };
 
 // Function to get user profile
 export const getProfile = async () => {
   try {
-    const response = await api.get('/user/me'); // Adjusted to the correct endpoint
+    const token = localStorage.getItem('authToken'); // Get token from localStorage
+    if (!token) throw new Error('User not logged in.');
+
+    const response = await api.get('/user/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
     return response.data;
   } catch (error) {
     console.error('Get profile error:', error);
@@ -75,7 +78,13 @@ export const getProfile = async () => {
 // Function to update user profile
 export const updateProfile = async (profileData) => {
   try {
-    const response = await api.patch('/user/update', profileData); // Adjusted to the correct endpoint
+    const token = localStorage.getItem('authToken'); // Get token from localStorage
+    if (!token) throw new Error('User not logged in.');
+
+    const response = await api.patch('/user/update', profileData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
     return response.data;
   } catch (error) {
     console.error('Update profile error:', error);
@@ -86,12 +95,17 @@ export const updateProfile = async (profileData) => {
 // Function to handle logout
 export const logout = async () => {
   try {
-    await api.post('/user/logout'); // Call the logout endpoint
-    await AsyncStorage.removeItem('authToken'); // Remove the token from AsyncStorage
+    const token = localStorage.getItem('authToken'); // Get token from localStorage
+    if (!token) throw new Error('User not logged in.');
+
+    await api.post('/user/logout', {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Remove token from localStorage
+    localStorage.removeItem('authToken');
   } catch (error) {
     console.error('Logout error:', error);
     throw error;
   }
 };
-
-// Optionally, add more functions for other endpoints if needed

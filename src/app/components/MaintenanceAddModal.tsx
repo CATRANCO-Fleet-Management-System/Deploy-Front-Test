@@ -10,9 +10,9 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
   const [vehicleId, setVehicleId] = useState("");
   const [maintenanceCost, setMaintenanceCost] = useState("");
   const [maintenanceDate, setMaintenanceDate] = useState(new Date());
-  const [maintenanceAddress, setMaintenanceAddress] = useState("");
   const [maintenanceType, setMaintenanceType] = useState("");
-  const [attendingMechanic, setAttendingMechanic] = useState("");
+  const [mechanicCompany, setMechanicCompany] = useState("");
+  const [mechanicCompanyAddress, setMechanicCompanyAddress] = useState("");
 
   // Maintenance types list
   const maintenanceTypes = [
@@ -42,7 +42,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
   // Handle form submission
   const handleSubmit = async () => {
     // Validate required fields
-    if (!maintenanceType || !maintenanceCost || !maintenanceAddress) {
+    if (!maintenanceType || !maintenanceCost || !mechanicCompany || !mechanicCompanyAddress) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -51,16 +51,18 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
       "en-GB",
       { hour12: false }
     )}`;
+    
     const newRecord = {
       maintenance_number: maintenanceNumber || "N/A",
       vehicle_id: vehicleId || "N/A",
       maintenance_cost: maintenanceCost || "0",
       maintenance_date: formattedDate,
-      maintenance_address: maintenanceAddress || "N/A",
       maintenance_type: maintenanceType || "unspecified",
-      attending_mechanic: attendingMechanic || "N/A",
+      mechanic_company: mechanicCompany || "N/A",
+      mechanic_company_address: mechanicCompanyAddress || "N/A",
       maintenance_status: "active",
     };
+
     await onSave(null, newRecord);
     onClose();
   };
@@ -85,14 +87,26 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="attendingMechanic" className="block text-sm font-medium text-gray-700">
-              Attending Mechanic
+            <label htmlFor="mechanicCompany" className="block text-sm font-medium text-gray-700">
+              Mechanic Company
             </label>
             <input
-              id="attendingMechanic"
-              placeholder="Attending Mechanic"
-              value={attendingMechanic}
-              onChange={(e) => setAttendingMechanic(e.target.value)}
+              id="mechanicCompany"
+              placeholder="Mechanic Company"
+              value={mechanicCompany}
+              onChange={(e) => setMechanicCompany(e.target.value)}
+              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+            />
+          </div>
+          <div className="col-span-1">
+            <label htmlFor="mechanicCompanyAddress" className="block text-sm font-medium text-gray-700">
+              Mechanic Company Address
+            </label>
+            <input
+              id="mechanicCompanyAddress"
+              placeholder="Mechanic Company Address"
+              value={mechanicCompanyAddress}
+              onChange={(e) => setMechanicCompanyAddress(e.target.value)}
               className="border border-gray-500 p-3 rounded-md w-full mt-1"
             />
           </div>
@@ -156,18 +170,6 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               dateFormat="MM/dd/yyyy"
             />
           </div>
-          <div className="col-span-2">
-            <label htmlFor="maintenanceAddress" className="block text-sm font-medium text-gray-700">
-              Maintenance Address
-            </label>
-            <input
-              id="maintenanceAddress"
-              placeholder="Maintenance Address"
-              value={maintenanceAddress}
-              onChange={(e) => setMaintenanceAddress(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
-            />
-          </div>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
           <button
@@ -178,12 +180,14 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
           </button>
           <button
             className={`px-6 py-3 ${
-              maintenanceType && maintenanceCost && maintenanceAddress
+              maintenanceType && maintenanceCost && mechanicCompany && mechanicCompanyAddress
                 ? "bg-blue-500 text-white"
                 : "bg-gray-300 text-gray-500"
             } rounded-md`}
             onClick={handleSubmit}
-            disabled={!maintenanceType || !maintenanceCost || !maintenanceAddress}
+            disabled={
+              !maintenanceType || !maintenanceCost || !mechanicCompany || !mechanicCompanyAddress
+            }
           >
             Save
           </button>

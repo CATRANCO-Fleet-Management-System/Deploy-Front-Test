@@ -5,9 +5,9 @@ import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import BusRecord from "../components/BusRecord";
-import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
-import { getAllProfiles } from "@/app/services/userProfile";
-import { getAllVehicleAssignments } from "@/app/services/vehicleAssignService";
+import AddBusRecordModal from "../components/AddBusRecordModal";
+import { getAllVehicles, deleteVehicle, createVehicle } from "../services/vehicleService";
+import { getAllVehicleAssignments } from "../services/vehicleAssignService";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
@@ -57,10 +57,11 @@ const BusRecordDisplay = () => {
   const [itemsPerPage] = useState(4);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [busRecords, setBusRecords] = useState([]);
   const [vehicleAssignments, setVehicleAssignments] = useState([]);
 
-  // Function to fetch the latest data
+  // Fetch data from the backend
   const fetchData = async () => {
     try {
       const vehicles = await getAllVehicles();
@@ -100,6 +101,16 @@ const BusRecordDisplay = () => {
   const cancelDelete = () => {
     setDeleteRecordId(null);
     setIsDeletePopupOpen(false);
+  };
+
+  // Handle adding a new bus record
+  const handleAddNewBus = async (newBus) => {
+    try {
+      await createVehicle(newBus); // Add new vehicle via service
+      fetchData(); // Refetch data after adding a new bus
+    } catch (error) {
+      console.error("Error adding new bus:", error);
+    }
   };
 
   // Filter bus records by search term
@@ -154,13 +165,13 @@ const BusRecordDisplay = () => {
           <FaSearch size={22} className="mr-2" />
           Search
         </button>
-        <a
-          href="bus-profiles/bus-add"
+        <button
+          onClick={() => setIsAddModalOpen(true)}
           className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
         >
           <FaPlus size={22} className="mr-2" />
           Add New
-        </a>
+        </button>
       </div>
       <div className="records flex flex-col h-full">
         <div className="output flex mt-2 items-center ml-8 flex-wrap gap-4">
@@ -199,9 +210,14 @@ const BusRecordDisplay = () => {
           onCancel={cancelDelete}
         />
       )}
+      {isAddModalOpen && (
+        <AddBusRecordModal
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmit={handleAddNewBus} // Pass the onSubmit function
+        />
+      )}
     </Layout>
   );
 };
 
 export default BusRecordDisplay;
-

@@ -15,6 +15,8 @@ interface BusData {
   status: string;
   latitude: number;
   longitude: number;
+  time: string; // Added time property to store the timestamp
+  speed: number; // Added speed property
 }
 
 // Custom Marker Icon for buses
@@ -37,10 +39,10 @@ const DispatchMonitoring: React.FC = () => {
     const client = mqtt.connect("wss://mqtt.flespi.io", {
       username: process.env.NEXT_PUBLIC_FLESPI_TOKEN || "", // Use your Flespi token as the username
     });
-
+  
     client.on("connect", () => {
       console.log("Connected to Flespi MQTT broker");
-
+  
       // Subscribe to all device messages
       client.subscribe("flespi/message/gw/devices/#", (err) => {
         if (err) {
@@ -51,65 +53,77 @@ const DispatchMonitoring: React.FC = () => {
         }
       });
     });
-
+  
     client.on("message", (topic, message) => {
       console.log("Received MQTT message:", topic, message.toString());
       try {
+        // Parse the incoming message as JSON
         const parsedMessage = JSON.parse(message.toString());
+  
+        // Extract the required data from the parsed JSON
         const deviceId = parsedMessage["device.id"];
-
-        // Check if the message contains position data
-        if (parsedMessage["position.latitude"] && parsedMessage["position.longitude"]) {
-          // Update path data for the selected bus
-          if (selectedBus === deviceId) {
+        const latitude = parsedMessage["position.latitude"];
+        const longitude = parsedMessage["position.longitude"];
+        const speed = parsedMessage["position.speed"];
+        const time = new Date(parsedMessage["timestamp"] * 1000).toISOString(); // Convert timestamp to ISO string
+  
+        // Update path data for the selected bus only if it's moving (speed > 0)
+        if (speed > 0) {
+          if (selectedBus === deviceId.toString()) {
             setPathData((prevPath) => [
               ...prevPath,
-              [parsedMessage["position.latitude"], parsedMessage["position.longitude"]],
+              [latitude, longitude],
             ]);
           }
-
-          // Update bus data with the latest position and speed
-          setBusData((prevData) => {
-            const updatedData = prevData.map((bus) =>
-              bus.number === deviceId
-                ? {
-                    ...bus,
-                    status: `Speed: ${parsedMessage["position.speed"]} km/h`,
-                    latitude: parsedMessage["position.latitude"],
-                    longitude: parsedMessage["position.longitude"],
-                  }
-                : bus
-            );
-
-            // Add new bus if it's not already in the list
-            if (!updatedData.some((bus) => bus.number === deviceId)) {
-              updatedData.push({
-                number: deviceId,
-                name: `Bus ${deviceId}`,
-                status: `Speed: ${parsedMessage["position.speed"]} km/h`,
-                latitude: parsedMessage["position.latitude"],
-                longitude: parsedMessage["position.longitude"],
-              });
-            }
-
-            return updatedData;
-          });
         }
+  
+        // Update bus data with the latest position and speed
+        setBusData((prevData) => {
+          const updatedData = prevData.map((bus) =>
+            bus.number === deviceId.toString()
+              ? {
+                  ...bus,
+                  status: `Speed: ${speed} km/h`,
+                  latitude,
+                  longitude,
+                  time,
+                  speed,
+                }
+              : bus
+          );
+  
+          // Add new bus if it's not already in the list
+          if (!updatedData.some((bus) => bus.number === deviceId.toString())) {
+            updatedData.push({
+              number: deviceId.toString(),
+              name: `Bus ${deviceId}`,
+              status: `Speed: ${speed} km/h`,
+              latitude,
+              longitude,
+              time,
+              speed,
+            });
+          }
+  
+          return updatedData;
+        });
       } catch (error) {
         console.error("Error processing MQTT message", error);
       }
     });
-
+  
     client.on("error", (err) => {
       console.error("MQTT error", err);
       setError("Failed to connect to MQTT broker.");
     });
-
+  
     // Cleanup on component unmount
     return () => {
       client.end(); // Disconnect MQTT client
     };
   }, [selectedBus]);
+  
+  
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -156,6 +170,8 @@ const DispatchMonitoring: React.FC = () => {
                               Status: {bus.status}
                               <br />
                               Lat: {bus.latitude}, Lon: {bus.longitude}
+                              <br />
+                              Time: {bus.time}
                             </div>
                           </Popup>
                         </Marker>
