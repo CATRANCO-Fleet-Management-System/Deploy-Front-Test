@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import MaintenanceAddModal from "../components/MaintenanceAddModal";
@@ -22,19 +22,21 @@ const MaintenanceManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 6;
 
-  useEffect(() => {
-    const fetchRecords = async () => {
-      try {
-        const data = await getAllMaintenanceScheduling();
-        setRecords(data);
-      } catch (error) {
-        console.error("Error fetching records:", error);
-      }
-    };
-    fetchRecords();
+  // Fetch Maintenance Records
+  const fetchRecords = useCallback(async () => {
+    try {
+      const data = await getAllMaintenanceScheduling();
+      setRecords(data);
+    } catch (error) {
+      console.error("Error fetching records:", error);
+    }
   }, []);
 
-  // Filter records based on the search term
+  useEffect(() => {
+    fetchRecords(); // Fetch records on mount
+  }, [fetchRecords]);
+
+  // Filter records based on search term
   const filteredRecords = records.filter((record) =>
     Object.values(record)
       .join(" ")
@@ -50,17 +52,10 @@ const MaintenanceManagement = () => {
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleAddNew = () => setIsAddModalOpen(true);
-
-  const handleEdit = (record) => {
-    setCurrentRecord(record);
-    setIsEditModalOpen(true);
-  };
-
   const handleRemove = async (id) => {
     try {
       await deleteMaintenanceScheduling(id);
-      setRecords((prev) => prev.filter((record) => record.maintenance_scheduling_id !== id));
+      fetchRecords(); // Refetch records after deletion
     } catch (error) {
       console.error("Error deleting record:", error);
     }
@@ -71,16 +66,13 @@ const MaintenanceManagement = () => {
       if (id) {
         // Update existing record
         await updateMaintenanceScheduling(id, data);
-        setRecords((prev) =>
-          prev.map((record) =>
-            record.maintenance_scheduling_id === id ? { ...record, ...data } : record
-          )
-        );
       } else {
         // Create new record
-        const newRecord = await createMaintenanceScheduling(data);
-        setRecords((prev) => [...prev, newRecord]);
+        await createMaintenanceScheduling(data);
       }
+      fetchRecords(); // Refetch records after save
+      setIsAddModalOpen(false);
+      setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error saving record:", error);
     }
@@ -118,7 +110,7 @@ const MaintenanceManagement = () => {
         </button>
         <button
           className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
-          onClick={handleAddNew}
+          onClick={() => setIsAddModalOpen(true)}
         >
           <FaPlus size={20} className="mr-2" />
           Add New
@@ -134,7 +126,7 @@ const MaintenanceManagement = () => {
               <tbody>
                 <tr>
                   <td className="border p-2 font-bold">Maintenance ID:</td>
-                  <td className="border p-2">{record.maintenance_scheduling_id}</td>
+                  <td className="border p-2">{record.maintenance_scheduling_id || "N/A"}</td>
                 </tr>
                 <tr>
                   <td className="border p-2 font-bold">Status:</td>
@@ -145,46 +137,41 @@ const MaintenanceManagement = () => {
                       }`}
                       onClick={() => handleToggleStatus(record.maintenance_scheduling_id)}
                     >
-                      {record.maintenance_status
-                        ? record.maintenance_status.charAt(0).toUpperCase() +
-                          record.maintenance_status.slice(1)
-                        : "Unknown"}
+                      {record.maintenance_status || "N/A"}
                     </button>
                   </td>
                 </tr>
                 <tr>
                   <td className="border p-2 font-bold">Type:</td>
-                  <td className="border p-2">
-                    {record.maintenance_type
-                      ? record.maintenance_type
-                          .split("_")
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(" ")
-                      : "N/A"}
-                  </td>
+                  <td className="border p-2">{record.maintenance_type || "N/A"}</td>
                 </tr>
                 <tr>
                   <td className="border p-2 font-bold">Cost:</td>
-                  <td className="border p-2">PHP {parseFloat(record.maintenance_cost).toFixed(2)}</td>
+                  <td className="border p-2">
+                    PHP {record.maintenance_cost ? parseFloat(record.maintenance_cost).toFixed(2) : "0.00"}
+                  </td>
                 </tr>
                 <tr>
                   <td className="border p-2 font-bold">Date:</td>
-                  <td className="border p-2">{record.maintenance_date}</td>
+                  <td className="border p-2">{record.maintenance_date || "N/A"}</td>
                 </tr>
                 <tr>
-                <td className="border p-2 font-bold">Company:</td>
-  <td className="border p-2">{record.mechanic_company || "N/A"}</td>
-</tr>
-<tr>
-  <td className="border p-2 font-bold">Address:</td>
-  <td className="border p-2">{record.mechanic_company_address || "N/A"}</td>
+                  <td className="border p-2 font-bold">Company:</td>
+                  <td className="border p-2">{record.mechanic_company || "N/A"}</td>
+                </tr>
+                <tr>
+                  <td className="border p-2 font-bold">Address:</td>
+                  <td className="border p-2">{record.mechanic_company_address || "N/A"}</td>
                 </tr>
               </tbody>
             </table>
             <div className="flex space-x-2 mt-3">
               <button
                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => handleEdit(record)}
+                onClick={() => {
+                  setCurrentRecord(record);
+                  setIsEditModalOpen(true);
+                }}
               >
                 Edit
               </button>

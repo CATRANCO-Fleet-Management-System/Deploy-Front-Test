@@ -1,15 +1,16 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect } from "react";
+import Layout from "../components/Layout";
+
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
+import AddDriverModal from "../components/AddDriverModal";
+import AddAssistantOfficerModal from "../components/AddAssistantOfficerModal";
+import EditDriverModal from "../components/EditDriverModal";
+import EditAssistantOfficerModal from "../components/EditAssistantOfficerModal"; // Import EditAssistantOfficerModal
 import { FaSearch, FaPlus } from "react-icons/fa";
 import PersonnelRecord from "@/app/components/PersonnelRecord";
-import {
-  getAllProfiles,
-  deleteProfile,
-} from "@/app/services/userProfile";
-import { useRouter } from "next/navigation";
+import { getAllProfiles, deleteProfile } from "@/app/services/userProfile";
 
 const ButtonGroup = ({ activeButton, onClick }) => (
   <div className="button-type-employee-container flex flex-row space-x-10 m-12">
@@ -36,54 +37,6 @@ const ButtonGroup = ({ activeButton, onClick }) => (
   </div>
 );
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page);
-    }
-  };
-
-  return (
-    <div className="pagination flex items-center justify-center space-x-2 mt-12">
-      <button
-        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-          currentPage === 1
-            ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-gray-300 text-gray-700 hover:bg-gray-100"
-        }`}
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        &lt;
-      </button>
-      {Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i}
-          className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-            i + 1 === currentPage
-              ? "bg-blue-500 text-white border-blue-500"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={() => handlePageChange(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
-      <button
-        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-          currentPage === totalPages
-            ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-gray-300 text-gray-700 hover:bg-gray-100"
-        }`}
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        &gt;
-      </button>
-    </div>
-  );
-};
-
 const calculateAge = (birthday) => {
   const birthDate = new Date(birthday);
   const ageDiff = Date.now() - birthDate.getTime();
@@ -93,13 +46,16 @@ const calculateAge = (birthday) => {
 const Personnel = () => {
   const [activeButton, setActiveButton] = useState("drivers");
   const [searchTerm, setSearchTerm] = useState("");
+  const [profiles, setProfiles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState(null);
-  const [profiles, setProfiles] = useState([]);
-  const router = useRouter();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
 
+  // Fetch profiles on component mount
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
@@ -113,6 +69,35 @@ const Personnel = () => {
     fetchProfiles();
   }, []);
 
+  // Filter profiles based on `activeButton` and `searchTerm`
+  const filteredProfiles = profiles
+    .filter(
+      (item) =>
+        item.profile &&
+        (activeButton === "drivers"
+          ? item.profile.position === "driver"
+          : item.profile.position === "passenger_assistant_officer")
+    )
+    .filter((profile) =>
+      `${profile.profile.first_name} ${profile.profile.last_name}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
+  const paginatedProfiles = filteredProfiles.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  // Delete profile
   const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true);
@@ -124,8 +109,7 @@ const Personnel = () => {
         await deleteProfile(deleteRecordId);
         setProfiles((prevProfiles) =>
           prevProfiles.filter(
-            (profile) =>
-              profile.profile.user_profile_id !== deleteRecordId
+            (profile) => profile.profile.user_profile_id !== deleteRecordId
           )
         );
         setDeleteRecordId(null);
@@ -141,50 +125,44 @@ const Personnel = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const handleEdit = (recordId) => {
-    const editPageUrl =
-      activeButton === "drivers"
-        ? `/personnel/edit-driver?user_profile_id=${recordId}`
-        : `/personnel/edit-conductor?user_profile_id=${recordId}`;
-    router.push(editPageUrl);
+  // Add new profile
+  const handleAddNew = async (newProfile) => {
+    try {
+      const formattedProfile = {
+        profile: newProfile,
+      };
+      setProfiles((prevProfiles) => [...prevProfiles, formattedProfile]);
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error("Error adding new personnel:", error);
+    }
   };
 
-  const handleButtonClick = (buttonId) => {
-    setActiveButton(buttonId);
-    setCurrentPage(1);
+  // Open the edit modal
+  const handleEdit = (profileId) => {
+    setSelectedProfileId(profileId);
+    setIsEditModalOpen(true);
   };
 
-  const filteredProfiles = profiles.filter((profile) =>
-    activeButton === "drivers"
-      ? profile.profile.position === "driver"
-      : profile.profile.position === "passenger_assistant_officer"
-  );
-
-  const finalFilteredProfiles = filteredProfiles.filter((profile) =>
-    `${profile.profile.first_name} ${profile.profile.last_name}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(
-    finalFilteredProfiles.length / itemsPerPage
-  );
-
-  const paginatedProfiles = finalFilteredProfiles.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Save updated profile
+  const handleSaveEdit = (updatedProfile) => {
+    setProfiles((prevProfiles) =>
+      prevProfiles.map((profile) =>
+        profile.profile.user_profile_id === updatedProfile.user_profile_id
+          ? { ...profile, profile: updatedProfile }
+          : profile
+      )
+    );
+    setIsEditModalOpen(false);
+  };
 
   return (
+    <Layout>
     <section className="flex flex-row h-screen bg-white">
-      <Sidebar />
       <div className="w-full flex flex-col bg-slate-200">
         <Header title="Bus Personnel Management" />
         <div className="content flex flex-col flex-1">
-          <ButtonGroup
-            activeButton={activeButton}
-            onClick={setActiveButton}
-          />
+          <ButtonGroup activeButton={activeButton} onClick={setActiveButton} />
           <div className="options flex items-center space-x-10 p-4 w-9/12 ml-10">
             <input
               type="text"
@@ -193,17 +171,13 @@ const Personnel = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
-              <FaSearch size={22} className="mr-2" />
-              Search
-            </button>
-            <a
-              href={activeButton === "drivers" ? "/personnel/driver" : "/personnel/conductor"}
+            <button
               className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
+              onClick={() => setIsAddModalOpen(true)}
             >
               <FaPlus size={22} className="mr-2" />
               Add New
-            </a>
+            </button>
           </div>
           <div className="records flex flex-col h-full">
             <div className="output flex flex-wrap mt-4 items-center ml-14">
@@ -227,20 +201,64 @@ const Personnel = () => {
                 />
               ))}
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+          </div>
+          <div className="pagination flex justify-center mt-6">
+            <button
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="px-4 py-2">{`Page ${currentPage} of ${totalPages}`}</span>
+            <button
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
+      {activeButton === "drivers" ? (
+        <AddDriverModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleAddNew}
+        />
+      ) : (
+        <AddAssistantOfficerModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleAddNew}
+        />
+      )}
+      {activeButton === "drivers" ? (
+        <EditDriverModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          userProfileId={selectedProfileId}
+          onSave={handleSaveEdit}
+        />
+      ) : (
+        <EditAssistantOfficerModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          userProfileId={selectedProfileId}
+          onSave={handleSaveEdit}
+        />
+     
+      )}
       <Confirmpopup
         isOpen={isDeletePopupOpen}
-        onClose={cancelDelete}
         onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        title="Delete Profile"
+        message="Are you sure you want to delete this profile?"
       />
     </section>
+    </Layout>
   );
 };
 

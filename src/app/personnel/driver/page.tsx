@@ -111,7 +111,7 @@ const EditDriver = () => {
       <Sidebar />
 
       <section className="w-full bg-slate-200">
-        <Header title="Edit Driver Record" />
+        <Header title="Add Driver Record" />
 
         <section className="right w-full overflow-y-hidden">
           <div className="forms-container ml-14">

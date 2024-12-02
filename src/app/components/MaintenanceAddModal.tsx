@@ -3,10 +3,11 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getAllVehicles } from "@/app/services/vehicleService";
+import { getNextMaintenanceNumber } from "@/app/services/maintenanceService"; // Add a service to fetch the next number
 
 const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
   const [vehicles, setVehicles] = useState([]);
-  const [maintenanceNumber, setMaintenanceNumber] = useState("");
+  const [maintenanceNumber, setMaintenanceNumber] = useState(""); // Initially empty
   const [vehicleId, setVehicleId] = useState("");
   const [maintenanceCost, setMaintenanceCost] = useState("");
   const [maintenanceDate, setMaintenanceDate] = useState(new Date());
@@ -23,25 +24,27 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
     "transmission_service",
   ];
 
-  // Fetch available vehicles when the modal opens
+  // Fetch available vehicles and the next maintenance number when the modal opens
   useEffect(() => {
     if (isOpen) {
-      const fetchVehicles = async () => {
+      const fetchInitialData = async () => {
         try {
           const vehicleData = await getAllVehicles();
           setVehicles(vehicleData);
+
+          const nextNumber = await getNextMaintenanceNumber(); // Fetch the next available number
+          setMaintenanceNumber(nextNumber); // Set the fetched number
         } catch (error) {
-          console.error("Error fetching vehicles:", error);
+          console.error("Error fetching data:", error);
         }
       };
 
-      fetchVehicles();
+      fetchInitialData();
     }
   }, [isOpen]);
 
   // Handle form submission
   const handleSubmit = async () => {
-    // Validate required fields
     if (!maintenanceType || !maintenanceCost || !mechanicCompany || !mechanicCompanyAddress) {
       alert("Please fill in all required fields.");
       return;
@@ -51,9 +54,9 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
       "en-GB",
       { hour12: false }
     )}`;
-    
+
     const newRecord = {
-      maintenance_number: maintenanceNumber || "N/A",
+      maintenance_number: maintenanceNumber, // Use the fetched and incremented maintenance number
       vehicle_id: vehicleId || "N/A",
       maintenance_cost: maintenanceCost || "0",
       maintenance_date: formattedDate,
@@ -78,13 +81,12 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
             <label htmlFor="maintenanceNumber" className="block text-sm font-medium text-gray-700">
               Maintenance #
             </label>
-            <input
+            <div
               id="maintenanceNumber"
-              placeholder="Maintenance #"
-              value={maintenanceNumber}
-              onChange={(e) => setMaintenanceNumber(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
-            />
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 bg-gray-100 text-gray-700"
+            >
+              {maintenanceNumber || "Loading..."}
+            </div>
           </div>
           <div className="col-span-1">
             <label htmlFor="mechanicCompany" className="block text-sm font-medium text-gray-700">
