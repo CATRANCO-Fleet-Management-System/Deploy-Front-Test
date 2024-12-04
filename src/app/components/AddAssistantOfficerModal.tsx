@@ -27,7 +27,10 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDifference = today.getMonth() - birthDate.getMonth();
-      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+      ) {
         calculatedAge--;
       }
       setAge(calculatedAge);
@@ -85,138 +88,177 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-[800px] rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Add Passenger Assistant Officer Record</h2>
-        <div className="form grid grid-cols-2 gap-6">
-          <div className="col-span-1">
-            <h1>Last Name</h1>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+        <div className="flex items-center justify-between border-b pb-4">
+          <h2 className="text-2xl font-semibold">Add Passenger Assistant Officer Record</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-0"
+          >
+            &times;
+          </button>
+        </div>
+        <form className="grid grid-cols-2 gap-4 mt-4">
+          {/* Left Column */}
+          <div>
+            {/* Profile Picture Upload */}
+            <div className="flex flex-col items-center space-y-4 mb-6">
+              <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
+                <input
+                  type="file"
+                  id="photoUpload"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+                {formData.user_profile_image ? (
+                  <img
+                    src={formData.user_profile_image}
+                    alt="Profile Preview"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <span className="flex items-center justify-center h-full text-gray-500">+ Add Photo</span>
+                )}
+              </div>
+              <span className="text-sm text-gray-500">
+                {formData.user_profile_image ? "File selected" : "No file chosen"}
+              </span>
+            </div>
+
+            <label className="block text-sm font-medium text-gray-700">Last Name</label>
             <Input
               name="last_name"
               value={formData.last_name}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="Last Name"
+              placeholder="e.g. Callo"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>First Name</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">First Name</label>
             <Input
               name="first_name"
               value={formData.first_name}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="First Name"
+              placeholder="e.g. Juan"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>Middle Initial</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Middle Initial</label>
             <Input
               name="middle_initial"
               value={formData.middle_initial}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="M.I."
+              placeholder="e.g. V"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>Position</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Position</label>
             <Input
               name="position"
               value="Passenger Assistant Officer"
-              className="h-10 text-lg"
               disabled
+              className="focus:outline-none focus-visible:ring-0"
             />
-            <h1>License Number</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">License Number</label>
             <Input
               name="license_number"
               value={formData.license_number}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="License Number"
+              placeholder="e.g. N03-12-123456"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>Date of Birth</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Date of Birth</label>
             <Input
               name="birthday"
               value={birthday}
               onChange={handleBirthdayChange}
-              className="h-10 text-lg"
               type="date"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="col-span-1">
-            <h1>Age</h1>
-            <Input value={age} className="h-10 text-lg" readOnly />
-            <h1>Gender</h1>
+
+          {/* Right Column */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Age</label>
+            <Input value={age} readOnly className="focus:ring-2 focus:ring-blue-500" />
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Gender</label>
             <select
               name="sex"
               value={formData.sex}
               onChange={handleInputChange}
-              className="h-10 text-lg border rounded-md"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             >
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-            <h1>Contact Number</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Contact Number</label>
             <Input
               name="contact_number"
               value={formData.contact_number}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="Contact Number"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>Contact Person</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Contact Person</label>
             <Input
               name="contact_person"
               value={formData.contact_person}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="Contact Person"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>Contact Person Number</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Contact Person Number</label>
             <Input
               name="contact_person_number"
               value={formData.contact_person_number}
               onChange={handleInputChange}
-              className="h-10 text-lg"
-              placeholder="Contact Person Number"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
             />
-            <h1>Address</h1>
+
+            <label className="block text-sm font-medium text-gray-700 mt-4">Address</label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="w-full h-24 border rounded-md p-2"
-              placeholder="Address"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
-          <div className="col-span-2 flex flex-col items-center mt-6">
-            <div className="relative w-64 h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
-              <input
-                type="file"
-                id="photoUpload"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-              {formData.user_profile_image && (
-                <img
-                  src={formData.user_profile_image}
-                  alt="Profile Preview"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              )}
-            </div>
+
+          {/* Action Buttons */}
+          <div className="col-span-2 flex justify-end space-x-4 mt-6">
+           {/* Save Button */}
+  <button
+    onClick={handleSubmit} // Handles form submission
+    className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+  >
+    Add
+  </button>
+  
+  {/* Cancel Button */}
+  <button
+    onClick={onClose} // Closes the modal
+    className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+  >
+    Cancel
+  </button>
+
           </div>
-        </div>
-        <div className="flex justify-end space-x-4 mt-6">
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-          >
-            Save
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-          >
-            Cancel
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );

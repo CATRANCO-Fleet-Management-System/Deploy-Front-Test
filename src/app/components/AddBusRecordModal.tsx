@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
-import { createVehicle } from "../services/vehicleService";  // Import the service
+import { createVehicle } from "../services/vehicleService"; // Import the service
 
 const AddBusRecordModal = ({ onClose }) => {
   const [busNumber, setBusNumber] = useState("");
@@ -24,7 +24,7 @@ const AddBusRecordModal = ({ onClose }) => {
 
   const formatDate = (date) => {
     if (!date) return null;
-    return date.toISOString().slice(0, 19).replace('T', ' '); // Converts to 'YYYY-MM-DD HH:MM:SS'
+    return date.toISOString().slice(0, 19).replace("T", " "); // Converts to 'YYYY-MM-DD HH:MM:SS'
   };
 
   const handleSubmit = async (e) => {
@@ -65,10 +65,7 @@ const AddBusRecordModal = ({ onClose }) => {
       <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">Add Bus Record</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 focus:outline-none">
             &times;
           </button>
         </div>
@@ -79,7 +76,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={busNumber}
               onChange={(e) => setBusNumber(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Bus Number"
               required
             />
@@ -91,7 +88,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={officialReceipt}
               onChange={(e) => setOfficialReceipt(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="OR #"
               required
             />
@@ -103,7 +100,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={certificateOfRegistration}
               onChange={(e) => setCertificateOfRegistration(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="CR #"
               required
             />
@@ -115,7 +112,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={plateNumber}
               onChange={(e) => setPlateNumber(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Plate Number"
               required
             />
@@ -127,7 +124,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={engineNumber}
               onChange={(e) => setEngineNumber(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Engine Number"
               required
             />
@@ -139,7 +136,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={chasisNumber}
               onChange={(e) => setChasisNumber(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Chasis Number"
               required
             />
@@ -151,7 +148,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={thirdPartyInsurance}
               onChange={(e) => setThirdPartyInsurance(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="3rd Party Liability Insurance"
               required
             />
@@ -163,7 +160,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={thirdPartyPolicyNo}
               onChange={(e) => setThirdPartyPolicyNo(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Policy No."
               required
             />
@@ -174,7 +171,7 @@ const AddBusRecordModal = ({ onClose }) => {
             <DatePicker
               selected={thirdPartyValidity}
               onChange={(date) => setThirdPartyValidity(date)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -184,7 +181,7 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={comprehensiveInsurance}
               onChange={(e) => setComprehensiveInsurance(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Comprehensive Insurance"
               required
             />
@@ -195,7 +192,7 @@ const AddBusRecordModal = ({ onClose }) => {
             <DatePicker
               selected={comprehensiveValidity}
               onChange={(date) => setComprehensiveValidity(date)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -204,7 +201,7 @@ const AddBusRecordModal = ({ onClose }) => {
             <DatePicker
               selected={datePurchased}
               onChange={(date) => setDatePurchased(date)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -214,25 +211,27 @@ const AddBusRecordModal = ({ onClose }) => {
               type="text"
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Supplier"
+              required
             />
           </div>
 
-          <div className="col-span-2 flex justify-end space-x-4 mt-4">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md"
-            >
-              Add
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded-md"
-            >
-              Cancel
-            </button>
+          <div className="col-span-2 flex justify-end mt-4 space-x-4">
+          <button
+    onClick={handleSubmit} // Handles form submission
+    className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+  >
+    Add
+  </button>
+  
+  {/* Cancel Button */}
+  <button
+    onClick={onClose} // Closes the modal
+    className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+  >
+    Cancel
+  </button>
           </div>
         </form>
       </div>

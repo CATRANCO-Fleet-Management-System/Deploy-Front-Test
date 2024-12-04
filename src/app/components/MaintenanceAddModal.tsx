@@ -97,7 +97,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               placeholder="Mechanic Company"
               value={mechanicCompany}
               onChange={(e) => setMechanicCompany(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 focus:ring focus:ring-blue-300"
             />
           </div>
           <div className="col-span-1">
@@ -109,7 +109,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               placeholder="Mechanic Company Address"
               value={mechanicCompanyAddress}
               onChange={(e) => setMechanicCompanyAddress(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 focus:ring focus:ring-blue-300"
             />
           </div>
           <div className="col-span-1">
@@ -118,7 +118,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
             </label>
             <select
               id="maintenanceType"
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 focus:ring focus:ring-blue-300"
               value={maintenanceType}
               onChange={(e) => setMaintenanceType(e.target.value)}
             >
@@ -136,7 +136,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
             </label>
             <select
               id="vehicleId"
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 focus:ring focus:ring-blue-300"
               value={vehicleId}
               onChange={(e) => setVehicleId(e.target.value)}
             >
@@ -157,7 +157,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               placeholder="PHP"
               value={maintenanceCost}
               onChange={(e) => setMaintenanceCost(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 focus:ring focus:ring-blue-300"
             />
           </div>
           <div className="col-span-1">
@@ -168,30 +168,23 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               id="maintenanceDate"
               selected={maintenanceDate}
               onChange={(date) => setMaintenanceDate(date)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1 focus:ring focus:ring-blue-300"
               dateFormat="MM/dd/yyyy"
             />
           </div>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
           <button
-            className="px-6 py-3 border border-gray-500 text-gray-500 rounded-md bg-transparent"
+            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+            onClick={handleSubmit}
+          >
+            Add
+          </button>
+          <button
+            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
             onClick={onClose}
           >
             Cancel
-          </button>
-          <button
-            className={`px-6 py-3 ${
-              maintenanceType && maintenanceCost && mechanicCompany && mechanicCompanyAddress
-                ? "bg-blue-500 text-white"
-                : "bg-gray-300 text-gray-500"
-            } rounded-md`}
-            onClick={handleSubmit}
-            disabled={
-              !maintenanceType || !maintenanceCost || !mechanicCompany || !mechanicCompanyAddress
-            }
-          >
-            Save
           </button>
         </div>
       </div>

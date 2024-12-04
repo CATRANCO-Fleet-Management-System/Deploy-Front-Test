@@ -77,7 +77,8 @@ const AssignBusPersonnelModal = ({ onClose }) => {
             &times;
           </button>
         </div>
-        <form className="grid grid-cols-1 gap-4 mt-4">
+        <form className="grid grid-cols-2 gap-4 mt-4">
+          {/* Left Column */}
           <div>
             <h1 className="text-xl mt-4">Driver Assignment</h1>
             {loading ? (
@@ -86,7 +87,7 @@ const AssignBusPersonnelModal = ({ onClose }) => {
               <select
                 value={selectedDriver}
                 onChange={(e) => setSelectedDriver(e.target.value)}
-                className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full"
+                className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a Driver</option>
                 {drivers.map((driver) => (
@@ -98,6 +99,7 @@ const AssignBusPersonnelModal = ({ onClose }) => {
             )}
           </div>
 
+          {/* Right Column */}
           <div>
             <h1 className="text-xl mt-4">Passenger Assistant Officer Assignment</h1>
             {loading ? (
@@ -106,7 +108,7 @@ const AssignBusPersonnelModal = ({ onClose }) => {
               <select
                 value={selectedPAO}
                 onChange={(e) => setSelectedPAO(e.target.value)}
-                className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full"
+                className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a PAO</option>
                 {paos.map((pao) => (
@@ -118,6 +120,7 @@ const AssignBusPersonnelModal = ({ onClose }) => {
             )}
           </div>
 
+          {/* Vehicle Selection */}
           <div>
             <h1 className="text-xl mt-4">Select Vehicle</h1>
             {loading ? (
@@ -126,7 +129,7 @@ const AssignBusPersonnelModal = ({ onClose }) => {
               <select
                 value={selectedVehicle}
                 onChange={(e) => setSelectedVehicle(e.target.value)}
-                className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full"
+                className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a Vehicle</option>
                 {vehicles.map((vehicle) => (
@@ -138,21 +141,23 @@ const AssignBusPersonnelModal = ({ onClose }) => {
             )}
           </div>
 
+          {/* Error Message */}
           {error && <p className="text-red-500">{error}</p>}
 
+          {/* Action Buttons */}
           <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
               onClick={handleDoneClick}
-              className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              disabled={loading}
+              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
             >
               Done
             </button>
+
             <button
               type="button"
               onClick={handleCancelClick}
-              className="px-6 py-2 border border-gray-500 text-gray-500 rounded-md hover:bg-gray-100"
+              className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
             >
               Cancel
             </button>
