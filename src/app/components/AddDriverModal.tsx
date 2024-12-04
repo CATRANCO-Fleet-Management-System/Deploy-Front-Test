@@ -162,7 +162,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               name="position"
               value="Driver"
               disabled
-              className="focus:ring-2 focus:ring-blue-500"
+              className="focus:outline-none focus-visible:ring-0"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-4">License Number</label>
@@ -229,34 +229,33 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
+            {/* Address Section from AddAssistantOfficerModal */}
             <label className="block text-sm font-medium text-gray-700 mt-4">Address</label>
-            <Input
+            <textarea
               name="address"
               value={formData.address}
               onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        </form>
 
-        <div className="col-span-2 flex justify-end space-x-4 mt-4">
-  {/* Save Button */}
-  <button
-    onClick={handleSubmit} // Handles form submission
-    className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-  >
-    Add
-  </button>
-  
-  {/* Cancel Button */}
-  <button
-    onClick={onClose} // Closes the modal
-    className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-  >
-    Cancel
-  </button>
-</div>
+          {/* Action Buttons */}
+          <div className="col-span-2 flex justify-end space-x-4 mt-6">
+            <button
+              onClick={handleSubmit}
+              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+            >
+              Add
+            </button>
+            <button
+              onClick={onClose}
+              className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
