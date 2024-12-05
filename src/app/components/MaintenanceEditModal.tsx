@@ -177,18 +177,6 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               dateFormat="MM/dd/yyyy"
             />
           </div>
-          <div className="col-span-2">
-            <label htmlFor="maintenanceAddress" className="block text-sm font-medium text-gray-700">
-              Maintenance Address
-            </label>
-            <input
-              id="maintenanceAddress"
-              placeholder="Maintenance Address"
-              value={maintenanceAddress}
-              onChange={(e) => setMaintenanceAddress(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
-            />
-          </div>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
           <button

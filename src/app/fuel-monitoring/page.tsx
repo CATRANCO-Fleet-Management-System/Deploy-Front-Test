@@ -22,13 +22,10 @@ const FuelMonitoring = () => {
   const [fuelLogs, setFuelLogs] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [maintenanceSchedules, setMaintenanceSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Fetch data: vehicles, fuel logs, and maintenance schedules
   const loadData = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const [logs, vehicleData, maintenanceData] = await Promise.all([
         fetchAllFuelLogs(),
@@ -44,26 +41,14 @@ const FuelMonitoring = () => {
     } catch (err) {
       console.error("Failed to load data:", err);
       setError("Failed to load data. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Refresh maintenance scheduling data when the page is loaded or status changes
+  // Fetch data when the component mounts
   useEffect(() => {
     loadData();
   }, []);
 
-  const refreshMaintenanceData = async () => {
-    try {
-      const updatedMaintenanceData = await getAllMaintenanceScheduling();
-      setMaintenanceSchedules(updatedMaintenanceData);
-    } catch (error) {
-      console.error("Failed to refresh maintenance data:", error);
-    }
-  };
-
-  // Handle time interval change for chart
   const chartData = {
     daily: {
       labels: fuelLogs
@@ -76,7 +61,6 @@ const FuelMonitoring = () => {
         .filter((log) => log.vehicle_id === selectedBus)
         .map((log) => log.fuel_liters_quantity),
     },
-    // Additional time intervals can be added here (e.g., weekly, monthly)
   };
 
   const currentData = chartData[timeInterval] || chartData.daily;
@@ -125,7 +109,9 @@ const FuelMonitoring = () => {
   const navigateToViewRecord = () => {
     const bus = vehicles.find((vehicle) => vehicle.vehicle_id === selectedBus);
     const maintenance = maintenanceSchedules.find(
-      (schedule) => schedule.vehicle_id === selectedBus && schedule.maintenance_status === "active"
+      (schedule) =>
+        schedule.vehicle_id === selectedBus &&
+        schedule.maintenance_status === "active"
     );
     const status = maintenance ? "Maintenance" : "On Operation";
     router.push(
@@ -144,10 +130,6 @@ const FuelMonitoring = () => {
     setIsCalendarOpen(false);
   };
 
-  if (loading) {
-    return <div className="text-gray-500">Loading...</div>;
-  }
-
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
@@ -158,7 +140,9 @@ const FuelMonitoring = () => {
       <section className="p-4">
         <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg mx-auto">
           <div className="absolute inset-0 flex justify-center items-center opacity-10">
-            <span className="text-6xl font-bold text-gray-500">{`Bus ${selectedBus}`}</span>
+            <span className="text-6xl font-bold text-gray-500">
+              {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
+            </span>
           </div>
           <Line data={data} options={options} />
         </div>
@@ -197,7 +181,9 @@ const FuelMonitoring = () => {
         <div className="buses mt-4 grid grid-cols-3 gap-4 w-5/6 mx-auto">
           {displayedBuses.map((bus) => {
             const maintenance = maintenanceSchedules.find(
-              (schedule) => schedule.vehicle_id === bus.vehicle_id && schedule.maintenance_status === "active"
+              (schedule) =>
+                schedule.vehicle_id === bus.vehicle_id &&
+                schedule.maintenance_status === "active"
             );
 
             const bgColor = maintenance ? "bg-yellow-400" : "bg-green-400";

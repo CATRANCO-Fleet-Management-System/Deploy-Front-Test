@@ -1,27 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getVehicleById, updateVehicle } from "@/app/services/vehicleService";
 
-interface EditBusRecordModalProps {
-  vehicle_id: string;
-  onClose: () => void;
-  onUpdate: () => void;
-}
-
-const EditBusRecordModal: React.FC<EditBusRecordModalProps> = ({
-  vehicle_id,
-  onClose,
-  onUpdate,
-}) => {
+const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
   const [busDetails, setBusDetails] = useState({
     vehicle_id: "",
+    plate_number: "",
     or_id: "",
     cr_id: "",
-    plate_number: "",
     engine_number: "",
     chasis_number: "",
     third_pli: "",
@@ -30,29 +19,28 @@ const EditBusRecordModal: React.FC<EditBusRecordModalProps> = ({
     supplier: "",
   });
 
-  // State for validity dates
-  const [third_pli_validity, setTPLValidity] = useState<Date | null>(null);
-  const [ci_validity, setCIValidity] = useState<Date | null>(null);
-  const [date_purchased, setDatePurchased] = useState<Date | null>(null);
+  const [third_pli_validity, setTPLValidity] = useState(null);
+  const [ci_validity, setCIValidity] = useState(null);
+  const [date_purchased, setDatePurchased] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch vehicle details on mount
+  // Fetch vehicle details when modal opens
   useEffect(() => {
-    if (!vehicle_id) {
-      setError("Vehicle ID is missing.");
-      return;
-    }
-
     const fetchVehicleDetails = async () => {
+      if (!vehicle_id) {
+        setError("Vehicle ID is required.");
+        return;
+      }
+
       try {
         const data = await getVehicleById(vehicle_id);
         setBusDetails({
           vehicle_id: data.vehicle_id || "",
+          plate_number: data.plate_number || "",
           or_id: data.or_id || "",
           cr_id: data.cr_id || "",
-          plate_number: data.plate_number || "",
           engine_number: data.engine_number || "",
           chasis_number: data.chasis_number || "",
           third_pli: data.third_pli || "",
@@ -60,6 +48,7 @@ const EditBusRecordModal: React.FC<EditBusRecordModalProps> = ({
           ci: data.ci || "",
           supplier: data.supplier || "",
         });
+
         setTPLValidity(data.third_pli_validity ? new Date(data.third_pli_validity) : null);
         setCIValidity(data.ci_validity ? new Date(data.ci_validity) : null);
         setDatePurchased(data.date_purchased ? new Date(data.date_purchased) : null);
@@ -74,203 +63,238 @@ const EditBusRecordModal: React.FC<EditBusRecordModalProps> = ({
     fetchVehicleDetails();
   }, [vehicle_id]);
 
-  // Update handler
-  const handleUpdate = async () => {
+  // Format date to `YYYY-MM-DD`
+  const formatDate = (date) => (date ? date.toISOString().split("T")[0] : null);
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBusDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle update
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    const updatedData = {
+      or_id: busDetails.or_id,
+      cr_id: busDetails.cr_id,
+      engine_number: busDetails.engine_number,
+      chasis_number: busDetails.chasis_number,
+      third_pli: busDetails.third_pli,
+      third_pli_policy_no: busDetails.third_pli_policy_no,
+      ci: busDetails.ci,
+      supplier: busDetails.supplier,
+      third_pli_validity: formatDate(third_pli_validity),
+      ci_validity: formatDate(ci_validity),
+      date_purchased: formatDate(date_purchased),
+    };
+
     try {
-      // Ensure that vehicle_id is included in the payload
-      const updatedData = {
-        vehicle_id: busDetails.vehicle_id, // Make sure vehicle_id is included here
-        or_id: busDetails.or_id,
-        cr_id: busDetails.cr_id,
-        plate_number: busDetails.plate_number,
-        engine_number: busDetails.engine_number,
-        chasis_number: busDetails.chasis_number,
-        third_pli: busDetails.third_pli,
-        third_pli_policy_no: busDetails.third_pli_policy_no,
-        ci: busDetails.ci,
-        supplier: busDetails.supplier,
-        third_pli_validity: third_pli_validity
-          ? third_pli_validity.toISOString().split("T")[0]
-          : null,
-        ci_validity: ci_validity ? ci_validity.toISOString().split("T")[0] : null,
-        date_purchased: date_purchased
-          ? date_purchased.toISOString().split("T")[0]
-          : null,
-      };
-  
-      // Log the data to check if vehicle_id is passed
-      console.log("Updated Data:", updatedData);
-  
-      // Call the update API
-      await updateVehicle(vehicle_id, updatedData);
-      alert("Bus record updated successfully!");
-      onUpdate(); // Trigger parent update after success
-      onClose(); // Close the modal after update
+      const updatedVehicle = await updateVehicle(vehicle_id, updatedData);
+      if (onSubmit) {
+        onSubmit(updatedVehicle); // Pass updated record back to parent
+      }
+      onClose(); // Close the modal
     } catch (err) {
       console.error("Error updating vehicle:", err);
-      setError("Failed to update vehicle. Please try again.");
+      if (err.response?.data?.errors) {
+        const validationErrors = err.response.data.errors;
+        const errorMessages = Object.values(validationErrors).flat().join("\n");
+        alert(`Update failed:\n${errorMessages}`);
+      } else {
+        onClose();
+      }
     }
   };
-  
 
-  // Cancel handler
-  const handleCancelClick = () => {
-    onClose();
-  };
-
-  if (loading) {
-    return <div>Loading vehicle details...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+  if (loading) return <div>Loading bus details...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl sm:max-w-xl md:max-w-lg">
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Edit Bus Record</h2>
-
-        {/* Vehicle ID */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Vehicle ID</h1>
-          <Input
-            className="h-12 text-lg border-gray-300 border rounded-lg shadow-sm px-4 py-2 w-full mt-2"
-            type="text"
-            placeholder="Vehicle ID"
-            value={busDetails.vehicle_id}
-            onChange={(e) =>
-              setBusDetails({ ...busDetails, vehicle_id: e.target.value })
-            }
-            disabled
-          />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+        <div className="flex items-center justify-between border-b pb-4">
+          <h2 className="text-2xl font-semibold">Edit Bus Record</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+          >
+            &times;
+          </button>
         </div>
 
-        {/* OR Number */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">OR Number</h1>
-          <Input
-            className="h-12 text-lg border-gray-300 border rounded-lg shadow-sm px-4 py-2 w-full mt-2"
-            type="text"
-            placeholder="OR #"
-            value={busDetails.or_id}
-            onChange={(e) =>
-              setBusDetails({ ...busDetails, or_id: e.target.value })
-            }
-          />
+        <form onSubmit={handleUpdate} className="grid grid-cols-2 gap-4 mt-4">
+          {/* Vehicle ID */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Bus Number</label>
+            <input
+              type="text"
+              name="vehicle_id"
+              value={busDetails.vehicle_id}
+              className="w-full px-4 py-2 border rounded-md"
+              disabled
+            />
+          </div>
+
+          {/* Plate Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Plate Number</label>
+            <input
+              type="text"
+              name="plate_number"
+              value={busDetails.plate_number}
+              className="w-full px-4 py-2 border rounded-md"
+              disabled
+            />
+          </div>
+
+          {/* OR Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Official Receipt (OR)</label>
+            <input
+              type="text"
+              name="or_id"
+              value={busDetails.or_id}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* CR Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Certificate of Registration (CR)</label>
+            <input
+              type="text"
+              name="cr_id"
+              value={busDetails.cr_id}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Engine Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Engine Number</label>
+            <input
+              type="text"
+              name="engine_number"
+              value={busDetails.engine_number}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Chasis Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Chasis Number</label>
+            <input
+              type="text"
+              name="chasis_number"
+              value={busDetails.chasis_number}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Third Party Liability Insurance */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance</label>
+            <input
+              type="text"
+              name="third_pli"
+              value={busDetails.third_pli}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* 3rd Party Policy Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Policy Number</label>
+            <input
+              type="text"
+              name="third_pli_policy_no"
+              value={busDetails.third_pli_policy_no}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Third Party Validity */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">3rd Party Insurance Validity</label>
+            <DatePicker
+              selected={third_pli_validity}
+              onChange={(date) => setTPLValidity(date)}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Comprehensive Insurance */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance</label>
+            <input
+              type="text"
+              name="ci"
+              value={busDetails.ci}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Comprehensive Insurance Validity */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance Validity</label>
+            <DatePicker
+              selected={ci_validity}
+              onChange={(date) => setCIValidity(date)}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Date Purchased */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date Purchased</label>
+            <DatePicker
+              selected={date_purchased}
+              onChange={(date) => setDatePurchased(date)}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {/* Supplier */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Supplier</label>
+            <input
+              type="text"
+              name="supplier"
+              value={busDetails.supplier}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+        </form>
+
+        <div className="flex justify-end mt-4 space-x-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            onClick={handleUpdate}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            Update
+          </button>
         </div>
-
-        {/* CR Number */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">CR Number</h1>
-          <Input
-            className="h-12 text-lg border-gray-300 border rounded-lg shadow-sm px-4 py-2 w-full mt-2"
-            type="text"
-            placeholder="CR #"
-            value={busDetails.cr_id}
-            onChange={(e) =>
-              setBusDetails({ ...busDetails, cr_id: e.target.value })
-            }
-          />
-        </div>
-
-        {/* Plate Number */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Plate Number</h1>
-          <Input
-            className="h-12 text-lg border-gray-300 border rounded-lg shadow-sm px-4 py-2 w-full mt-2"
-            type="text"
-            placeholder="Plate Number"
-            value={busDetails.plate_number}
-            onChange={(e) =>
-              setBusDetails({ ...busDetails, plate_number: e.target.value })
-            }
-            disabled
-          />
-        </div>
-
-        {/* Third Party Liability Insurance */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Third Party Liability Insurance</h1>
-          <Input
-            className="h-12 text-lg border-gray-300 border rounded-lg shadow-sm px-4 py-2 w-full mt-2"
-            type="text"
-            placeholder="Third Party Insurance"
-            value={busDetails.third_pli}
-            onChange={(e) =>
-              setBusDetails({ ...busDetails, third_pli: e.target.value })
-            }
-          />
-        </div>
-
-        {/* Third Party Liability Policy Number */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Third Party Liability Policy Number</h1>
-          <Input
-            className="h-12 text-lg border-gray-300 border rounded-lg shadow-sm px-4 py-2 w-full mt-2"
-            type="text"
-            placeholder="Policy Number"
-            value={busDetails.third_pli_policy_no}
-            onChange={(e) =>
-              setBusDetails({
-                ...busDetails,
-                third_pli_policy_no: e.target.value,
-              })
-            }
-          />
-        </div>
-
-        {/* Date Pickers */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Third Party Liability Validity</h1>
-          <DatePicker
-            selected={third_pli_validity}
-            onChange={(date) => setTPLValidity(date)}
-            className="border border-gray-300 p-4 rounded-lg shadow-sm w-full mt-2"
-            dateFormat="MM/dd/yyyy"
-          />
-        </div>
-
-        {/* Other Date Pickers and Fields */}
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Comprehensive Insurance Validity</h1>
-          <DatePicker
-            selected={ci_validity}
-            onChange={(date) => setCIValidity(date)}
-            className="border border-gray-300 p-4 rounded-lg shadow-sm w-full mt-2"
-            dateFormat="MM/dd/yyyy"
-          />
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-sm font-medium text-gray-600">Date Purchased</h1>
-          <DatePicker
-           
-           selected={date_purchased}
-           onChange={(date) => setDatePurchased(date)}
-           className="border border-gray-300 p-4 rounded-lg shadow-sm w-full mt-2"
-           dateFormat="MM/dd/yyyy"
-         />
-       </div>
-
-       {/* Action Buttons */}
-       <div className="flex justify-end mt-8">
-         <button
-           onClick={handleCancelClick}
-           className="mr-4 py-2 px-6 bg-gray-400 text-white rounded-lg shadow-lg hover:bg-gray-500"
-         >
-           Cancel
-         </button>
-         <button
-           onClick={handleUpdate}
-           className="py-2 px-6 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600"
-         >
-           Update
-         </button>
-       </div>
-     </div>
-   </div>
- );
+      </div>
+    </div>
+  );
 };
 
 export default EditBusRecordModal;

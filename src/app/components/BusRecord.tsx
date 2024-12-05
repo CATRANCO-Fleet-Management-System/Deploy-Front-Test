@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getVehicleAssignmentById, createVehicleAssignment } from "@/app/services/vehicleAssignService";
-import { deleteVehicle } from "@/app/services/vehicleService"; 
-import EditBusRecordModal from "@/app/components/EditBusRecordModal"; 
-import EditPersonnelModal from "@/app/components/EditPersonnelModal"; 
+import {
+  getVehicleAssignmentById,
+  createVehicleAssignment,
+} from "@/app/services/vehicleAssignService";
+import { deleteVehicle } from "@/app/services/vehicleService";
+import EditBusRecordModal from "@/app/components/EditBusRecordModal";
+import EditPersonnelModal from "@/app/components/EditPersonnelModal";
 
 interface BusBoxProps {
   vehicle_id: string;
@@ -15,9 +18,10 @@ interface BusBoxProps {
   comprehensiveInsurance?: string;
   assignedDriver: string;
   assignedPAO: string;
-  assignmentId: string | null; 
+  assignmentId: string | null;
   route?: string;
   onDelete: () => void;
+  onUpdate: (updatedBus: any) => void; // Ensure onUpdate is passed from the parent
 }
 
 const BusRecord: React.FC<BusBoxProps> = ({
@@ -33,19 +37,17 @@ const BusRecord: React.FC<BusBoxProps> = ({
   assignmentId: initialAssignmentId,
   route,
   onDelete,
+  onUpdate,
 }) => {
-  // State management
   const [assignmentId, setAssignmentId] = useState<string | null>(initialAssignmentId);
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isEditBusModalOpen, setIsEditBusModalOpen] = useState(false); 
-  const [isEditPersonnelModalOpen, setIsEditPersonnelModalOpen] = useState(false); 
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null); 
+  const [isEditBusModalOpen, setIsEditBusModalOpen] = useState(false);
+  const [isEditPersonnelModalOpen, setIsEditPersonnelModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  // Toggle dropdown visibility
-  const toggleDropdown = () => setDropdownOpen(prev => !prev);
+  const toggleDropdown = useCallback(() => setDropdownOpen((prev) => !prev), []);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -89,38 +91,30 @@ const BusRecord: React.FC<BusBoxProps> = ({
   // Delete vehicle handler
   const handleDelete = async () => {
     try {
-      await deleteVehicle(vehicle_id); 
-      onDelete();
+      await deleteVehicle(vehicle_id);
+      onDelete(); // Update parent state after deletion
     } catch (error) {
       console.error("Error deleting vehicle:", error);
+      alert("Failed to delete the vehicle. Please try again.");
     }
   };
 
   // Open modal for editing bus record
   const handleEditBus = () => {
-    setSelectedVehicleId(vehicle_id); 
-    setIsEditBusModalOpen(true); 
-    setDropdownOpen(false); 
+    setIsEditBusModalOpen(true);
+    setDropdownOpen(false);
   };
 
   // Open modal for editing personnel assignment
   const handleEditPersonnel = () => {
-    setIsEditPersonnelModalOpen(true); 
-    setDropdownOpen(false); 
+    setIsEditPersonnelModalOpen(true);
+    setDropdownOpen(false);
   };
 
   // Close modals
   const handleModalClose = () => {
     setIsEditBusModalOpen(false);
     setIsEditPersonnelModalOpen(false);
-    setSelectedVehicleId(null); 
-  };
-
-  // Handle update and refresh
-  const handleUpdate = () => {
-    setIsEditBusModalOpen(false);
-    setIsEditPersonnelModalOpen(false);
-    // Refresh or trigger necessary actions after update
   };
 
   return (
@@ -128,50 +122,105 @@ const BusRecord: React.FC<BusBoxProps> = ({
       {/* Bus Record Details */}
       <table className="w-full border-collapse text-sm">
         <tbody>
-          <tr><td className="border p-2 font-bold">Bus Number:</td><td className="border p-2">{busNumber}</td></tr>
-          <tr><td className="border p-2 font-bold">OR Number:</td><td className="border p-2">{ORNumber}</td></tr>
-          <tr><td className="border p-2 font-bold">CR Number:</td><td className="border p-2">{CRNumber}</td></tr>
-          <tr><td className="border p-2 font-bold">Plate Number:</td><td className="border p-2">{plateNumber}</td></tr>
-          <tr><td className="border p-2 font-bold">Third LBI:</td><td className="border p-2">{thirdLBI}</td></tr>
-          {comprehensiveInsurance && <tr><td className="border p-2 font-bold">Comprehensive Insurance:</td><td className="border p-2">{comprehensiveInsurance}</td></tr>}
-          <tr><td className="border p-2 font-bold">Assigned Driver:</td><td className="border p-2">{assignedDriver}</td></tr>
-          <tr><td className="border p-2 font-bold">Assigned PAO:</td><td className="border p-2">{assignedPAO}</td></tr>
-          <tr><td className="border p-2 font-bold">Route:</td><td className="border p-2">{route || "Not Assigned"}</td></tr>
+          <tr>
+            <td className="border p-2 font-bold">Bus Number:</td>
+            <td className="border p-2">{busNumber}</td>
+          </tr>
+          <tr>
+            <td className="border p-2 font-bold">OR Number:</td>
+            <td className="border p-2">{ORNumber}</td>
+          </tr>
+          <tr>
+            <td className="border p-2 font-bold">CR Number:</td>
+            <td className="border p-2">{CRNumber}</td>
+          </tr>
+          <tr>
+            <td className="border p-2 font-bold">Plate Number:</td>
+            <td className="border p-2">{plateNumber}</td>
+          </tr>
+          <tr>
+            <td className="border p-2 font-bold">Third LBI:</td>
+            <td className="border p-2">{thirdLBI}</td>
+          </tr>
+          {comprehensiveInsurance && (
+            <tr>
+              <td className="border p-2 font-bold">Comprehensive Insurance:</td>
+              <td className="border p-2">{comprehensiveInsurance}</td>
+            </tr>
+          )}
+          <tr>
+            <td className="border p-2 font-bold">Assigned Driver:</td>
+            <td className="border p-2">{assignedDriver}</td>
+          </tr>
+          <tr>
+            <td className="border p-2 font-bold">Assigned PAO:</td>
+            <td className="border p-2">{assignedPAO}</td>
+          </tr>
+          <tr>
+            <td className="border p-2 font-bold">Route:</td>
+            <td className="border p-2">{route || "Not Assigned"}</td>
+          </tr>
         </tbody>
       </table>
 
       {/* Action Buttons */}
       <div className="flex flex-col space-y-2 mt-4">
-        <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full" onClick={handleDelete} aria-label={`Delete ${busNumber}`}>
+        <button
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
+          onClick={handleDelete}
+        >
           Remove
         </button>
 
         {/* Edit Dropdown */}
         <div className="relative w-full" ref={dropdownRef}>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full" onClick={toggleDropdown} aria-haspopup="true" aria-expanded={dropdownOpen}>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+            onClick={toggleDropdown}
+          >
             Edit
           </button>
           {dropdownOpen && (
             <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-4/5 bg-white border border-gray-300 rounded shadow-lg z-10">
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" role="menuitem" onClick={handleEditBus}>
+              <button
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                onClick={handleEditBus}
+              >
                 Edit Bus Record
               </button>
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" role="menuitem" onClick={handleEditPersonnel}>
+              <button
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                onClick={handleEditPersonnel}
+              >
                 Edit Personnel Assignment
               </button>
             </div>
           )}
         </div>
-
-        {/* View Bus Full Record Link */}
-        <a href={`/bus-profiles/bus-records/${busNumber}`} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full text-center" role="link" aria-label={`View full record for ${busNumber}`}>
+        <a
+          href={`/bus-profiles/bus-records/${busNumber}`}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full text-center"
+          aria-label={`View full record for ${busNumber}`}
+        >
           View Bus Full Record
         </a>
       </div>
 
       {/* Modals */}
-      {isEditBusModalOpen && <EditBusRecordModal vehicle_id={selectedVehicleId!} onClose={handleModalClose} onUpdate={handleUpdate} />}
-      {isEditPersonnelModalOpen && <EditPersonnelModal vehicle_id={selectedVehicleId!} onClose={handleModalClose} onUpdate={handleUpdate} />}
+      {isEditBusModalOpen && (
+        <EditBusRecordModal
+          vehicle_id={vehicle_id}
+          onClose={handleModalClose}
+          onSubmit={(updatedBus) => onUpdate(updatedBus)}
+        />
+      )}
+      {isEditPersonnelModalOpen && (
+        <EditPersonnelModal
+          vehicle_id={vehicle_id}
+          onClose={handleModalClose}
+          onSubmit={(updatedPersonnel) => onUpdate(updatedPersonnel)}
+        />
+      )}
     </div>
   );
 };

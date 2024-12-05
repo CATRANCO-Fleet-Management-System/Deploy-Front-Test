@@ -6,17 +6,17 @@ import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import BusRecord from "../components/BusRecord";
 import AddBusRecordModal from "../components/AddBusRecordModal";
-import { getAllVehicles, deleteVehicle, createVehicle } from "../services/vehicleService";
+import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
+import EditBusRecordModal from "../components/EditBusRecordModal";
+import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <div className="pagination flex items-center justify-center space-x-2 mt-8">
       <button
-        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-          currentPage === 1
-            ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-gray-300 text-gray-700 hover:bg-gray-100"
+        className={`px-3 py-1 border-2 rounded ${
+          currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-gray-700"
         }`}
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -26,10 +26,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       {Array.from({ length: totalPages }, (_, i) => (
         <button
           key={i + 1}
-          className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-            i + 1 === currentPage
-              ? "bg-blue-500 text-white border-blue-500"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+          className={`px-3 py-1 border-2 rounded ${
+            i + 1 === currentPage ? "bg-blue-500 text-white" : "text-gray-700"
           }`}
           onClick={() => onPageChange(i + 1)}
         >
@@ -37,10 +35,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         </button>
       ))}
       <button
-        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-          currentPage === totalPages
-            ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-gray-300 text-gray-700 hover:bg-gray-100"
+        className={`px-3 py-1 border-2 rounded ${
+          currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-gray-700"
         }`}
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -58,8 +54,11 @@ const BusRecordDisplay = () => {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAssignPersonnelModalOpen, setIsAssignPersonnelModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [busRecords, setBusRecords] = useState([]);
   const [vehicleAssignments, setVehicleAssignments] = useState([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState(null);
 
   // Fetch data from the backend
   const fetchData = async () => {
@@ -79,7 +78,7 @@ const BusRecordDisplay = () => {
   }, []);
 
   // Handle deleting a vehicle
-  const handleDelete = (recordId: string) => {
+  const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true);
   };
@@ -88,7 +87,10 @@ const BusRecordDisplay = () => {
     if (deleteRecordId) {
       try {
         await deleteVehicle(deleteRecordId);
-        fetchData(); // Refetch data after deletion
+        setBusRecords((prev) => prev.filter((record) => record.vehicle_id !== deleteRecordId));
+        setVehicleAssignments((prev) =>
+          prev.filter((assignment) => assignment.vehicle_id !== deleteRecordId)
+        );
       } catch (error) {
         console.error("Error deleting vehicle:", error);
       } finally {
@@ -104,13 +106,25 @@ const BusRecordDisplay = () => {
   };
 
   // Handle adding a new bus record
-  const handleAddNewBus = async (newBus) => {
-    try {
-      await createVehicle(newBus); // Add new vehicle via service
-      fetchData(); // Refetch data after adding a new bus
-    } catch (error) {
-      console.error("Error adding new bus:", error);
-    }
+  const handleAddNewBus = (newBus) => {
+    setBusRecords((prevRecords) => [...prevRecords, newBus]);
+    setSelectedVehicleId(newBus.vehicle_id);
+    setIsAssignPersonnelModalOpen(true);
+  };
+
+  // Handle editing a bus record
+  const handleEditBus = (updatedBus) => {
+    setBusRecords((prevRecords) =>
+      prevRecords.map((record) =>
+        record.vehicle_id === updatedBus.vehicle_id ? updatedBus : record
+      )
+    );
+    setIsEditModalOpen(false); // Close the modal
+  };
+
+  // Callback for updating vehicle assignments
+  const handleAddVehicleAssignment = (newAssignment) => {
+    setVehicleAssignments((prevAssignments) => [...prevAssignments, newAssignment]);
   };
 
   // Filter bus records by search term
@@ -119,7 +133,7 @@ const BusRecordDisplay = () => {
   );
 
   // Get the assigned profiles for a vehicle
-  const getAssignedProfiles = (vehicleId: string) => {
+  const getAssignedProfiles = (vehicleId) => {
     const assignment = vehicleAssignments.find(
       (assignment) => assignment.vehicle_id === vehicleId
     );
@@ -128,18 +142,14 @@ const BusRecordDisplay = () => {
       return { driver: "N/A", conductor: "N/A" };
     }
 
-    const driver = assignment.user_profiles.find(
-      (profile) => profile.position === "driver"
-    );
+    const driver = assignment.user_profiles.find((profile) => profile.position === "driver");
     const conductor = assignment.user_profiles.find(
       (profile) => profile.position === "passenger_assistant_officer"
     );
 
     return {
       driver: driver ? `${driver.first_name} ${driver.last_name}` : "N/A",
-      conductor: conductor
-        ? `${conductor.first_name} ${conductor.last_name}`
-        : "N/A",
+      conductor: conductor ? `${conductor.first_name} ${conductor.last_name}` : "N/A",
     };
   };
 
@@ -161,7 +171,7 @@ const BusRecordDisplay = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
+        <button className="flex items-center px-4 py-2 border-2 rounded-md text-blue-500">
           <FaSearch size={22} className="mr-2" />
           Search
         </button>
@@ -192,28 +202,48 @@ const BusRecordDisplay = () => {
                 assignedPAO={conductor}
                 route={record.route || "Not Assigned"}
                 onDelete={() => handleDelete(record.vehicle_id)}
-                refreshData={fetchData} // Pass the refetch function
+                onEdit={() => {
+                  setSelectedVehicleId(record.vehicle_id);
+                  setIsEditModalOpen(true);
+                }}
               />
             );
           })}
         </div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
       {isDeletePopupOpen && (
         <Confirmpopup
-          message="Are you sure you want to delete this vehicle?"
+          isOpen={isDeletePopupOpen}
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
+          title="Delete Profile"
+          message="Are you sure you want to delete this profile?"
         />
       )}
       {isAddModalOpen && (
         <AddBusRecordModal
           onClose={() => setIsAddModalOpen(false)}
-          onSubmit={handleAddNewBus} // Pass the onSubmit function
+          refreshData={fetchData}
+          onSubmit={(newBus) => {
+            handleAddNewBus(newBus);
+          }}
+        />
+      )}
+      {isAssignPersonnelModalOpen && (
+        <AssignBusPersonnelModal
+          onClose={() => setIsAssignPersonnelModalOpen(false)}
+          refreshData={fetchData}
+          onAssign={handleAddVehicleAssignment}
+          preSelectedVehicle={selectedVehicleId}
+        />
+      )}
+      {isEditModalOpen && (
+        <EditBusRecordModal
+          vehicle_id={selectedVehicleId}
+          onClose={() => setIsEditModalOpen(false)}
+          refreshData={fetchData}
+          onSubmit={handleEditBus}
         />
       )}
     </Layout>

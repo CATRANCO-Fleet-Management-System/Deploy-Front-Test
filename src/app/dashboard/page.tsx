@@ -218,7 +218,7 @@ const DashboardHeader = () => {
                   ) : error ? (
                     <p>{error}</p>
                   ) : (
-                    <MapContainer center={[8.48325558794408, 124.5866112118501]} zoom={13} style={{ height: "100%", width: "100%" }}>
+                    <MapContainer center={[8.48325558794408, 124.5866112118501]} zoom={13} style={{ height: "70vh", width: "100%" }}>
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       {busData.map((bus) => (
                         <Marker

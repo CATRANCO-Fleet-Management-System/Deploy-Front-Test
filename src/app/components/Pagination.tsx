@@ -6,36 +6,41 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}) => {
-  const pageNumbers = [];
-
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
   return (
-    <nav className="pagination flex justify-center mt-4">
-      <ul className="inline-flex space-x-2">
-        {pageNumbers.map((number) => (
-          <li key={number}>
-            <button
-              onClick={() => onPageChange(number)}
-              className={`px-4 py-2 border rounded-md ${
-                number === currentPage
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-black"
-              } hover:bg-blue-100`}
-            >
-              {number}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <div className="pagination flex items-center justify-center space-x-2 mt-6">
+      <button
+        className={`px-3 py-1 border rounded ${
+          currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-gray-700 hover:bg-gray-200"
+        }`}
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        &lt; Previous
+      </button>
+      {pages.map((page) => (
+        <button
+          key={page}
+          className={`px-3 py-1 border rounded ${
+            page === currentPage ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+          }`}
+          onClick={() => onPageChange(page)}
+        >
+          {page}
+        </button>
+      ))}
+      <button
+        className={`px-3 py-1 border rounded ${
+          currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-gray-700 hover:bg-gray-200"
+        }`}
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Next &gt;
+      </button>
+    </div>
   );
 };
 

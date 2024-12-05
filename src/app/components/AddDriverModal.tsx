@@ -1,11 +1,11 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { createProfile } from "@/app/services/userProfile";
 
 const AddDriverModal = ({ isOpen, onClose, onSave }) => {
-  const [birthday, setBirthday] = useState<string>("");
-  const [age, setAge] = useState<number | string>("");
-
+  const [birthday, setBirthday] = useState<string>(""); // State for birthday
+  const [age, setAge] = useState<number | string>(""); // State for age
   const [formData, setFormData] = useState({
     last_name: "",
     first_name: "",
@@ -35,11 +35,11 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
       }
       setAge(calculatedAge);
     } else {
-      setAge("");
+      setAge(""); // Clear age if birthday is removed
     }
   }, [birthday]);
 
-  // Handle form changes
+  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -48,7 +48,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
     }));
   };
 
-  // Handle date of birth changes
+  // Handle birthday changes
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
   };
@@ -99,15 +99,14 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
             &times;
           </button>
         </div>
+
         <form className="grid grid-cols-2 gap-4 mt-4">
           {/* Left Column */}
           <div>
-            {/* Profile Picture Upload */}
             <div className="flex flex-col items-center space-y-4 mb-6">
               <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
                 <input
                   type="file"
-                  id="photoUpload"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="absolute inset-0 opacity-0 cursor-pointer"
@@ -122,9 +121,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
                   <span className="flex items-center justify-center h-full text-gray-500">+ Add Photo</span>
                 )}
               </div>
-              <span className="text-sm text-gray-500">
-                {formData.user_profile_image ? "File selected" : "No file chosen"}
-              </span>
             </div>
 
             <label className="block text-sm font-medium text-gray-700">Last Name</label>
@@ -174,8 +170,11 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
+          </div>
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Date of Birth</label>
+          {/* Right Column */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
             <Input
               name="birthday"
               value={birthday}
@@ -184,12 +183,13 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-          </div>
 
-          {/* Right Column */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Age</label>
-            <Input value={age} readOnly className="focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-medium text-gray-700 mt-4">Age</label>
+            <Input
+              value={age}
+              readOnly
+              className="focus:ring-2 focus:ring-blue-500"
+            />
 
             <label className="block text-sm font-medium text-gray-700 mt-4">Gender</label>
             <select
@@ -229,7 +229,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            {/* Address Section from AddAssistantOfficerModal */}
             <label className="block text-sm font-medium text-gray-700 mt-4">Address</label>
             <textarea
               name="address"
@@ -239,23 +238,22 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
             />
           </div>
-
-          {/* Action Buttons */}
-          <div className="col-span-2 flex justify-end space-x-4 mt-6">
-            <button
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Add
-            </button>
-            <button
-              onClick={onClose}
-              className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-            >
-              Cancel
-            </button>
-          </div>
         </form>
+
+        <div className="flex justify-end space-x-4 mt-6">
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+          >
+            Save
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

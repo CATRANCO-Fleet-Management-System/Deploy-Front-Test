@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
 import { createVehicle } from "../services/vehicleService"; // Import the service
 
-const AddBusRecordModal = ({ onClose }) => {
+const AddBusRecordModal = ({ onClose, refreshData }) => {
   const [busNumber, setBusNumber] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [officialReceipt, setOfficialReceipt] = useState("");
@@ -49,15 +49,31 @@ const AddBusRecordModal = ({ onClose }) => {
     try {
       // Send the vehicle data to the backend
       await createVehicle(vehicleData);
+
+      // Refresh the parent data
+      if (refreshData) {
+        refreshData(); // Ensure the parent state is refreshed
+      }
+
       setIsSubmitted(true); // Set submitted to true on successful submission
     } catch (error) {
       console.error("Error adding vehicle:", error);
     }
   };
 
-  // Debugging: Check submission state and whether modal should render
+  // Show the AssignBusPersonnelModal after submission
   if (isSubmitted) {
-    return <AssignBusPersonnelModal onClose={onClose} />;
+    return (
+      <AssignBusPersonnelModal
+    onClose={onClose}
+    refreshData={refreshData}
+    onAssign={(newAssignment) => {
+      refreshData(); // Refresh or dynamically update assignments
+      handleAddVehicleAssignment(newAssignment); // Update parent state
+    }}
+    preSelectedVehicle={busNumber}
+  />
+    );
   }
 
   return (
@@ -65,173 +81,188 @@ const AddBusRecordModal = ({ onClose }) => {
       <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">Add Bus Record</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 focus:outline-none">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+          >
             &times;
           </button>
         </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mt-4">
+          {/* Bus Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Bus Number</label>
             <input
               type="text"
               value={busNumber}
               onChange={(e) => setBusNumber(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="Bus Number"
               required
             />
           </div>
 
+          {/* Official Receipt */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Official Receipt of Registration</label>
             <input
               type="text"
               value={officialReceipt}
               onChange={(e) => setOfficialReceipt(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="OR #"
               required
             />
           </div>
 
+          {/* Certificate of Registration */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Certificate of Registration</label>
             <input
               type="text"
               value={certificateOfRegistration}
               onChange={(e) => setCertificateOfRegistration(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="CR #"
               required
             />
           </div>
 
+          {/* Plate Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Plate Number</label>
             <input
               type="text"
               value={plateNumber}
               onChange={(e) => setPlateNumber(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="Plate Number"
               required
             />
           </div>
 
+          {/* Engine Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Engine Number</label>
             <input
               type="text"
               value={engineNumber}
               onChange={(e) => setEngineNumber(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="Engine Number"
               required
             />
           </div>
 
+          {/* Chasis Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Chasis Number</label>
             <input
               type="text"
               value={chasisNumber}
               onChange={(e) => setChasisNumber(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="Chasis Number"
               required
             />
           </div>
 
+          {/* Third Party Liability Insurance */}
           <div>
             <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance</label>
             <input
               type="text"
               value={thirdPartyInsurance}
               onChange={(e) => setThirdPartyInsurance(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="3rd Party Liability Insurance"
               required
             />
           </div>
 
+          {/* 3rd Party Policy Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance Policy No.</label>
             <input
               type="text"
               value={thirdPartyPolicyNo}
               onChange={(e) => setThirdPartyPolicyNo(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="Policy No."
               required
             />
           </div>
 
+          {/* 3rd Party Validity Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance Validity</label>
             <DatePicker
               selected={thirdPartyValidity}
               onChange={(date) => setThirdPartyValidity(date)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
             />
           </div>
 
+          {/* Comprehensive Insurance */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance</label>
             <input
               type="text"
               value={comprehensiveInsurance}
               onChange={(e) => setComprehensiveInsurance(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
               placeholder="Comprehensive Insurance"
               required
             />
           </div>
 
+          {/* Comprehensive Insurance Validity */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance Validity</label>
             <DatePicker
               selected={comprehensiveValidity}
               onChange={(date) => setComprehensiveValidity(date)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
             />
           </div>
 
+          {/* Date Purchased */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Date Purchased</label>
             <DatePicker
               selected={datePurchased}
               onChange={(date) => setDatePurchased(date)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
             />
           </div>
 
+          {/* Supplier */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Supplier</label>
             <input
               type="text"
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Supplier"
+              className="w-full px-4 py-2 border rounded-md"
+              placeholder="Supplier Name"
               required
             />
           </div>
 
-          <div className="col-span-2 flex justify-end mt-4 space-x-4">
-          <button
-    onClick={handleSubmit} // Handles form submission
-    className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-  >
-    Add
-  </button>
-  
-  {/* Cancel Button */}
-  <button
-    onClick={onClose} // Closes the modal
-    className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-  >
-    Cancel
-  </button>
+          <div className="mt-4 flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            >
+              Save
+            </button>
           </div>
         </form>
       </div>

@@ -69,7 +69,8 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
   };
 
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       const profileData = {
         ...formData,
@@ -78,8 +79,10 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
       const response = await createProfile(profileData); // Call createProfile service
       if (response && response.profile) {
         onSave(response.profile); // Pass the newly created profile to the parent component
+        onClose(); // Close the modal
+      } else {
+        console.error("Error: No profile returned in the response.");
       }
-      onClose(); // Close the modal
     } catch (error) {
       console.error("Error creating profile:", error);
     }
@@ -94,20 +97,18 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
           <h2 className="text-2xl font-semibold">Add Passenger Assistant Officer Record</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-0"
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
           >
             &times;
           </button>
         </div>
-        <form className="grid grid-cols-2 gap-4 mt-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mt-4">
           {/* Left Column */}
           <div>
-            {/* Profile Picture Upload */}
             <div className="flex flex-col items-center space-y-4 mb-6">
               <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
                 <input
                   type="file"
-                  id="photoUpload"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="absolute inset-0 opacity-0 cursor-pointer"
@@ -126,7 +127,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
                 {formData.user_profile_image ? "File selected" : "No file chosen"}
               </span>
             </div>
-
             <label className="block text-sm font-medium text-gray-700">Last Name</label>
             <Input
               name="last_name"
@@ -136,7 +136,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">First Name</label>
             <Input
               name="first_name"
@@ -146,7 +145,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Middle Initial</label>
             <Input
               name="middle_initial"
@@ -156,15 +154,13 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Position</label>
             <Input
               name="position"
               value="Passenger Assistant Officer"
               disabled
-              className="focus:outline-none focus-visible:ring-0"
+              className="focus:outline-none"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">License Number</label>
             <Input
               name="license_number"
@@ -174,8 +170,11 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
+          </div>
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Date of Birth</label>
+          {/* Right Column */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
             <Input
               name="birthday"
               value={birthday}
@@ -184,13 +183,8 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          {/* Right Column */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Age</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">Age</label>
             <Input value={age} readOnly className="focus:ring-2 focus:ring-blue-500" />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Gender</label>
             <select
               name="sex"
@@ -201,62 +195,59 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Contact Number</label>
             <Input
               name="contact_number"
               value={formData.contact_number}
               onChange={handleInputChange}
+              placeholder="e.g. 09123456789"
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Contact Person</label>
             <Input
               name="contact_person"
               value={formData.contact_person}
               onChange={handleInputChange}
+              placeholder="Contact Person Name"
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Contact Person Number</label>
             <Input
               name="contact_person_number"
               value={formData.contact_person_number}
               onChange={handleInputChange}
+              placeholder="e.g. 09123456789"
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-4">Address</label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleInputChange}
+              placeholder="Enter Address"
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
-          {/* Action Buttons */}
+          {/* Buttons */}
           <div className="col-span-2 flex justify-end space-x-4 mt-6">
-           {/* Save Button */}
-  <button
-    onClick={handleSubmit} // Handles form submission
-    className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-  >
-    Add
-  </button>
-  
-  {/* Cancel Button */}
-  <button
-    onClick={onClose} // Closes the modal
-    className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-  >
-    Cancel
-  </button>
-
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </div>
