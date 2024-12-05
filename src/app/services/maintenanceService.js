@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define the base API URL
-const API_URL = 'http://192.168.68.154:8000/api/user/admin';
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Create an instance of axios with default settings
 const api = axios.create({
@@ -35,7 +35,7 @@ api.interceptors.request.use(
  */
 export const createMaintenanceScheduling = async (data) => {
   try {
-    const response = await api.post('/maintenance-scheduling/create', data);
+    const response = await api.post('/user/admin/maintenance-scheduling/create', data);
     return response.data;
   } catch (error) {
     console.error('Create Maintenance Scheduling error:', error);
@@ -49,7 +49,7 @@ export const createMaintenanceScheduling = async (data) => {
  */
 export const getAllMaintenanceScheduling = async () => {
   try {
-    const response = await api.get('/maintenance-scheduling/all');
+    const response = await api.get('/user/admin/maintenance-scheduling/all');
     return response.data;
   } catch (error) {
     console.error('Get All Maintenance Scheduling error:', error);
@@ -64,7 +64,7 @@ export const getAllMaintenanceScheduling = async () => {
  */
 export const getMaintenanceSchedulingById = async (id) => {
   try {
-    const response = await api.get(`/maintenance-scheduling/${id}`);
+    const response = await api.get(`/user/admin/maintenance-scheduling/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Get Maintenance Scheduling by ID error: ${id}`, error);
@@ -80,7 +80,7 @@ export const getMaintenanceSchedulingById = async (id) => {
  */
 export const updateMaintenanceScheduling = async (id, data) => {
   try {
-    const response = await api.patch(`/maintenance-scheduling/update/${id}`, data);
+    const response = await api.patch(`/user/admin/maintenance-scheduling/update/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(`Update Maintenance Scheduling error: ${id}`, error);
@@ -95,7 +95,7 @@ export const updateMaintenanceScheduling = async (id, data) => {
  */
 export const deleteMaintenanceScheduling = async (id) => {
   try {
-    const response = await api.delete(`/maintenance-scheduling/delete/${id}`);
+    const response = await api.delete(`/user/admin/maintenance-scheduling/delete/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Delete Maintenance Scheduling error: ${id}`, error);
@@ -110,7 +110,7 @@ export const deleteMaintenanceScheduling = async (id) => {
  */
 export const toggleMaintenanceSchedulingStatus = async (id) => {
   try {
-    const response = await api.patch(`/maintenance-scheduling/toggle-status/${id}`);
+    const response = await api.patch(`/user/admin/maintenance-scheduling/toggle-status/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Toggle Maintenance Scheduling Status error: ${id}`, error);

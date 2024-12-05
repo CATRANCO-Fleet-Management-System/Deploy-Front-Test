@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define the base API URL for vehicle assignments
-const API_URL = 'http://192.168.68.154:8000/api/user/admin/assignments';
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Create an instance of axios with default settings
 const api = axios.create({
@@ -35,7 +35,7 @@ api.interceptors.request.use(
  */
 export const createVehicleAssignment = async (assignmentData) => {
   try {
-    const response = await api.post('/create', assignmentData);
+    const response = await api.post('/user/admin/assignments/create', assignmentData);
     return response.data;
   } catch (error) {
     console.error('Create vehicle assignment error:', error);
@@ -49,7 +49,7 @@ export const createVehicleAssignment = async (assignmentData) => {
  */
 export const getAllVehicleAssignments = async () => {
   try {
-    const response = await api.get('/all');
+    const response = await api.get('/user/admin/assignments/all');
     return response.data;
   } catch (error) {
     console.error('Get all vehicle assignments error:', error.message);
@@ -69,7 +69,7 @@ export const getAllVehicleAssignments = async () => {
  */
 export const getVehicleAssignmentById = async (id) => {
   try {
-    const response = await api.get(`/${id}`); // Correct URL format
+    const response = await api.get(`/user/admin/assignments/${id}`); // Correct URL format
     return response.data;
   } catch (error) {
     console.error('Get vehicle assignment by ID error:', error);
@@ -85,7 +85,7 @@ export const getVehicleAssignmentById = async (id) => {
  */
 export const updateVehicleAssignment = async (id, assignmentData) => {
   try {
-    const response = await api.patch(`/update/${id}`, assignmentData);
+    const response = await api.patch(`/user/admin/assignments/update/${id}`, assignmentData);
     return response.data;
   } catch (error) {
     console.error('Update vehicle assignment error:', error);
@@ -100,7 +100,7 @@ export const updateVehicleAssignment = async (id, assignmentData) => {
  */
 export const deleteVehicleAssignment = async (id) => {
   try {
-    const response = await api.delete(`/delete/${id}`);
+    const response = await api.delete(`/user/admin/assignments/delete/${id}`);
     return response.data;
   } catch (error) {
     console.error('Delete vehicle assignment error:', error);

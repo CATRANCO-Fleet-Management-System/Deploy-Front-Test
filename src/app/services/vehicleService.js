@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define the base API URL for vehicles
-const API_URL = 'http://192.168.68.154:8000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Create an instance of axios with default settings
 const api = axios.create({

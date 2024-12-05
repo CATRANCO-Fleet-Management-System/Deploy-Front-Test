@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define the base API URL
-const API_URL = 'http://192.168.68.154:8000/api/user'; // Adjusted to /user, if needed
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // Adjusted to /user, if needed
 
 // Create an instance of axios with default settings
 const api = axios.create({
@@ -35,7 +35,7 @@ api.interceptors.request.use(
  */
 export const createProfile = async (profileData) => {
   try {
-    const response = await api.post('/admin/profiles/create', profileData);
+    const response = await api.post('/user/admin/profiles/create', profileData);
     return response.data;
   } catch (error) {
     console.error('Create profile error:', error);
@@ -49,7 +49,7 @@ export const createProfile = async (profileData) => {
  */
 export const getAllProfiles = async () => {
   try {
-    const response = await api.get('/admin/profiles/all');
+    const response = await api.get('/user/admin/profiles/all');
     return response.data;
   } catch (error) {
     console.error('Get all profiles error:', error.message);
@@ -64,7 +64,7 @@ export const getAllProfiles = async () => {
  */
 export const getProfileById = async (id) => {
   try {
-    const response = await api.get(`/admin/profiles/${id}`);
+    const response = await api.get(`/user/admin/profiles/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Get profile by ID error: ${id}`, error);
@@ -80,7 +80,7 @@ export const getProfileById = async (id) => {
  */
 export const updateProfile = async (id, profileData) => {
   try {
-    const response = await api.patch(`/admin/profiles/update/${id}`, profileData);
+    const response = await api.patch(`/user/admin/profiles/update/${id}`, profileData);
     return response.data;
   } catch (error) {
     console.error(`Update profile error: ${id}`, error);
@@ -95,7 +95,7 @@ export const updateProfile = async (id, profileData) => {
  */
 export const deleteProfile = async (id) => {
   try {
-    const response = await api.delete(`/admin/profiles/delete/${id}`);
+    const response = await api.delete(`/user/admin/profiles/delete/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Delete profile error: ${id}`, error);
