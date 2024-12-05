@@ -7,7 +7,7 @@ npm install
 
 run cmd and input ipconfig (locate ip address example: 192.168.68.154)
 
-locate .env.local edit "NEXT_PUBLIC_API_BASE_URL=http://192.168.68.154:8000/api" to your ip address*
+locate .env.local edit or add "NEXT_PUBLIC_API_BASE_URL=http://192.168.68.154:8000/api" to your ip address*
 
 2 ways
 run npm run dev -- --host=192.168.68.154 --port=3000
