@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Step by step integration to next.js and laravel.
+```sh
 
-## Getting Started
+FRONTEND = Next.js
 
-First, run the development server:
+npm install
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+run cmd and input ipconfig (locate ip address example: 192.168.68.154)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+locate .env.local edit "NEXT_PUBLIC_API_BASE_URL=http://192.168.68.154:8000/api" to your ip address*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2 ways
+run npm run dev -- --host=192.168.68.154 --port=3000
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+another way
 
-## Learn More
+locate package.json and edit the following:
+"dev": "next dev --hostname 192.168.68.154 --port 3000",
+"start": "next start --hostname 192.168.68.154 --port 3000",
 
-To learn more about Next.js, take a look at the following resources:
+BACKEND = Laravel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+php artisan env:decrypt --force --key=base64:0rPEg5jGaTu42J4qqE3vTy1MpMsFDy2CxvtDI8eaHrQ=
 
-## Deploy on Vercel
+php artisan migrate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+php artisan db:seed
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+php artisan serve --host=192.168.68.154 --port=8000 your ip address*
