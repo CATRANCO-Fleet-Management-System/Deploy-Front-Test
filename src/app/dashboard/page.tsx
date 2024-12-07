@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import Header from "../components/Header";
 import { FaBus, FaCog, FaUsers, FaAngleDoubleRight } from "react-icons/fa";
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import vehicle service
-import { getAllMaintenanceScheduling } from "@/app/services/maintenanceService"; // Import maintenance scheduling service
+import { getAllActiveMaintenanceScheduling } from "@/app/services/maintenanceService"; // Import maintenance scheduling service
 import { getAllProfiles } from "@/app/services/userProfile"; // Import profile service
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -55,11 +55,12 @@ const DashboardHeader = () => {
 
     const fetchMaintenance = async () => {
       try {
-        const maintenance = await getAllMaintenanceScheduling();
-        const inMaintenance = maintenance.filter((maintenance) => maintenance.maintenance_scheduling_id).length;
-        setBusesInMaintenance(inMaintenance);
+        const response = await getAllActiveMaintenanceScheduling();
+        const maintenanceCount = response.data ? response.data.length : 0; // Get count
+        setBusesInMaintenance(maintenanceCount);
       } catch (error) {
-        console.error("Error fetching maintenance:", error);
+        console.error("Error fetching active maintenance schedules:", error);
+        setBusesInMaintenance(0); // Fallback to 0
       }
     };
 
@@ -218,7 +219,7 @@ const DashboardHeader = () => {
                   ) : error ? (
                     <p>{error}</p>
                   ) : (
-                    <MapContainer center={[8.48325558794408, 124.5866112118501]} zoom={13} style={{ height: "70vh", width: "100%" }}>
+                    <MapContainer center={[8.48325558794408, 124.5866112118501]} zoom={13} style={{ height: "100%", width: "100%" }}>
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       {busData.map((bus) => (
                         <Marker

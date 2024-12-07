@@ -3,43 +3,37 @@ import axios from 'axios';
 // Define the base API URL
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// Create an instance of axios with default settings
+// Create an axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
 });
 
-// Add request interceptor to include the token in the headers
-api.interceptors.request.use(config => {
-  if (typeof window !== "undefined") { // Check if in the browser environment
-    const token = localStorage.getItem('authToken'); // Ensure 'authToken' is used
+// Add interceptors for token handling
+api.interceptors.request.use(
+  async (config) => {
+    const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-  }
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// Function to handle login
+// Authentication Services
+
+// Login
 export const login = async (credentials) => {
   try {
-    const response = await api.post('/user/login', {
-      username: credentials.username,
-      password: credentials.password,
-    });
-
-    if (response.data && response.data.token) {
-      const token = response.data.token;
-
-      // Save token in localStorage
+    const response = await api.post('/user/login', credentials);
+    const { token } = response.data;
+    if (token) {
       localStorage.setItem('authToken', token);
     }
-
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
@@ -47,7 +41,7 @@ export const login = async (credentials) => {
   }
 };
 
-// Function to handle registration
+// Register
 export const register = async (userData) => {
   try {
     const response = await api.post('/user/register', userData);
@@ -58,16 +52,10 @@ export const register = async (userData) => {
   }
 };
 
-// Function to get user profile
+// Get Logged-in User Profile
 export const getProfile = async () => {
   try {
-    const token = localStorage.getItem('authToken'); // Get token from localStorage
-    if (!token) throw new Error('User not logged in.');
-
-    const response = await api.get('/user/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
+    const response = await api.get('/user/me');
     return response.data;
   } catch (error) {
     console.error('Get profile error:', error);
@@ -75,37 +63,56 @@ export const getProfile = async () => {
   }
 };
 
-// Function to update user profile
-export const updateProfile = async (profileData) => {
+export const getOwnProfile = async () => {
   try {
-    const token = localStorage.getItem('authToken'); // Get token from localStorage
-    if (!token) throw new Error('User not logged in.');
-
-    const response = await api.patch('/user/update', profileData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
+    const response = await api.get('/user/profile/view');
     return response.data;
   } catch (error) {
-    console.error('Update profile error:', error);
+    console.error('Get profile error:', error);
     throw error.response ? error.response.data : error;
   }
 };
 
-// Function to handle logout
+// Update Logged-in User Account
+export const updateAccount = async (accountData) => {
+  try {
+    const response = await api.patch('/user/update', accountData);
+    return response.data;
+  } catch (error) {
+    console.error('Update account error:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+// Logout
 export const logout = async () => {
   try {
-    const token = localStorage.getItem('authToken'); // Get token from localStorage
-    if (!token) throw new Error('User not logged in.');
-
-    await api.post('/user/logout', {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    // Remove token from localStorage
+    await api.post('/user/logout');
     localStorage.removeItem('authToken');
   } catch (error) {
     console.error('Logout error:', error);
-    throw error;
+    throw error.response ? error.response.data : error;
+  }
+};
+
+// Deactivate User Account
+export const deactivateAccount = async (userId) => {
+  try {
+    const response = await api.patch(`/user/admin/deactivate-account/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Deactivate account error:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+// Activate User Account
+export const activateAccount = async (userId) => {
+  try {
+    const response = await api.patch(`/user/admin/activate-account/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Activate account error:', error);
+    throw error.response ? error.response.data : error;
   }
 };

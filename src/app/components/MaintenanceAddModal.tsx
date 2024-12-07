@@ -113,23 +113,40 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="maintenanceType" className="block text-sm font-medium text-gray-700">
-              Maintenance Type
-            </label>
-            <select
-              id="maintenanceType"
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
-              value={maintenanceType}
-              onChange={(e) => setMaintenanceType(e.target.value)}
-            >
-              <option value="">Select a maintenance type</option>
-              {maintenanceTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                </option>
-              ))}
-            </select>
-          </div>
+  <label htmlFor="maintenanceType" className="block text-sm font-medium text-gray-700">
+    Maintenance Type
+  </label>
+  <select
+    id="maintenanceType"
+    className="border border-gray-500 p-3 rounded-md w-full mt-1"
+    value={maintenanceType}
+    onChange={(e) => setMaintenanceType(e.target.value)}
+  >
+    <option value="">Select a maintenance type</option>
+    {maintenanceTypes.map((type) => (
+      <option key={type} value={type}>
+        {type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+      </option>
+    ))}
+    <option value="others">Others (Specify Below)</option>
+  </select>
+</div>
+
+{maintenanceType === "others" && (
+  <div className="col-span-2">
+    <label htmlFor="otherMaintenanceType" className="block text-sm font-medium text-gray-700">
+      Specify Other Concern
+    </label>
+    <input
+      id="otherMaintenanceType"
+      placeholder="Describe the maintenance type"
+      value={mechanicCompanyAddress}
+      onChange={(e) => setMechanicCompanyAddress(e.target.value)}
+      className="border border-gray-500 p-3 rounded-md w-full mt-1"
+    />
+  </div>
+)}
+
           <div className="col-span-1">
             <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700">
               Vehicle

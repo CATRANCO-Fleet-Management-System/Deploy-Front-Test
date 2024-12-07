@@ -108,12 +108,46 @@ export const deleteMaintenanceScheduling = async (id) => {
  * @param {number} id - The ID of the maintenance schedule.
  * @returns {Promise<Object>} - The updated status of the schedule.
  */
-export const toggleMaintenanceSchedulingStatus = async (id) => {
+export const toggleMaintenanceSchedulingStatus = async (id, formData) => {
   try {
-    const response = await api.patch(`/user/admin/maintenance-scheduling/toggle-status/${id}`);
+    const response = await api.post(`/user/admin/maintenance-scheduling/toggle-status/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error(`Toggle Maintenance Scheduling Status error: ${id}`, error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+
+
+/**
+ * Get all active maintenance scheduling records.
+ * @returns {Promise<Object[]>} - An array of active maintenance schedules.
+ */
+export const getAllActiveMaintenanceScheduling = async () => {
+  try {
+    const response = await api.get('/user/admin/maintenance-scheduling/all/active');
+    return response.data;
+  } catch (error) {
+    console.error('Get All Active Maintenance Scheduling error:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+/**
+ * Get all completed maintenance scheduling records.
+ * @returns {Promise<Object[]>} - An array of completed maintenance schedules.
+ */
+export const getAllCompletedMaintenanceScheduling = async () => {
+  try {
+    const response = await api.get('/user/admin/maintenance-scheduling/all/completed');
+    return response.data;
+  } catch (error) {
+    console.error('Get All Completed Maintenance Scheduling error:', error);
     throw error.response ? error.response.data : error;
   }
 };

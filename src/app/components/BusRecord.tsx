@@ -7,6 +7,7 @@ import {
 import { deleteVehicle } from "@/app/services/vehicleService";
 import EditBusRecordModal from "@/app/components/EditBusRecordModal";
 import EditPersonnelModal from "@/app/components/EditPersonnelModal";
+import FullRecordModal from "@/app/components/FullRecordModal";
 
 interface BusBoxProps {
   vehicle_id: string;
@@ -15,7 +16,7 @@ interface BusBoxProps {
   CRNumber: string;
   plateNumber: string;
   thirdLBI: string;
-  comprehensiveInsurance?: string;
+  ci?: string;
   assignedDriver: string;
   assignedPAO: string;
   assignmentId: string | null;
@@ -44,9 +45,12 @@ const BusRecord: React.FC<BusBoxProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isEditBusModalOpen, setIsEditBusModalOpen] = useState(false);
   const [isEditPersonnelModalOpen, setIsEditPersonnelModalOpen] = useState(false);
+  const [isFullRecordModalOpen, setIsFullRecordModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
+  const openFullRecordModal = () => setIsFullRecordModalOpen(true);
+  const closeFullRecordModal = () => setIsFullRecordModalOpen(false);
   const toggleDropdown = useCallback(() => setDropdownOpen((prev) => !prev), []);
 
   // Close dropdown if clicked outside
@@ -197,14 +201,30 @@ const BusRecord: React.FC<BusBoxProps> = ({
             </div>
           )}
         </div>
-        <a
-          href={`/bus-profiles/bus-records/${busNumber}`}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full text-center"
-          aria-label={`View full record for ${busNumber}`}
-        >
-          View Bus Full Record
-        </a>
+        <button
+  onClick={openFullRecordModal}
+  className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+>
+  View Full Record
+</button>
       </div>
+
+       {/* Full Record Modal */}
+       <FullRecordModal
+        isOpen={isFullRecordModalOpen}
+        onClose={closeFullRecordModal}
+        busDetails={{
+          busNumber,
+          ORNumber,
+          CRNumber,
+          plateNumber,
+          thirdLBI,
+          comprehensiveInsurance,
+          assignedDriver,
+          assignedPAO,
+          route,
+        }}
+      />
 
       {/* Modals */}
       {isEditBusModalOpen && (

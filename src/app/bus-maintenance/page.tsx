@@ -4,9 +4,12 @@ import Layout from "../components/Layout";
 import Header from "../components/Header";
 import MaintenanceAddModal from "../components/MaintenanceAddModal";
 import MaintenanceEditModal from "../components/MaintenanceEditModal";
+import CompletionProofModal from "../components/CompletionProofModal"; // Component for proof submission
+import ViewProofModal from "../components/ViewProofModal"; // Component for viewing proof
 import { FaSearch, FaPlus } from "react-icons/fa";
 import {
-  getAllMaintenanceScheduling,
+  getAllActiveMaintenanceScheduling,
+  getAllCompletedMaintenanceScheduling,
   createMaintenanceScheduling,
   updateMaintenanceScheduling,
   deleteMaintenanceScheduling,
@@ -16,33 +19,69 @@ import {
 const MaintenanceManagement = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isProofModalOpen, setIsProofModalOpen] = useState(false);
+  const [isViewProofModalOpen, setIsViewProofModalOpen] = useState(false); // New state for viewing proof
   const [currentRecord, setCurrentRecord] = useState(null);
   const [records, setRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [viewType, setViewType] = useState("active"); // "active" or "completed"
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 6;
 
-  // Fetch Maintenance Records
+  // Fetch Maintenance Records based on viewType
   const fetchRecords = useCallback(async () => {
     try {
-      const data = await getAllMaintenanceScheduling();
-      setRecords(data);
+      let response;
+      if (viewType === "active") {
+        response = await getAllActiveMaintenanceScheduling();
+      } else {
+        response = await getAllCompletedMaintenanceScheduling();
+      }
+      setRecords(Array.isArray(response.data) ? response.data : []); // Extract the `data` key
     } catch (error) {
       console.error("Error fetching records:", error);
+      setRecords([]); // Fallback to an empty array
     }
-  }, []);
+  }, [viewType]);
 
   useEffect(() => {
-    fetchRecords(); // Fetch records on mount
+    fetchRecords(); // Fetch records when viewType changes
   }, [fetchRecords]);
 
   // Filter records based on search term
-  const filteredRecords = records.filter((record) =>
-    Object.values(record)
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  const filteredRecords = Array.isArray(records)
+  ? records.filter((record) =>
+      Object.values(record)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+  : [];
+
+  const handleReturnToActive = async (id) => {
+    try {
+      const formData = new FormData();
+
+      // Append proof file if available
+      if (currentRecord?.maintenance_complete_proof instanceof File) {
+        formData.append("maintenance_complete_proof", currentRecord.maintenance_complete_proof);
+      }
+
+      const updatedRecord = await toggleMaintenanceSchedulingStatus(id, formData);
+
+      setRecords((prev) =>
+        prev.map((record) =>
+          record.maintenance_scheduling_id === id
+            ? { ...record, maintenance_status: updatedRecord.schedule.maintenance_status }
+            : record
+        )
+      );
+
+      setIsViewProofModalOpen(false); // Close the modal after successful update
+    } catch (error) {
+      console.error("Error returning to active:", error.response?.data || error);
+    }
+  };
 
   // Pagination logic
   const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
@@ -64,10 +103,8 @@ const MaintenanceManagement = () => {
   const handleSave = async (id, data) => {
     try {
       if (id) {
-        // Update existing record
         await updateMaintenanceScheduling(id, data);
       } else {
-        // Create new record
         await createMaintenanceScheduling(data);
       }
       fetchRecords(); // Refetch records after save
@@ -78,25 +115,54 @@ const MaintenanceManagement = () => {
     }
   };
 
-  const handleToggleStatus = async (id) => {
+  const handleProofSubmit = async (id, proofData) => {
     try {
-      const updatedRecord = await toggleMaintenanceSchedulingStatus(id);
+      const updatedRecord = await toggleMaintenanceSchedulingStatus(id, proofData);
       setRecords((prev) =>
         prev.map((record) =>
           record.maintenance_scheduling_id === id
-            ? { ...record, maintenance_status: updatedRecord.schedule.maintenance_status }
+            ? {
+                ...record,
+                maintenance_status: updatedRecord.schedule.maintenance_status,
+                maintenance_complete_proof: updatedRecord.schedule.maintenance_complete_proof,
+              }
             : record
         )
       );
+      setIsProofModalOpen(false);
     } catch (error) {
-      console.error("Error toggling status:", error);
+      console.error("Error submitting proof:", error);
     }
+  };
+
+  const handleViewProof = (record) => {
+    setCurrentRecord(record);
+    setIsViewProofModalOpen(true); // Open proof modal
   };
 
   return (
     <Layout>
       <Header title="Bus Maintenance Management" />
       <div className="options flex items-center space-x-10 p-4 w-9/12 ml-8">
+        {/* Active/Completed Toggle Buttons */}
+        <button
+          className={`px-4 py-2 rounded-md ${
+            viewType === "active" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+          }`}
+          onClick={() => setViewType("active")}
+        >
+          Active
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md ${
+            viewType === "completed" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+          }`}
+          onClick={() => setViewType("completed")}
+        >
+          Completed
+        </button>
+
+        {/* Search and Add Buttons */}
         <input
           type="text"
           placeholder="Find maintenance records"
@@ -116,26 +182,33 @@ const MaintenanceManagement = () => {
           Add New
         </button>
       </div>
+
+      {/* Display Records */}
       <div className="records flex flex-wrap gap-4 px-8 mt-4">
         {currentRecords.map((record) => (
           <div
             key={record.maintenance_scheduling_id}
-            className="record-card bg-white p-4 rounded shadow w-full md:w-1/2 lg:w-1/3"
+            className="record-card bg-white p-2 rounded shadow w-full md:w-1/3 lg:w-1/4"
           >
             <table className="w-full border-collapse">
               <tbody>
                 <tr>
-                  <td className="border p-2 font-bold">Maintenance ID:</td>
-                  <td className="border p-2">{record.maintenance_scheduling_id || "N/A"}</td>
+                  <td className="border p-2 font-bold">Bus:</td>
+                  <td className="border p-2">{record.vehicle_id || "N/A"}</td>
                 </tr>
                 <tr>
                   <td className="border p-2 font-bold">Status:</td>
                   <td className="border p-2">
                     <button
-                      className={`px-2 py-1 rounded text-white ${
-                        record.maintenance_status === "active" ? "bg-green-500" : "bg-red-500"
+                      className={`px-2 py-1 rounded text-black ${
+                        record.maintenance_status === "active" ? "bg-yellow-400" : "bg-green-400"
                       }`}
-                      onClick={() => handleToggleStatus(record.maintenance_scheduling_id)}
+                      onClick={() => {
+                        if (record.maintenance_status === "active") {
+                          setCurrentRecord(record);
+                          setIsProofModalOpen(true);
+                        }
+                      }}
                     >
                       {record.maintenance_status || "N/A"}
                     </button>
@@ -166,25 +239,38 @@ const MaintenanceManagement = () => {
               </tbody>
             </table>
             <div className="flex space-x-2 mt-3">
-              <button
-                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => {
-                  setCurrentRecord(record);
-                  setIsEditModalOpen(true);
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => handleRemove(record.maintenance_scheduling_id)}
-              >
-                Remove
-              </button>
+              {record.maintenance_status === "completed" ? (
+                <button
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  onClick={() => handleViewProof(record)}
+                >
+                  View Completion Proof
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    onClick={() => {
+                      setCurrentRecord(record);
+                      setIsEditModalOpen(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    onClick={() => handleRemove(record.maintenance_scheduling_id)}
+                  >
+                    Remove
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
       <div className="pagination flex justify-center items-center space-x-2 mt-6">
         {Array.from({ length: totalPages }, (_, index) => (
           <button
@@ -198,6 +284,8 @@ const MaintenanceManagement = () => {
           </button>
         ))}
       </div>
+
+      {/* Modals */}
       <MaintenanceAddModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -208,6 +296,18 @@ const MaintenanceManagement = () => {
         onClose={() => setIsEditModalOpen(false)}
         record={currentRecord}
         onSave={handleSave}
+      />
+      <CompletionProofModal
+        isOpen={isProofModalOpen}
+        onClose={() => setIsProofModalOpen(false)}
+        record={currentRecord}
+        onSubmit={handleProofSubmit}
+      />
+      <ViewProofModal
+        isOpen={isViewProofModalOpen}
+        onClose={() => setIsViewProofModalOpen(false)}
+        proof={currentRecord?.maintenance_complete_proof}
+        onReturnToActive={() => handleReturnToActive(currentRecord?.maintenance_scheduling_id)}
       />
     </Layout>
   );

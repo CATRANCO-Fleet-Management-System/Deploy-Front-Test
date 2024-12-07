@@ -12,7 +12,7 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
   } = viewData;
 
   const BASE_URL =
-    process.env.NEXT_PUBLIC_STORAGE_URL || "http://192.168.68.154:8000/storage/";
+    process.env.NEXT_PUBLIC_STORAGE_URL || "http://192.168.68.147:8000/storage/";
 
   const formatDate = (date) => {
     if (!date || date === "N/A") return "N/A";
