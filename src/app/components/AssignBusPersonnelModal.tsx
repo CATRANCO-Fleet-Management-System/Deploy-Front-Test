@@ -3,13 +3,20 @@ import { getAllProfiles } from "@/app/services/userProfile";
 import { getAllVehicles } from "@/app/services/vehicleService";
 import { createVehicleAssignment } from "@/app/services/vehicleAssignService";
 
-const AssignBusPersonnelModal = ({ onClose, refreshData, onAssign, preSelectedVehicle }) => {
+const AssignBusPersonnelModal = ({
+  onClose,
+  refreshData,
+  onAssign,
+  preSelectedVehicle,
+}) => {
   const [drivers, setDrivers] = useState([]);
   const [paos, setPaos] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState("");
   const [selectedPAO, setSelectedPAO] = useState("");
-  const [selectedVehicle, setSelectedVehicle] = useState(preSelectedVehicle || "");
+  const [selectedVehicle, setSelectedVehicle] = useState(
+    preSelectedVehicle || ""
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,9 +26,12 @@ const AssignBusPersonnelModal = ({ onClose, refreshData, onAssign, preSelectedVe
       setLoading(true);
       try {
         const profiles = await getAllProfiles();
-        const driverProfiles = profiles.filter((profile) => profile.profile.position === "driver");
+        const driverProfiles = profiles.filter(
+          (profile) => profile.profile.position === "driver"
+        );
         const paoProfiles = profiles.filter(
-          (profile) => profile.profile.position === "passenger_assistant_officer"
+          (profile) =>
+            profile.profile.position === "passenger_assistant_officer"
         );
         const vehicleData = await getAllVehicles();
 
@@ -44,43 +54,45 @@ const AssignBusPersonnelModal = ({ onClose, refreshData, onAssign, preSelectedVe
       setError("Please select a driver, PAO, and vehicle.");
       return;
     }
-  
+
     setLoading(true);
     setError(""); // Clear any previous errors
-  
+
     try {
       const assignmentData = {
         vehicle_id: selectedVehicle,
         user_profile_ids: [selectedDriver, selectedPAO],
       };
-  
+
       console.log("Submitting assignment data:", assignmentData);
-  
+
       const response = await createVehicleAssignment(assignmentData);
-  
+
       // Assuming a successful response contains the `assignment` object
       if (response.assignment) {
         console.log("Assignment created successfully:", response.assignment);
-  
+
         // Trigger onAssign callback to update parent state
         if (onAssign) {
           onAssign(response.assignment);
         }
-  
+
         // Refresh parent data
         if (refreshData) {
           refreshData();
         }
-  
+
         // Close the modal immediately after a successful assignment
         onClose();
       }
     } catch (catchError) {
       console.error("Error creating vehicle assignment:", catchError);
-  
+
       // If an error is received, log it and show a generic error message
       // Do not show the error message if it is just closing after success
-      setError("An error occurred while creating the assignment. Please try again.");
+      setError(
+        "An error occurred while creating the assignment. Please try again."
+      );
     } finally {
       onClose();
     }
@@ -125,7 +137,9 @@ const AssignBusPersonnelModal = ({ onClose, refreshData, onAssign, preSelectedVe
             )}
           </div>
           <div>
-            <h1 className="text-xl mt-4">Passenger Assistant Officer Assignment</h1>
+            <h1 className="text-xl mt-4">
+              Passenger Assistant Officer Assignment
+            </h1>
             {loading ? (
               <p>Loading PAOs...</p>
             ) : (
@@ -164,12 +178,17 @@ const AssignBusPersonnelModal = ({ onClose, refreshData, onAssign, preSelectedVe
                 disabled={!!preSelectedVehicle} // Disable if pre-selected
               >
                 {preSelectedVehicle ? (
-                  <option value={preSelectedVehicle}>{preSelectedVehicle}</option>
+                  <option value={preSelectedVehicle}>
+                    {preSelectedVehicle}
+                  </option>
                 ) : (
                   <>
                     <option value="">Select a Vehicle</option>
                     {vehicles.map((vehicle) => (
-                      <option key={vehicle.vehicle_id} value={vehicle.vehicle_id}>
+                      <option
+                        key={vehicle.vehicle_id}
+                        value={vehicle.vehicle_id}
+                      >
                         {vehicle.vehicle_id}
                       </option>
                     ))}
@@ -177,6 +196,13 @@ const AssignBusPersonnelModal = ({ onClose, refreshData, onAssign, preSelectedVe
                 )}
               </select>
             )}
+          </div>
+          <div className="mt-4">
+            <label className="text-xl">Route Assigned</label>
+            <select className="mt-4 h-10 text-lg border border-gray-300 rounded-md p-2 w-full">
+              <option value="canitoan_to_cogon">Canitoan To Cogon</option>
+              <option value="silvercreek_to_cogon">SilverCreek To Cogon</option>
+            </select>
           </div>
           {error && <p className="text-red-500">{error}</p>}
           <div className="flex justify-end space-x-4 mt-6">
