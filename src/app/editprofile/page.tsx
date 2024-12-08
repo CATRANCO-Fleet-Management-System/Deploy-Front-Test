@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Sidebar2 from "../components/Sidebar2";
 import Header from "../components/Header";
-import { getProfile, updateAccount, getOwnProfile } from "../services/authService";
+import {
+  getProfile,
+  updateAccount,
+  getOwnProfile,
+} from "../services/authService";
 import { updateOwnAccount } from "../services/userProfile";
 const EditProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"account" | "profile">("account"); // Toggle between tabs
@@ -26,7 +30,9 @@ const EditProfile: React.FC = () => {
     newPassword: "",
   });
 
-  const [selectedImage, setSelectedImage] = useState<string | ArrayBuffer | null>(null);
+  const [selectedImage, setSelectedImage] = useState<
+    string | ArrayBuffer | null
+  >(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -147,14 +153,16 @@ const EditProfile: React.FC = () => {
       <Sidebar2 />
       <section className="right w-full bg-slate-200 overflow-y-hidden">
         <Header title="Edit Profile" />
-        <div className="content flex flex-col h-full p-10">
+        <div className="content flex flex-col h-full px-10 py-4">
           {loading && <p className="text-center">Loading...</p>}
-          <div className="bg-white rounded-lg shadow-lg w-full p-6">
+          <div className="bg-white rounded-lg shadow-lg w-full px-6 py-4">
             {/* Tab Navigation */}
             <div className="flex justify-center mb-6">
               <button
                 className={`px-4 py-2 mr-4 ${
-                  activeTab === "account" ? "bg-blue-600 text-white" : "bg-gray-200"
+                  activeTab === "account"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200"
                 } rounded-md`}
                 onClick={() => setActiveTab("account")}
               >
@@ -162,7 +170,9 @@ const EditProfile: React.FC = () => {
               </button>
               <button
                 className={`px-4 py-2 ${
-                  activeTab === "profile" ? "bg-blue-600 text-white" : "bg-gray-200"
+                  activeTab === "profile"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200"
                 } rounded-md`}
                 onClick={() => setActiveTab("profile")}
               >
@@ -180,7 +190,9 @@ const EditProfile: React.FC = () => {
                     <input
                       type="text"
                       value={accountSettings.username}
-                      onChange={(e) => handleAccountChange("username", e.target.value)}
+                      onChange={(e) =>
+                        handleAccountChange("username", e.target.value)
+                      }
                       className="block w-full mt-1 px-3 py-2 border rounded-md"
                     />
                   </div>
@@ -189,7 +201,9 @@ const EditProfile: React.FC = () => {
                     <input
                       type="email"
                       value={accountSettings.email}
-                      onChange={(e) => handleAccountChange("email", e.target.value)}
+                      onChange={(e) =>
+                        handleAccountChange("email", e.target.value)
+                      }
                       className="block w-full mt-1 px-3 py-2 border rounded-md"
                     />
                   </div>
@@ -198,17 +212,21 @@ const EditProfile: React.FC = () => {
                     <input
                       type="password"
                       value={accountSettings.newPassword}
-                      onChange={(e) => handleAccountChange("newPassword", e.target.value)}
+                      onChange={(e) =>
+                        handleAccountChange("newPassword", e.target.value)
+                      }
                       className="block w-full mt-1 px-3 py-2 border rounded-md"
                     />
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md mt-4"
-                >
-                  Save Account Settings
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md mt-4"
+                  >
+                    Save Account Settings
+                  </button>
+                </div>
               </form>
             )}
 
@@ -222,41 +240,80 @@ const EditProfile: React.FC = () => {
                     { label: "First Name", field: "firstName" },
                     { label: "Middle Initial", field: "middleInitial" },
                     { label: "Address", field: "address" },
-                    { label: "Date of Birth", field: "dateOfBirth", type: "date" },
+                    {
+                      label: "Date of Birth",
+                      field: "dateOfBirth",
+                      type: "date",
+                    },
                     { label: "Sex", field: "sex" },
                     { label: "Contact Number", field: "contactNumber" },
                     { label: "Contact Person", field: "contactPerson" },
-                    { label: "Contact Person Number", field: "contactPersonNumber" },
+                    {
+                      label: "Contact Person Number",
+                      field: "contactPersonNumber",
+                    },
                   ].map(({ label, field, type = "text" }) => (
                     <div key={field}>
                       <label>{label}</label>
                       <input
                         type={type}
-                        value={profileSettings[field as keyof typeof profileSettings] || ""}
-                        onChange={(e) => handleProfileChange(field, e.target.value)}
+                        value={
+                          profileSettings[
+                            field as keyof typeof profileSettings
+                          ] || ""
+                        }
+                        onChange={(e) =>
+                          handleProfileChange(field, e.target.value)
+                        }
                         className="block w-full mt-1 px-3 py-2 border rounded-md"
                       />
                     </div>
                   ))}
                   <div>
-                    <label>Profile Photo</label>
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {selectedImage && (
-                      <img
-                        src={selectedImage as string}
-                        alt="Profile"
-                        className="mt-2 rounded-md"
-                        style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                    <label className="text-gray-700 mb-2">Profile Photo</label>
+                    <div className="relative w-44 h-12 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
                       />
-                    )}
+                      {selectedImage ? (
+                        <img
+                          src={selectedImage as string}
+                          alt="Profile"
+                          className=" object-cover rounded-lg"
+                        />
+                      ) : (
+                        <span className="text-gray-500">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 inline-block mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 4v16m8-8H4"
+                            />
+                          </svg>
+                          Add Attachment
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md mt-4"
-                >
-                  Save Profile Settings
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                  >
+                    Save Profile Settings
+                  </button>
+                </div>
               </form>
             )}
           </div>

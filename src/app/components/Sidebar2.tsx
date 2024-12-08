@@ -9,7 +9,6 @@ export default function Sidebar2() {
 
   const menuItems = [
     { href: "/editprofile", icon: <FaPen size={25} />, label: "Edit Profile" },
-    { href: "/messages", icon: <FaEnvelope size={25} />, label: "Messages" },
     {
       href: "/notification",
       icon: <FaBell size={25} />,

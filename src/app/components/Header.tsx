@@ -70,7 +70,10 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           </Link>
         </div>
         <div className="profile ml-3 flex items-center justify-center relative">
-          <FaUser size={42} className="rounded-full border border-gray-400 p-2" />
+          <FaUser
+            size={42}
+            className="rounded-full border border-gray-400 p-2"
+          />
           <FaCaretDown
             size={20}
             className="ml-2 cursor-pointer"
@@ -79,20 +82,15 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           {dropdownVisible && (
             <div
               ref={dropdownRef}
-              className="absolute right-0 mr-2 mt-44 w-32 text-base bg-white border border-gray-300 rounded shadow-lg"
+              className="absolute right-0 mr-2 mt-28 w-32 text-base bg-white border border-gray-300 rounded shadow-lg"
             >
               <Link
                 href="/editprofile"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
               >
-                Edit Profile
-              </Link>
-              <Link
-                href="#"
-                className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-              >
                 Settings
               </Link>
+
               <button
                 onClick={handleLogout} // Trigger logout on click
                 className="block w-full text-left px-4 py-2 text-red-500 font-semibold hover:bg-gray-100"
