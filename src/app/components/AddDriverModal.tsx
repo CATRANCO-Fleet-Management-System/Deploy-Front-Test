@@ -40,7 +40,11 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
   }, [birthday]);
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -50,6 +54,10 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
 
   // Handle birthday changes
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBirthday(e.target.value);
+  };
+  // Handle date hired changes
+  const handleDateHiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
   };
 
@@ -103,7 +111,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
         <form className="grid grid-cols-2 gap-4 mt-4">
           {/* Left Column */}
           <div>
-            <div className="flex flex-col items-center space-y-4 mb-6">
+            <div className="flex flex-col items-center space-y-4 mb-2">
               <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
                 <input
                   type="file"
@@ -118,12 +126,16 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
-                  <span className="flex items-center justify-center h-full text-gray-500">+ Add Photo</span>
+                  <span className="flex items-center justify-center h-full text-gray-500">
+                    + Add Photo
+                  </span>
                 )}
               </div>
             </div>
 
-            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Last Name
+            </label>
             <Input
               name="last_name"
               value={formData.last_name}
@@ -133,7 +145,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">First Name</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              First Name
+            </label>
             <Input
               name="first_name"
               value={formData.first_name}
@@ -143,7 +157,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Middle Initial</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Middle Initial
+            </label>
             <Input
               name="middle_initial"
               value={formData.middle_initial}
@@ -153,7 +169,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Position</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Position
+            </label>
             <Input
               name="position"
               value="Driver"
@@ -161,7 +179,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:outline-none focus-visible:ring-0"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">License Number</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              License Number
+            </label>
             <Input
               name="license_number"
               value={formData.license_number}
@@ -170,11 +190,20 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          {/* Right Column */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Date Hired
+            </label>
+            <Input
+              name="birthday"
+              value={birthday}
+              onChange={handleDateHiredChange}
+              type="date"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
+            />
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Date of Birth
+            </label>
             <Input
               name="birthday"
               value={birthday}
@@ -183,15 +212,22 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
+          </div>
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Age</label>
+          {/* Right Column */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Age
+            </label>
             <Input
               value={age}
               readOnly
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Gender</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Gender
+            </label>
             <select
               name="sex"
               value={formData.sex}
@@ -202,7 +238,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               <option value="Female">Female</option>
             </select>
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Contact Number</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Contact Number
+            </label>
             <Input
               name="contact_number"
               value={formData.contact_number}
@@ -211,7 +249,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Contact Person</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Contact Person
+            </label>
             <Input
               name="contact_person"
               value={formData.contact_person}
@@ -220,7 +260,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Contact Person Number</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Contact Person Number
+            </label>
             <Input
               name="contact_person_number"
               value={formData.contact_person_number}
@@ -229,7 +271,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">Address</label>
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Address
+            </label>
             <textarea
               name="address"
               value={formData.address}
@@ -237,23 +281,49 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
             />
+
+            {/* Personnel Status */}
+            <label className="block text-sm font-medium text-gray-700 mt-4">
+              Personnel Status
+            </label>
+            <select
+              name="personnel_status"
+              value={formData.personnel_status}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="On Duty">On Duty</option>
+              <option value="Terminated">Terminated</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Others">Others</option>
+            </select>
+
+            {/* Additional input for "Others" */}
+            {formData.personnel_status === "Others" && (
+              <Input
+                name="specific_personnel_status"
+                value={formData.specific_personnel_status}
+                onChange={handleInputChange}
+                placeholder="Specify personnel status"
+                className="mt-2 focus:ring-2 focus:ring-blue-500"
+              />
+            )}
+            <div className="flex justify-end space-x-4 bottom-0 mt-16">
+              <button
+                onClick={handleSubmit}
+                className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+              >
+                Save
+              </button>
+              <button
+                onClick={onClose}
+                className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
-
-        <div className="flex justify-end space-x-4 mt-6">
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-          >
-            Save
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-          >
-            Cancel
-          </button>
-        </div>
       </div>
     </div>
   );

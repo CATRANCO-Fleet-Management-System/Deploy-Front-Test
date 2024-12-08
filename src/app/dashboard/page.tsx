@@ -6,7 +6,13 @@ import { FaBus, FaCog, FaUsers, FaAngleDoubleRight } from "react-icons/fa";
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import vehicle service
 import { getAllActiveMaintenanceScheduling } from "@/app/services/maintenanceService"; // Import maintenance scheduling service
 import { getAllProfiles } from "@/app/services/userProfile"; // Import profile service
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import mqtt from "mqtt";
@@ -46,7 +52,9 @@ const DashboardHeader = () => {
     const fetchVehicles = async () => {
       try {
         const vehicles = await getAllVehicles();
-        const inOperation = vehicles.filter((vehicle) => vehicle.vehicle_id).length;
+        const inOperation = vehicles.filter(
+          (vehicle) => vehicle.vehicle_id
+        ).length;
         setBusesInOperation(inOperation);
       } catch (error) {
         console.error("Error fetching vehicles:", error);
@@ -168,42 +176,66 @@ const DashboardHeader = () => {
         <Header title="Dashboard" />
         <section className="right w-full overflow-y-hidden">
           <div className="content flex flex-col h-full">
-            <div className="statuses flex flex-row space-x-10 m-12">
+            <div className="statuses flex flex-row space-x-5 m-12">
               {/* Buses in Operation */}
-              <div className="status-container w-1/4 bg-white h-40 rounded-lg border-2 border-violet-400">
-                <div className="inside-box flex flex-row justify-center items-center space-x-5 mt-8">
+              <div
+                className="status-container bg-white h-40 rounded-lg border-2 border-violet-400"
+                style={{ width: "290px" }}
+              >
+                <div className="inside-box flex flex-row justify-center items-center space-x-3 mt-8 ml-4 ">
                   <div className="text text-violet-700 space-y-2">
-                    <h1 className="bus-op text-5xl font-bold">{busesInOperation}</h1>
-                    <p className="text-lg">Buses in Operation</p>
+                    <h1 className="bus-op text-5xl font-bold">
+                      {busesInOperation}
+                    </h1>
+                    <p className="text-lg mt-12">Buses in Operation</p>
                   </div>
                   <div>
-                    <FaBus size={80} className="ml-2 cursor-pointer text-violet-400" />
+                    <FaBus
+                      size={60}
+                      className="ml-2 cursor-pointer text-violet-400 mr-2"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Buses in Maintenance */}
-              <div className="status-container w-1/4 bg-white h-40 rounded-lg border-2 border-violet-400">
-                <div className="inside-box flex flex-row justify-center items-center space-x-5 mt-8">
+              <div
+                className="status-container w-1/4 bg-white h-40 rounded-lg border-2 border-violet-400"
+                style={{ width: "300px" }}
+              >
+                <div className="inside-box flex flex-row justify-center items-center space-x-2 mt-8 ml-4">
                   <div className="text text-violet-700 space-y-2">
-                    <h1 className="bus-op text-5xl font-bold">{busesInMaintenance}</h1>
+                    <h1 className="bus-op text-5xl font-bold">
+                      {busesInMaintenance}
+                    </h1>
                     <p className="text-lg">Buses in Maintenance</p>
                   </div>
                   <div>
-                    <FaCog size={80} className="ml-2 cursor-pointer fill-none stroke-violet-400 stroke-20" />
+                    <FaCog
+                      size={60}
+                      className="ml-2 cursor-pointer fill-none stroke-violet-400 stroke-20 mr-4 mb-6"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Current Employees */}
-              <div className="status-container w-1/4 bg-white h-40 rounded-lg border-2 border-violet-400">
-                <div className="inside-box flex flex-row justify-center items-center space-x-5 mt-8">
+              <div
+                className="status-container w-1/4 bg-white h-40 rounded-lg border-2 border-violet-400"
+                style={{ width: "290px" }}
+              >
+                <div className="inside-box flex flex-row justify-center items-center space-x-2 mt-8 ml-4">
                   <div className="text text-violet-700 space-y-2">
-                    <h1 className="bus-op text-5xl font-bold">{currentEmployees}</h1>
+                    <h1 className="bus-op text-5xl font-bold">
+                      {currentEmployees}
+                    </h1>
                     <p className="text-lg">Current Employees</p>
                   </div>
                   <div>
-                    <FaUsers size={80} className="ml-2 cursor-pointer text-violet-400" />
+                    <FaUsers
+                      size={70}
+                      className="ml-2 cursor-pointer text-violet-400"
+                    />
                   </div>
                 </div>
               </div>
@@ -219,7 +251,11 @@ const DashboardHeader = () => {
                   ) : error ? (
                     <p>{error}</p>
                   ) : (
-                    <MapContainer center={[8.48325558794408, 124.5866112118501]} zoom={13} style={{ height: "100%", width: "100%" }}>
+                    <MapContainer
+                      center={[8.48325558794408, 124.5866112118501]}
+                      zoom={13}
+                      style={{ height: "100%", width: "100%" }}
+                    >
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       {busData.map((bus) => (
                         <Marker
@@ -247,23 +283,42 @@ const DashboardHeader = () => {
                 </div>
 
                 <div className="arrow">
-                  <FaAngleDoubleRight size={20} className="ml-2 cursor-pointer text-violet-800" />
+                  <FaAngleDoubleRight
+                    size={20}
+                    className="ml-2 cursor-pointer text-violet-800"
+                  />
                 </div>
 
                 {/* Example Bus Information */}
-                <div className="bus-information w-1/4 bg-white h-120 rounded-lg border-2 border-violet-400">
+                <div className="bus-information w-1/4 bg-white h-96 rounded-lg border-2 border-violet-400">
                   <div className="infos flex flex-col ml-5">
                     <div className="header-info flex flex-row mt-10 space-x-5">
-                      <FaBus size={80} className="ml-2 cursor-pointer text-violet-600" />
-                      <h1 className="text-red-600 text-3xl font-bold">{selectedBus ? `BUS ${selectedBus}` : "Select a Bus"}</h1>
+                      <FaBus
+                        size={60}
+                        className="ml-2 cursor-pointer text-violet-600"
+                      />
+                      <h1 className="text-red-600 text-2xl font-bold">
+                        {selectedBus ? `BUS ${selectedBus}` : "Select a Bus"}
+                      </h1>
                     </div>
                     <div className="info-text mt-10">
-                      <ul className="list-disc list-inside space-y-4 text-xl">
-                        <li><strong>Driver:</strong> James Harden</li>
-                        <li><strong>Conductor:</strong> Stephen Curry</li>
-                        <li><strong>Plate number:</strong> KVJ-232-2313</li>
-                        <li><strong>Trips:</strong> 5</li>
-                        <li><strong>Status:</strong> {selectedBus ? "In Operation" : "Not Selected"}</li>
+                      <ul className="list-disc list-inside space-y-4 text-base">
+                        <li>
+                          <strong>Driver:</strong> James Harden
+                        </li>
+                        <li>
+                          <strong>Conductor:</strong> Stephen Curry
+                        </li>
+                        <li>
+                          <strong>Plate number:</strong> KVJ-232-2313
+                        </li>
+                        <li>
+                          <strong>Trips:</strong> 5
+                        </li>
+                        <li>
+                          <strong>Status:</strong>{" "}
+                          {selectedBus ? "In Operation" : "Not Selected"}
+                        </li>
                       </ul>
                     </div>
                   </div>

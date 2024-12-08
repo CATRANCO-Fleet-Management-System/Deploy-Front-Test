@@ -133,7 +133,9 @@ export default function AuthPage() {
       });
     } catch (error) {
       setFormErrors({
-        global: error.response?.data?.message || "Registration failed. Please try again.",
+        global:
+          error.response?.data?.message ||
+          "Registration failed. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -144,7 +146,11 @@ export default function AuthPage() {
     <section className="h-screen flex flex-row bg-white">
       {/* Left Side - Logo */}
       <div className="left w-1/2 h-full flex justify-center items-center">
-        <img src="/logo.png" alt="Logo" className="w-4/5 object-contain ml-20" />
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="w-4/5 object-contain ml-20"
+        />
       </div>
 
       {/* Right Side - Form */}
@@ -160,7 +166,9 @@ export default function AuthPage() {
               value={formData.username}
               onChange={handleChange}
             />
-            {formErrors.username && <p className="text-red-500">{formErrors.username}</p>}
+            {formErrors.username && (
+              <p className="text-red-500">{formErrors.username}</p>
+            )}
             <Input
               className="h-16 text-lg"
               type="password"
@@ -169,8 +177,12 @@ export default function AuthPage() {
               value={formData.password}
               onChange={handleChange}
             />
-            {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
-            {formErrors.global && <p className="text-red-500">{formErrors.global}</p>}
+            {formErrors.password && (
+              <p className="text-red-500">{formErrors.password}</p>
+            )}
+            {formErrors.global && (
+              <p className="text-red-500">{formErrors.global}</p>
+            )}
           </div>
 
           {/* Login Button */}
@@ -182,12 +194,12 @@ export default function AuthPage() {
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
-            <Button
+            {/* <Button
               className="h-16 w-4/5 text-white text-2xl font-bold bg-gradient-to-r from-green-500 to-yellow-500"
               onClick={toggleRegister}
             >
               Register
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
@@ -205,22 +217,39 @@ export default function AuthPage() {
             <h2 className="text-3xl font-bold mb-8 text-center">Register</h2>
             <div className="space-y-6">
               {/* Register Form Fields */}
-              {["firstName", "lastName", "email", "username", "password", "confirmPassword", "position"].map((field) => (
+              {[
+                "firstName",
+                "lastName",
+                "email",
+                "username",
+                "password",
+                "confirmPassword",
+                "position",
+              ].map((field) => (
                 <div key={field}>
                   <Input
                     className="h-12 text-lg"
                     type={field.includes("password") ? "password" : "text"}
-                    placeholder={field.charAt(0).toUpperCase() + field.slice(1).replace("confirmPassword", "Re-type Password")}
+                    placeholder={
+                      field.charAt(0).toUpperCase() +
+                      field
+                        .slice(1)
+                        .replace("confirmPassword", "Re-type Password")
+                    }
                     name={field}
                     value={formData[field]}
                     onChange={handleChange}
                   />
-                  {formErrors[field] && <p className="text-red-500">{formErrors[field]}</p>}
+                  {formErrors[field] && (
+                    <p className="text-red-500">{formErrors[field]}</p>
+                  )}
                 </div>
               ))}
             </div>
-            {formErrors.global && <p className="text-red-500 mt-4">{formErrors.global}</p>}
-            <div className="flex justify-center mt-10">
+            {formErrors.global && (
+              <p className="text-red-500 mt-4">{formErrors.global}</p>
+            )}
+            {/* <div className="flex justify-center mt-10">
               <Button
                 className="h-12 w-full text-white text-xl font-bold bg-gradient-to-r from-blue-500 to-red-500"
                 onClick={handleRegister}
@@ -228,7 +257,7 @@ export default function AuthPage() {
               >
                 {loading ? "Registering..." : "Register"}
               </Button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
