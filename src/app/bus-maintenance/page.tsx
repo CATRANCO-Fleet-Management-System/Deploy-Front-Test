@@ -6,6 +6,7 @@ import MaintenanceAddModal from "../components/MaintenanceAddModal";
 import MaintenanceEditModal from "../components/MaintenanceEditModal";
 import CompletionProofModal from "../components/CompletionProofModal"; // Component for proof submission
 import ViewProofModal from "../components/ViewProofModal"; // Component for viewing proof
+import Pagination from "../components/Pagination";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import {
   getAllActiveMaintenanceScheduling,
@@ -26,7 +27,7 @@ const MaintenanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewType, setViewType] = useState("active"); // "active" or "completed"
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 6;
+  const recordsPerPage = 3;
 
   // Fetch Maintenance Records based on viewType
   const fetchRecords = useCallback(async () => {
@@ -83,22 +84,22 @@ const MaintenanceManagement = () => {
     }
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = filteredRecords.slice(indexOfFirstRecord, indexOfLastRecord);
+ // Pagination logic
+ const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
+ const indexOfLastRecord = currentPage * recordsPerPage;
+ const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+ const currentRecords = filteredRecords.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+ const handlePageChange = (page) => setCurrentPage(page);
 
-  const handleRemove = async (id) => {
-    try {
-      await deleteMaintenanceScheduling(id);
-      fetchRecords(); // Refetch records after deletion
-    } catch (error) {
-      console.error("Error deleting record:", error);
-    }
-  };
+ const handleRemove = async (id) => {
+   try {
+     await deleteMaintenanceScheduling(id);
+     fetchRecords();
+   } catch (error) {
+     console.error("Error deleting record:", error);
+   }
+ };
 
   const handleSave = async (id, data) => {
     try {
@@ -270,20 +271,12 @@ const MaintenanceManagement = () => {
         ))}
       </div>
 
-      {/* Pagination */}
-      <div className="pagination flex justify-center items-center space-x-2 mt-6">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index + 1}
-            onClick={() => handlePageChange(index + 1)}
-            className={`px-3 py-1 border rounded-md ${
-              currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
-            }`}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      {/* Pagination Component */}
+      <Pagination
+    currentPage={currentPage}
+    totalPages={totalPages}
+    onPageChange={handlePageChange}
+/>
 
       {/* Modals */}
       <MaintenanceAddModal

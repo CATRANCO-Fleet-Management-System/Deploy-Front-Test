@@ -8,49 +8,14 @@ import BusRecord from "../components/BusRecord";
 import AddBusRecordModal from "../components/AddBusRecordModal";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
 import EditBusRecordModal from "../components/EditBusRecordModal";
+import Pagination from "../components/Pagination"; // Pagination Component
 import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
-
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  return (
-    <div className="pagination flex items-center justify-center space-x-2 mt-8">
-      <button
-        className={`px-3 py-1 border-2 rounded ${
-          currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-gray-700"
-        }`}
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        &lt;
-      </button>
-      {Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i + 1}
-          className={`px-3 py-1 border-2 rounded ${
-            i + 1 === currentPage ? "bg-blue-500 text-white" : "text-gray-700"
-          }`}
-          onClick={() => onPageChange(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
-      <button
-        className={`px-3 py-1 border-2 rounded ${
-          currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-gray-700"
-        }`}
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        &gt;
-      </button>
-    </div>
-  );
-};
 
 const BusRecordDisplay = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(4);
+  const itemsPerPage = 3; // Number of items per page
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -159,6 +124,11 @@ const BusRecordDisplay = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Reset pagination when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   return (
     <Layout>

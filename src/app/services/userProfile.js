@@ -70,16 +70,6 @@ export const updateProfile = async (id, profileData) => {
   }
 };
 
-export const updateOwnAccount = async (accountData) => {
-  try {
-    const response = await api.patch('/user/admin/updateOwnProfile', accountData);
-    return response.data;
-  } catch (error) {
-    console.error('Update account error:', error);
-    throw error.response ? error.response.data : error;
-  }
-};
-
 // Update Profile Image
 export const updateProfileImage = async (id, imageData) => {
   try {

@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       await logout(); // Call the logout function from authService
 
       // Clear the token from localStorage
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem("authToken");
 
       // Redirect to the login page after logout
       router.push("/login");

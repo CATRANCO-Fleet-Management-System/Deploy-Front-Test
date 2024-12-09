@@ -161,7 +161,6 @@ const ViewRecord = () => {
                   <th className="py-2 px-4">Distance</th>
                   <th className="py-2 px-4">Liters</th>
                   <th className="py-2 px-4">Total Amount (PHP)</th>
-                  <th className="py-2 px-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -174,13 +173,13 @@ const ViewRecord = () => {
                     <td className="py-2 text-right flex items-center space-x-2">
                       <button
                         onClick={() => handleViewDetails(entry)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                       >
                         View
                       </button>
                       <button
                         onClick={() => handleEdit(entry)}
-                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                       >
                         Edit
                       </button>
@@ -188,7 +187,7 @@ const ViewRecord = () => {
                         onClick={() => handleDeleteFuelLog(entry.fuel_logs_id)}
                         className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                       >
-                        <FaTrash />
+                        Remove
                       </button>
                     </td>
                     </tr>

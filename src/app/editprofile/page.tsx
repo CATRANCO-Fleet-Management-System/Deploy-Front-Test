@@ -5,10 +5,9 @@ import Sidebar2 from "../components/Sidebar2";
 import Header from "../components/Header";
 import {
   getProfile,
-  updateAccount,
+  updateAccount, updateOwnAccount,
   getOwnProfile,
 } from "../services/authService";
-import { updateOwnAccount } from "../services/userProfile";
 const EditProfile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"account" | "profile">("account"); // Toggle between tabs
   const [profileSettings, setProfileSettings] = useState({

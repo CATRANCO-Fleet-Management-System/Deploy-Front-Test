@@ -5,12 +5,13 @@ import { createProfile } from "@/app/services/userProfile";
 
 const AddDriverModal = ({ isOpen, onClose, onSave }) => {
   const [birthday, setBirthday] = useState<string>(""); // State for birthday
+  const [dateHired, setDateHired] = useState<string>(""); // State for date hired
   const [age, setAge] = useState<number | string>(""); // State for age
   const [formData, setFormData] = useState({
     last_name: "",
     first_name: "",
     middle_initial: "",
-    position: "driver",
+    position: "driver", 
     license_number: "",
     sex: "Male",
     contact_number: "",
@@ -18,6 +19,8 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
     contact_person_number: "",
     address: "",
     user_profile_image: "",
+    personnel_status: "On Duty",
+    specific_personnel_status: "",
   });
 
   // Calculate Age
@@ -56,9 +59,10 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
   };
+
   // Handle date hired changes
   const handleDateHiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBirthday(e.target.value);
+    setDateHired(e.target.value);
   };
 
   // Handle Image Upload
@@ -82,6 +86,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
       const newProfile = {
         ...formData,
         date_of_birth: birthday,
+        date_hired: dateHired,
       };
       const response = await createProfile(newProfile); // Save the new driver profile
       if (response && response.profile) {
@@ -190,24 +195,14 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
+
             <label className="block text-sm font-medium text-gray-700 mt-4">
               Date Hired
             </label>
             <Input
-              name="birthday"
-              value={birthday}
+              name="date_hired"
+              value={dateHired}
               onChange={handleDateHiredChange}
-              type="date"
-              required
-              className="focus:ring-2 focus:ring-blue-500"
-            />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
-              Date of Birth
-            </label>
-            <Input
-              name="birthday"
-              value={birthday}
-              onChange={handleBirthdayChange}
               type="date"
               required
               className="focus:ring-2 focus:ring-blue-500"
@@ -216,6 +211,15 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Right Column */}
           <div>
+          <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <Input
+              name="birthday"
+              value={birthday}
+              onChange={handleBirthdayChange}
+              type="date"
+              required
+              className="focus:ring-2 focus:ring-blue-500"
+            />
             <label className="block text-sm font-medium text-gray-700">
               Age
             </label>
@@ -312,7 +316,8 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
           {/* Buttons */}
           <div className="col-span-2 flex justify-end space-x-4 -mt-12 mb-4">
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
             >
               Save

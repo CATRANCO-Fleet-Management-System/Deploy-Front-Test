@@ -7,7 +7,11 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  const visiblePages = 3; // Limit to 3 visible page buttons
+  const startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+  const endPage = Math.min(totalPages, startPage + visiblePages - 1);
+
+  const pages = Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
 
   return (
     <div className="pagination flex items-center justify-center space-x-2 mt-6">
@@ -20,6 +24,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       >
         &lt; Previous
       </button>
+
       {pages.map((page) => (
         <button
           key={page}
@@ -31,6 +36,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
           {page}
         </button>
       ))}
+
       <button
         className={`px-3 py-1 border rounded ${
           currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-gray-700 hover:bg-gray-200"

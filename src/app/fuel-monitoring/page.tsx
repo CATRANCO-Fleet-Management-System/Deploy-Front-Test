@@ -3,13 +3,14 @@ import React, { useState, useEffect } from "react";
 import { FaBus, FaCalendar } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
-import Layout from "../components/Layout"; 
-import Header from "../components/Header"; 
+import Layout from "../components/Layout";
+import Header from "../components/Header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchAllFuelLogs } from "@/app/services/fuellogsService"; // Fuel Logs service
 import { getAllVehicles } from "@/app/services/vehicleService"; // Vehicles service
 import { getAllMaintenanceScheduling } from "@/app/services/maintenanceService"; // Maintenance service
+import Pagination from "../components/Pagination"; // Import the Pagination component
 import { useRouter } from "next/navigation";
 
 const FuelMonitoring = () => {
@@ -23,6 +24,8 @@ const FuelMonitoring = () => {
   const [vehicles, setVehicles] = useState([]);
   const [maintenanceSchedules, setMaintenanceSchedules] = useState([]);
   const [error, setError] = useState(null);
+
+  const itemsPerPage = 3; // Number of buses to display per page
 
   // Fetch data: vehicles, fuel logs, and maintenance schedules
   const loadData = async () => {
@@ -88,14 +91,7 @@ const FuelMonitoring = () => {
     maintainAspectRatio: false,
   };
 
-  const itemsPerPage = 9;
   const totalPages = Math.ceil(vehicles.length / itemsPerPage);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
   const displayedBuses = vehicles.slice(
     (currentPage - 1) * itemsPerPage,
@@ -158,7 +154,7 @@ const FuelMonitoring = () => {
               }`}
               onClick={() => setTimeInterval(interval)}
             >
-              {interval.charAt(0).toUpperCase()}
+              {interval.charAt(0).toUpperCase() + interval.slice(1)}
             </button>
           ))}
           <FaCalendar
@@ -175,7 +171,15 @@ const FuelMonitoring = () => {
                 className="bg-white border border-gray-300 rounded-md shadow-lg"
               />
             </div>
+            
           )}
+          <button
+            onClick={navigateToViewRecord}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={!selectedBus}
+          >
+            View Record
+          </button>
         </div>
 
         <div className="buses mt-4 grid grid-cols-3 gap-4 w-5/6 mx-auto">
@@ -211,52 +215,12 @@ const FuelMonitoring = () => {
           })}
         </div>
 
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={navigateToViewRecord}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-            disabled={!selectedBus}
-          >
-            View Record
-          </button>
-        </div>
-
-        <div className="pagination mt-6 flex justify-center space-x-2">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 border rounded ${
-              currentPage === 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-white border-gray-500 text-gray-700"
-            }`}
-          >
-            &lt;
-          </button>
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 border rounded ${
-                currentPage === index + 1
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-700"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 border rounded ${
-              currentPage === totalPages
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-white border-gray-500 text-gray-700"
-            }`}
-          >
-            &gt;
-          </button>
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </section>
     </Layout>

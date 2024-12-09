@@ -1,14 +1,32 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { createFeedbackLog, generateOTP, verifyPhoneNumber } from "../services/feedbackService";
+import { getAllVehicles } from "../services/vehicleService";
 
 const FeedbackForm: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState('initial'); 
-  const [busNumber, setBusNumber] = useState('');
+  const [currentStep, setCurrentStep] = useState("initial");
+  const [busNumber, setBusNumber] = useState("");
   const [rating, setRating] = useState(0);
-  const [comments, setComments] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
+  const [comments, setComments] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [feedbackLogsId, setFeedbackLogsId] = useState(null);
+  const [buses, setBuses] = useState([]);
+
+  // Fetch bus numbers
+  useEffect(() => {
+    const fetchBuses = async () => {
+      try {
+        const busList = await getAllVehicles();
+        setBuses(busList);
+      } catch (error) {
+        console.error("Error fetching buses:", error);
+      }
+    };
+
+    fetchBuses();
+  }, []);
 
   const handleBusNumberChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setBusNumber(event.target.value);
@@ -23,25 +41,56 @@ const FeedbackForm: React.FC = () => {
   };
 
   const handleSendFeedback = () => {
-    setCurrentStep('feedback');
+    setCurrentStep("feedback");
   };
 
-  const handleSubmitFeedback = () => {
-    setCurrentStep('phoneInput');
+  const handleSubmitFeedback = async () => {
+    if (!busNumber || rating === 0 || !comments.trim()) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+    try {
+        const feedbackData = { vehicle_id: busNumber, rating, comments };
+        console.log("Submitting feedback data:", feedbackData);
+        const response = await createFeedbackLog(feedbackData);
+        console.log("Feedback response:", response);
+        setFeedbackLogsId(response.feedback_logs_id);
+        setCurrentStep("phoneInput");
+        console.log("Moved to phone input step");
+    } catch (error) {
+        console.error("Error submitting feedback:", error);
+        alert("Failed to submit feedback. Please try again.");
+    }
+};
+  
+
+  const handlePhoneInputSubmit = async () => {
+    try {
+      await generateOTP(feedbackLogsId);
+      setCurrentStep("verification");
+    } catch (error) {
+      console.error("Error generating OTP:", error);
+      alert("Failed to generate OTP. Please try again.");
+    }
   };
 
-  const handlePhoneInputSubmit = () => {
-    setCurrentStep('verification');
-  };
-
-  const handleVerificationSubmit = () => {
-    setCurrentStep('thankYou');
+  const handleVerificationSubmit = async () => {
+    try {
+      await verifyPhoneNumber(feedbackLogsId, verificationCode);
+      setCurrentStep("thankYou");
+    } catch (error) {
+      console.error("Error verifying phone number:", error);
+      alert("Invalid verification code. Please try again.");
+    }
   };
 
   return (
-    <section className="h-screen w-full flex justify-center items-center" style={{ background: 'linear-gradient(135deg, #e0f7fa, #d1c4e9)' }}>
+    <section
+      className="h-screen w-full flex justify-center items-center"
+      style={{ background: "linear-gradient(135deg, #e0f7fa, #d1c4e9)" }}
+    >
       <div className="w-full h-full flex flex-col justify-center items-center">
-        {currentStep === 'initial' && (
+        {currentStep === "initial" && (
           <div style={styles.container}>
             <div className="w-full flex justify-center items-center mb-4">
               <img
@@ -57,17 +106,19 @@ const FeedbackForm: React.FC = () => {
           </div>
         )}
 
-        {currentStep === 'feedback' && (
+        {currentStep === "feedback" && (
           <div style={styles.container}>
             <h2 style={styles.title}>Give feedback</h2>
 
             <div style={styles.dropdown}>
-              <label>Select Bus Number </label>
+              <label>Select Bus Number</label>
               <select value={busNumber} onChange={handleBusNumberChange} style={styles.input}>
                 <option value="">Select Bus Number</option>
-                <option value="1">Bus 1</option>
-                <option value="2">Bus 2</option>
-                <option value="3">Bus 3</option>
+                {buses.map((bus) => (
+                  <option key={bus.vehicle_id} value={bus.vehicle_id}>
+                    {bus.plate_number || `Bus ${bus.vehicle_id}`}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -78,9 +129,9 @@ const FeedbackForm: React.FC = () => {
                   <span
                     key={index}
                     style={{
-                      cursor: 'pointer',
-                      fontSize: '30px', 
-                      color: rating >= index ? '#FFD700' : '#CCCCCC',
+                      cursor: "pointer",
+                      fontSize: "30px",
+                      color: rating >= index ? "#FFD700" : "#CCCCCC",
                     }}
                     onClick={() => handleRatingChange(index)}
                   >
@@ -100,14 +151,16 @@ const FeedbackForm: React.FC = () => {
             </div>
 
             <button onClick={handleSubmitFeedback} style={styles.submitButton}>
-              Submit Feedback (Via Phone Number)
-            </button>
+  Submit Feedback
+</button>
           </div>
         )}
 
-        {currentStep === 'phoneInput' && (
+        {currentStep === "phoneInput" && (
           <div style={styles.container}>
-            <button onClick={() => setCurrentStep('feedback')} style={styles.backButton}>←</button>
+            <button onClick={() => setCurrentStep("feedback")} style={styles.backButton}>
+              ←
+            </button>
             <h2 style={styles.title}>Phone Number</h2>
             <input
               type="text"
@@ -122,9 +175,11 @@ const FeedbackForm: React.FC = () => {
           </div>
         )}
 
-        {currentStep === 'verification' && (
+        {currentStep === "verification" && (
           <div style={styles.container}>
-            <button onClick={() => setCurrentStep('phoneInput')} style={styles.backButton}>←</button>
+            <button onClick={() => setCurrentStep("phoneInput")} style={styles.backButton}>
+              ←
+            </button>
             <h2 style={styles.title}>Enter Verification Code</h2>
             <p>Your verification code is sent by SMS to: {phoneNumber}</p>
             <input
@@ -140,17 +195,13 @@ const FeedbackForm: React.FC = () => {
           </div>
         )}
 
-        {currentStep === 'thankYou' && (
-
+        {currentStep === "thankYou" && (
           <div style={styles.thankYouContainer}>
             <h2 style={styles.thankYouTitle}>Thank you for your feedback!</h2>
             <p>We appreciate your input and will use it to improve our services.</p>
-            <button onClick={() => setCurrentStep('initial')} style={styles.submitButton}>
+            <button onClick={() => setCurrentStep("initial")} style={styles.submitButton}>
               Ok
             </button>
-            <a onClick={() => setCurrentStep('feedback')} style={styles.feedbackLink}>
-              send feedback again
-            </a>
           </div>
         )}
       </div>

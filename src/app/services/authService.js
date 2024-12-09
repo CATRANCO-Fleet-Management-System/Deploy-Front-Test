@@ -84,6 +84,35 @@ export const updateAccount = async (accountData) => {
   }
 };
 
+export const updateOwnAccount = async (accountData) => {
+  try {
+    let payload;
+
+    if (accountData instanceof FormData) {
+      // If accountData is already FormData, use it as-is
+      payload = accountData;
+    } else {
+      // Otherwise, convert accountData to FormData
+      payload = new FormData();
+      Object.keys(accountData).forEach((key) => {
+        payload.append(key, accountData[key]);
+      });
+    }
+
+    const response = await api.post('/user/admin/updateOwnProfile', payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data', // Ensure the correct content type
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Update own account error:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+
+
 // Logout
 export const logout = async () => {
   try {

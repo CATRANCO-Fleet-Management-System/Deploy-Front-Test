@@ -1,14 +1,14 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import LoadingSpinner from "./components/loadingAnimation";
+import LoadingSpinner from "./components/loadingAnimations";
 
 export default function LoadingPage() {
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("http://192.168.254.112:3000/login");
+      router.push("http://192.168.68.147:3000/login");
     }, 3000);
 
     // Cleanup timer
