@@ -14,6 +14,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
   const [maintenanceType, setMaintenanceType] = useState("");
   const [mechanicCompany, setMechanicCompany] = useState("");
   const [mechanicCompanyAddress, setMechanicCompanyAddress] = useState("");
+  const [otherMaintenanceType, setOtherMaintenanceType] = useState(""); // New state for "others"
 
   // Maintenance types list
   const maintenanceTypes = [
@@ -43,6 +44,15 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
     }
   }, [isOpen]);
 
+  const handleMaintenanceTypeChange = (e) => {
+    const selectedType = e.target.value;
+    setMaintenanceType(selectedType);
+
+    // Clear the "other" field when switching away from "others"
+    if (selectedType !== "others") {
+      setOtherMaintenanceType("");
+    }
+  };
   // Handle form submission
   const handleSubmit = async () => {
     if (
@@ -59,12 +69,15 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
       "en-CA"
     )} ${maintenanceDate.toLocaleTimeString("en-GB", { hour12: false })}`;
 
+    const finalMaintenanceType =
+      maintenanceType === "others" ? otherMaintenanceType : maintenanceType;
+
     const newRecord = {
-      maintenance_number: maintenanceNumber, // Use the fetched and incremented maintenance number
+      maintenance_number: maintenanceNumber,
       vehicle_id: vehicleId || "N/A",
       maintenance_cost: maintenanceCost || "0",
       maintenance_date: formattedDate,
-      maintenance_type: maintenanceType || "unspecified",
+      maintenance_type: finalMaintenanceType || "unspecified",
       mechanic_company: mechanicCompany || "N/A",
       mechanic_company_address: mechanicCompanyAddress || "N/A",
       maintenance_status: "active",
@@ -130,7 +143,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
                 id="maintenanceType"
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
                 value={maintenanceType}
-                onChange={(e) => setMaintenanceType(e.target.value)}
+                onChange={handleMaintenanceTypeChange} // Updated handler
               >
                 <option value="">Select a maintenance type</option>
                 {maintenanceTypes.map((type) => (
@@ -148,15 +161,15 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               <div className="col-span-2">
                 <label
                   htmlFor="otherMaintenanceType"
-                  className="block text-sm font-medium text-gray-700 "
+                  className="block text-sm font-medium text-gray-700"
                 >
                   Specify Other Concern
                 </label>
                 <input
                   id="otherMaintenanceType"
                   placeholder="Describe the maintenance type"
-                  value={mechanicCompanyAddress}
-                  onChange={(e) => setMechanicCompanyAddress(e.target.value)}
+                  value={otherMaintenanceType} // Use new state
+                  onChange={(e) => setOtherMaintenanceType(e.target.value)} // Update new state
                   className="border border-gray-500 p-3 rounded-md mt-1 w-full"
                 />
               </div>

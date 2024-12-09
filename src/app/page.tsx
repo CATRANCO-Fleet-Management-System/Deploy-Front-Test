@@ -8,7 +8,7 @@ export default function LoadingPage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("http://192.168.68.147:3000/login");
+      router.push("http://192.168.254.112:3000/login");
     }, 3000);
 
     // Cleanup timer
