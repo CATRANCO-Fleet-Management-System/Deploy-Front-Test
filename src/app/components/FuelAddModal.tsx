@@ -8,6 +8,8 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
     distanceTraveled: "",
     fuelType: "",
     fuelPrice: "",
+    fuel_liters_quantity: "",
+    total_expense: "",
     odometerProof: null,
     fuelReceiptProof: null,
   });
@@ -16,7 +18,19 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, [name]: value };
+
+      // Auto compute fuel expense
+      if (name === "fuelPrice" || name === "fuel_liters_quantity") {
+        const price = parseFloat(updatedData.fuelPrice) || 0;
+        const quantity = parseFloat(updatedData.fuel_liters_quantity) || 0;
+        updatedData.total_expense = (price * quantity).toFixed(2);
+      }
+
+      return updatedData;
+    });
   };
 
   const handleFileChange = (e) => {
@@ -30,7 +44,9 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
       !formData.date ||
       !formData.distanceTraveled ||
       !formData.fuelType ||
-      !formData.fuelPrice
+      !formData.fuelPrice ||
+      !formData.fuel_liters_quantity ||
+      !formData.total_expense
     ) {
       alert("Please fill in all required fields.");
       return;
@@ -39,14 +55,20 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("purchase_date", formData.date);
     formDataToSubmit.append("odometer_km", formData.distanceTraveled);
-    formDataToSubmit.append("fuel_liters_quantity", formData.fuelPrice); // Assuming fuel price is in liters
+    formDataToSubmit.append(
+      "fuel_liters_quantity",
+      formData.fuel_liters_quantity
+    ); // Assuming fuel price is in liters
     formDataToSubmit.append("fuel_price", formData.fuelPrice);
     formDataToSubmit.append("fuel_type", formData.fuelType);
     formDataToSubmit.append("vehicle_id", selectedBus);
 
     // Append optional files
     if (formData.odometerProof) {
-      formDataToSubmit.append("odometer_distance_proof", formData.odometerProof);
+      formDataToSubmit.append(
+        "odometer_distance_proof",
+        formData.odometerProof
+      );
     }
     if (formData.fuelReceiptProof) {
       formDataToSubmit.append("fuel_receipt_proof", formData.fuelReceiptProof);
@@ -91,7 +113,9 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block font-medium">Distance Traveled (KM)</label>
+              <label className="block font-medium">
+                Distance Traveled (KM)
+              </label>
               <input
                 type="number"
                 name="distanceTraveled"
@@ -124,11 +148,33 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
                 className="w-full border border-gray-300 p-2 rounded"
               />
             </div>
+            <div className="mb-4">
+              <label className="block font-medium">Fuel Quantity (L)</label>
+              <input
+                type="number"
+                name="fuel_liters_quantity"
+                value={formData.fuel_liters_quantity}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-2 rounded"
+              />
+            </div>
           </div>
           {/* Right Section */}
           <div className="w-1/2">
             <div className="mb-4">
-              <label className="block font-medium">Distance (Odometer) Proof</label>
+              <label className="block font-medium">Total Expense (PHP)</label>
+              <input
+                type="number"
+                name="total_expense"
+                value={formData.total_expense}
+                disabled
+                className="w-full border border-gray-300 p-2 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block font-medium">
+                Distance (Odometer) Proof
+              </label>
               <input
                 type="file"
                 name="odometerProof"

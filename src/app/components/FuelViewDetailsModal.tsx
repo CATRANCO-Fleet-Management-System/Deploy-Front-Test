@@ -7,12 +7,15 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
     odometer_km = "N/A",
     fuel_price = "N/A",
     fuel_type = "N/A",
+    fuel_liters_quantity = "N/A",
+    total_expense = "N/A",
     odometer_distance_proof = null,
     fuel_receipt_proof = null,
   } = viewData;
 
   const BASE_URL =
-    process.env.NEXT_PUBLIC_STORAGE_URL || "http://192.168.68.147:8000/storage/";
+    process.env.NEXT_PUBLIC_STORAGE_URL ||
+    "http://192.168.68.147:8000/storage/";
 
   const formatDate = (date) => {
     if (!date || date === "N/A") return "N/A";
@@ -69,10 +72,30 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
                 className="w-full border border-gray-300 p-2 rounded bg-gray-100"
               />
             </div>
+            <div className="mb-4">
+              <label className="block font-medium">Fuel Quantity (L)</label>
+              <input
+                type="number"
+                name="fuel_liters_quantity"
+                value={fuel_liters_quantity}
+                disabled
+                className="w-full border border-gray-300 p-2 rounded"
+              />
+            </div>
           </div>
 
           {/* Right Section */}
           <div className="w-1/2">
+            <div className="mb-4">
+              <label className="block font-medium">Total Expense (PHP)</label>
+              <input
+                type="number"
+                name="total_expense"
+                value={total_expense}
+                disabled
+                className="w-full border border-gray-300 p-2 rounded"
+              />
+            </div>
             <div className="mb-4">
               <label className="block font-medium">Odometer Proof</label>
               {odometer_distance_proof ? (
