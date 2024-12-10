@@ -10,7 +10,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import FuelAddModal from "@/app/components/FuelAddModal";
 import FuelViewDetailsModal from "@/app/components/FuelViewDetailsModal";
-import { fetchAllFuelLogs, deleteFuelLog } from "@/app/services/fuellogsService";
+import {
+  fetchAllFuelLogs,
+  deleteFuelLog,
+} from "@/app/services/fuellogsService";
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
@@ -31,7 +34,9 @@ const ViewRecord = () => {
     const fetchLogs = async () => {
       try {
         const logs = await fetchAllFuelLogs();
-        const filteredLogs = logs.filter((log) => log.vehicle_id === selectedBus);
+        const filteredLogs = logs.filter(
+          (log) => log.vehicle_id === selectedBus
+        );
         setFuelLogs(filteredLogs);
       } catch (error) {
         console.error("Failed to fetch fuel logs:", error);
@@ -63,7 +68,9 @@ const ViewRecord = () => {
   // Handle new record addition or update
   const handleAddOrUpdateRecord = (updatedRecord) => {
     setFuelLogs((prevLogs) => {
-      const index = prevLogs.findIndex((log) => log.fuel_logs_id === updatedRecord.fuel_logs_id);
+      const index = prevLogs.findIndex(
+        (log) => log.fuel_logs_id === updatedRecord.fuel_logs_id
+      );
       if (index !== -1) {
         // Update existing record
         const updatedLogs = [...prevLogs];
@@ -95,7 +102,9 @@ const ViewRecord = () => {
   const chartData = {
     daily: {
       labels: fuelLogs.map((log) => log.purchase_date),
-      distance: fuelLogs.map((log) => log.distance_travelled || log.distance_traveled || 0), // Fixing to check both fields
+      distance: fuelLogs.map(
+        (log) => log.distance_travelled || log.distance_traveled || 0
+      ), // Fixing to check both fields
       liters: fuelLogs.map((log) => log.fuel_liters_quantity || 0),
     },
   };
@@ -145,7 +154,9 @@ const ViewRecord = () => {
             <FaBus size={24} className="mr-2" />
             <span className="text-lg font-bold">BUS {selectedBus}</span>
             <span
-              className={`ml-2 ${busStatus === "Maintenance" ? "text-red-500" : "text-green-500"}`}
+              className={`ml-2 ${
+                busStatus === "Maintenance" ? "text-red-500" : "text-green-500"
+              }`}
             >
               {busStatus}
             </span>
@@ -159,7 +170,9 @@ const ViewRecord = () => {
                 <tr>
                   <th className="py-2 px-4">Date</th>
                   <th className="py-2 px-4">Distance</th>
-                  <th className="py-2 px-4">Liters</th>
+                  <th className="py-2 px-4">Fuel Type</th>
+                  <th className="py-2 px-4">Fuel Price</th>
+                  <th className="py-2 px-4">Fuel Quantity</th>
                   <th className="py-2 px-4">Total Amount (PHP)</th>
                 </tr>
               </thead>
@@ -168,7 +181,11 @@ const ViewRecord = () => {
                   <tr key={entry.fuel_logs_id} className="border-t">
                     <td className="py-2 px-4">{entry.purchase_date}</td>
                     <td className="py-2 px-4">{entry.odometer_km} KM</td>
-                    <td className="py-2 px-4">{entry.fuel_liters_quantity} L</td>
+                    <td className="py-2 px-4">{entry.fuel_type}</td>
+                    <td className="py-2 px-4">{entry.fuel_price}</td>
+                    <td className="py-2 px-4">
+                      {entry.fuel_liters_quantity} L
+                    </td>
                     <td className="py-2 px-4">{entry.total_expense} PHP</td>
                     <td className="py-2 text-right flex items-center space-x-2">
                       <button
@@ -190,7 +207,7 @@ const ViewRecord = () => {
                         Remove
                       </button>
                     </td>
-                    </tr>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -241,4 +258,3 @@ const ViewRecord = () => {
 };
 
 export default ViewRecord;
-

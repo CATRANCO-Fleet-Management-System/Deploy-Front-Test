@@ -9,14 +9,17 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
   const [busNumber, setBusNumber] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [officialReceipt, setOfficialReceipt] = useState("");
-  const [certificateOfRegistration, setCertificateOfRegistration] = useState("");
+  const [certificateOfRegistration, setCertificateOfRegistration] =
+    useState("");
   const [engineNumber, setEngineNumber] = useState("");
   const [chasisNumber, setChasisNumber] = useState("");
   const [thirdPartyInsurance, setThirdPartyInsurance] = useState("");
   const [thirdPartyPolicyNo, setThirdPartyPolicyNo] = useState("");
   const [thirdPartyValidity, setThirdPartyValidity] = useState(new Date());
   const [comprehensiveInsurance, setComprehensiveInsurance] = useState("");
-  const [comprehensiveValidity, setComprehensiveValidity] = useState(new Date());
+  const [comprehensiveValidity, setComprehensiveValidity] = useState(
+    new Date()
+  );
   const [datePurchased, setDatePurchased] = useState(new Date());
   const [supplier, setSupplier] = useState("");
 
@@ -24,7 +27,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
   const formatDate = (date) => {
     if (!date) return null;
-    return date.toISOString().slice(0, 19).replace("T", " "); // Converts to 'YYYY-MM-DD HH:MM:SS'
+    const parsedDate = new Date(date); // Convert string to Date object
+    if (isNaN(parsedDate)) return null; // Handle invalid dates
+    return parsedDate.toISOString().slice(0, 19).replace("T", " "); // Convert to 'YYYY-MM-DD HH:MM:SS'
   };
 
   const handleSubmit = async (e) => {
@@ -65,14 +70,14 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
   if (isSubmitted) {
     return (
       <AssignBusPersonnelModal
-    onClose={onClose}
-    refreshData={refreshData}
-    onAssign={(newAssignment) => {
-      refreshData(); // Refresh or dynamically update assignments
-      handleAddVehicleAssignment(newAssignment); // Update parent state
-    }}
-    preSelectedVehicle={busNumber}
-  />
+        onClose={onClose}
+        refreshData={refreshData}
+        onAssign={(newAssignment) => {
+          refreshData(); // Refresh or dynamically update assignments
+          handleAddVehicleAssignment(newAssignment); // Update parent state
+        }}
+        preSelectedVehicle={busNumber}
+      />
     );
   }
 
@@ -91,7 +96,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mt-4">
           {/* Bus Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Bus Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Bus Number
+            </label>
             <input
               type="text"
               value={busNumber}
@@ -104,7 +111,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Official Receipt */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Official Receipt of Registration</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Official Receipt of Registration
+            </label>
             <input
               type="text"
               value={officialReceipt}
@@ -117,7 +126,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Certificate of Registration */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Certificate of Registration</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Certificate of Registration
+            </label>
             <input
               type="text"
               value={certificateOfRegistration}
@@ -130,7 +141,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Plate Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Plate Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Plate Number
+            </label>
             <input
               type="text"
               value={plateNumber}
@@ -143,7 +156,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Engine Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Engine Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Engine Number
+            </label>
             <input
               type="text"
               value={engineNumber}
@@ -156,7 +171,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Chasis Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Chasis Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Chasis Number
+            </label>
             <input
               type="text"
               value={chasisNumber}
@@ -169,7 +186,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Third Party Liability Insurance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance</label>
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Liability Insurance
+            </label>
             <input
               type="text"
               value={thirdPartyInsurance}
@@ -182,7 +201,9 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* 3rd Party Policy Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance Policy No.</label>
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Liability Insurance Policy No.
+            </label>
             <input
               type="text"
               value={thirdPartyPolicyNo}
@@ -193,19 +214,24 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
             />
           </div>
 
-          {/* 3rd Party Validity Date */}
+          {/* 3rd Party Liability Insurance Validity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance Validity</label>
-            <DatePicker
-              selected={thirdPartyValidity}
-              onChange={(date) => setThirdPartyValidity(date)}
-              className="w-full px-4 py-2 border rounded-md"
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Liability Insurance Validity
+            </label>
+            <input
+              type="date"
+              value={thirdPartyValidity}
+              onChange={(e) => setThirdPartyValidity(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Comprehensive Insurance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Comprehensive Insurance
+            </label>
             <input
               type="text"
               value={comprehensiveInsurance}
@@ -218,27 +244,35 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
 
           {/* Comprehensive Insurance Validity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance Validity</label>
-            <DatePicker
-              selected={comprehensiveValidity}
-              onChange={(date) => setComprehensiveValidity(date)}
-              className="w-full px-4 py-2 border rounded-md"
+            <label className="block text-sm font-medium text-gray-700">
+              Comprehensive Insurance Validity
+            </label>
+            <input
+              type="date"
+              value={comprehensiveValidity}
+              onChange={(e) => setComprehensiveValidity(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Date Purchased */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Date Purchased</label>
-            <DatePicker
-              selected={datePurchased}
-              onChange={(date) => setDatePurchased(date)}
-              className="w-full px-4 py-2 border rounded-md"
+            <label className="block text-sm font-medium text-gray-700">
+              Date Purchased
+            </label>
+            <input
+              type="date"
+              value={datePurchased}
+              onChange={(e) => setDatePurchased(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Supplier */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Supplier</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Supplier
+            </label>
             <input
               type="text"
               value={supplier}

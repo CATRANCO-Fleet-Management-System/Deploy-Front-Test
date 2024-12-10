@@ -49,9 +49,13 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
           supplier: data.supplier || "",
         });
 
-        setTPLValidity(data.third_pli_validity ? new Date(data.third_pli_validity) : null);
+        setTPLValidity(
+          data.third_pli_validity ? new Date(data.third_pli_validity) : null
+        );
         setCIValidity(data.ci_validity ? new Date(data.ci_validity) : null);
-        setDatePurchased(data.date_purchased ? new Date(data.date_purchased) : null);
+        setDatePurchased(
+          data.date_purchased ? new Date(data.date_purchased) : null
+        );
       } catch (err) {
         console.error("Error fetching vehicle details:", err);
         setError("Failed to fetch vehicle details.");
@@ -63,8 +67,12 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
     fetchVehicleDetails();
   }, [vehicle_id]);
 
-  // Format date to `YYYY-MM-DD`
-  const formatDate = (date) => (date ? date.toISOString().split("T")[0] : null);
+  const formatDate = (date) => {
+    if (!date) return null;
+    const parsedDate = new Date(date); // Convert string to Date object
+    if (isNaN(parsedDate)) return null; // Handle invalid dates
+    return parsedDate.toISOString().slice(0, 19).replace("T", " "); // Convert to 'YYYY-MM-DD HH:MM:SS'
+  };
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -127,7 +135,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
         <form onSubmit={handleUpdate} className="grid grid-cols-2 gap-4 mt-4">
           {/* Vehicle ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Bus Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Bus Number
+            </label>
             <input
               type="text"
               name="vehicle_id"
@@ -139,7 +149,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* Plate Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Plate Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Plate Number
+            </label>
             <input
               type="text"
               name="plate_number"
@@ -151,7 +163,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* OR Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Official Receipt (OR)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Official Receipt (OR)
+            </label>
             <input
               type="text"
               name="or_id"
@@ -163,7 +177,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* CR Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Certificate of Registration (CR)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Certificate of Registration (CR)
+            </label>
             <input
               type="text"
               name="cr_id"
@@ -175,7 +191,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* Engine Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Engine Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Engine Number
+            </label>
             <input
               type="text"
               name="engine_number"
@@ -187,7 +205,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* Chasis Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Chasis Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Chasis Number
+            </label>
             <input
               type="text"
               name="chasis_number"
@@ -199,7 +219,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* Third Party Liability Insurance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance</label>
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Liability Insurance
+            </label>
             <input
               type="text"
               name="third_pli"
@@ -211,7 +233,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* 3rd Party Policy Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Policy Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Policy Number
+            </label>
             <input
               type="text"
               name="third_pli_policy_no"
@@ -221,19 +245,24 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Third Party Validity */}
+          {/* 3rd Party Liability Insurance Validity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Insurance Validity</label>
-            <DatePicker
-              selected={third_pli_validity}
-              onChange={(date) => setTPLValidity(date)}
-              className="w-full px-4 py-2 border rounded-md"
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Liability Insurance Validity
+            </label>
+            <input
+              type="date"
+              value={thirdPartyValidity}
+              onChange={(e) => setThirdPartyValidity(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Comprehensive Insurance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Comprehensive Insurance
+            </label>
             <input
               type="text"
               name="ci"
@@ -245,27 +274,35 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit }) => {
 
           {/* Comprehensive Insurance Validity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance Validity</label>
-            <DatePicker
-              selected={ci_validity}
-              onChange={(date) => setCIValidity(date)}
-              className="w-full px-4 py-2 border rounded-md"
+            <label className="block text-sm font-medium text-gray-700">
+              Comprehensive Insurance Validity
+            </label>
+            <input
+              type="date"
+              value={comprehensiveValidity}
+              onChange={(e) => setComprehensiveValidity(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Date Purchased */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Date Purchased</label>
-            <DatePicker
-              selected={date_purchased}
-              onChange={(date) => setDatePurchased(date)}
-              className="w-full px-4 py-2 border rounded-md"
+            <label className="block text-sm font-medium text-gray-700">
+              Date Purchased
+            </label>
+            <input
+              type="date"
+              value={datePurchased}
+              onChange={(e) => setDatePurchased(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Supplier */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Supplier</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Supplier
+            </label>
             <input
               type="text"
               name="supplier"
