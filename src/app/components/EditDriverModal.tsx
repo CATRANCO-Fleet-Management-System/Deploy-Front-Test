@@ -14,10 +14,12 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
     license_number: "",
     sex: "Male",
     contact_number: "",
+    date_hired: "",
     contact_person: "",
     contact_person_number: "",
     address: "",
     user_profile_image: "",
+    status: "",
   });
 
   // Fetch user profile data when the modal is opened
@@ -37,6 +39,8 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
           license_number: userProfileData.license_number || "",
           sex: userProfileData.sex || "Male",
           contact_number: userProfileData.contact_number || "",
+          date_hired: userProfileData.date_hired || "",
+          status: userProfileData.status || "",
           contact_person: userProfileData.contact_person || "",
           contact_person_number: userProfileData.contact_person_number || "",
           address: userProfileData.address || "",
@@ -87,10 +91,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
   };
-  // Handle date hired changes
-  const handleDateHiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBirthday(e.target.value);
-  };
+
 
   // Handle image upload
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,14 +226,17 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
               Date Hired
             </label>
             <Input
-              name="birthday"
-              value={birthday}
-              onChange={handleDateHiredChange}
+              name="Date Hired"
+              value={formData.date_hired}
               type="date"
-              required
+              readOnly
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+          </div>
+
+          {/* Right Column */}
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mt-4">
               Date of Birth
             </label>
             <Input
@@ -243,10 +247,6 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          {/* Right Column */}
-          <div>
             <label className="block text-sm font-medium text-gray-700">
               Age
             </label>
@@ -319,7 +319,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
             </label>
             <select
               name="personnel_status"
-              value={formData.personnel_status}
+              value={formData.status}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             >
@@ -330,7 +330,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
             </select>
 
             {/* Additional input for "Others" */}
-            {formData.personnel_status === "Others" && (
+            {formData.status === "Others" && (
               <Input
                 name="specific_personnel_status"
                 value={formData.specific_personnel_status}

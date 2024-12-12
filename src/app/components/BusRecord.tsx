@@ -169,12 +169,12 @@ const BusRecord: React.FC<BusBoxProps> = ({
 
       {/* Action Buttons */}
       <div className="flex flex-col space-y-2 mt-4">
-        <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
-          onClick={handleDelete}
-        >
-          Remove
-        </button>
+      <button
+  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
+  onClick={() => onDelete()} // Trigger the parent’s delete handler
+>
+  Remove
+</button>
 
         {/* Edit Dropdown */}
         <div className="relative w-full" ref={dropdownRef}>

@@ -19,10 +19,12 @@ const EditAssistantOfficerModal = ({
     license_number: "",
     sex: "Male",
     contact_number: "",
+    date_hired: "",
     contact_person: "",
     contact_person_number: "",
     address: "",
     user_profile_image: "",
+    status: "",
   });
 
   // Fetch user profile data when the modal is opened
@@ -40,6 +42,8 @@ const EditAssistantOfficerModal = ({
           position: userProfileData.position || "passenger_assistant_officer",
           license_number: userProfileData.license_number || "",
           sex: userProfileData.sex || "Male",
+          date_hired: userProfileData.date_hired || "",
+          status: userProfileData.status || "",
           contact_number: userProfileData.contact_number || "",
           contact_person: userProfileData.contact_person || "",
           contact_person_number: userProfileData.contact_person_number || "",
@@ -225,6 +229,20 @@ const EditAssistantOfficerModal = ({
               className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-4">
+              Date Hired
+            </label>
+            <Input
+              name="Date Hired"
+              value={formData.date_hired}
+              type="date"
+              readOnly
+              className="focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Right Column */}
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mt-4">
               Date of Birth
             </label>
             <Input
@@ -235,10 +253,6 @@ const EditAssistantOfficerModal = ({
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          {/* Right Column */}
-          <div>
             <label className="block text-sm font-medium text-gray-700 ">
               Age
             </label>
@@ -304,31 +318,16 @@ const EditAssistantOfficerModal = ({
               required
             />
             {/* Personnel Status */}
-            <label className="block text-sm font-medium text-gray-700 mt-4">
-              Personnel Status
+              <label className="block text-sm font-medium text-gray-700 mt-4">
+              Status
             </label>
-            <select
-              name="personnel_status"
-              value={formData.personnel_status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="On Duty">On Duty</option>
-              <option value="Terminated">Terminated</option>
-              <option value="On Leave">On Leave</option>
-              <option value="Others">Others</option>
-            </select>
-
-            {/* Additional input for "Others" */}
-            {formData.personnel_status === "Others" && (
-              <Input
-                name="specific_personnel_status"
-                value={formData.specific_personnel_status}
-                onChange={handleInputChange}
-                placeholder="Specify personnel status"
-                className="mt-2 focus:ring-2 focus:ring-blue-500"
-              />
-            )}
+            <Input
+              name="Status"
+              value={formData.status}
+              type="status"
+              readOnly
+              className="focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           {/* Buttons */}
           <div className="col-span-2 flex justify-end space-x-4 -mt-3">

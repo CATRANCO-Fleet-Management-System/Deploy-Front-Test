@@ -19,7 +19,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
     contact_person_number: "",
     address: "",
     user_profile_image: "",
-    personnel_status: "On Duty",
+    status: "On Duty",
     specific_personnel_status: "",
   });
 
@@ -292,7 +292,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
             </label>
             <select
               name="personnel_status"
-              value={formData.personnel_status}
+              value={formData.status}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             >
@@ -303,7 +303,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
             </select>
 
             {/* Additional input for "Others" */}
-            {formData.personnel_status === "Others" && (
+            {formData.status === "Others" && (
               <Input
                 name="specific_personnel_status"
                 value={formData.specific_personnel_status}

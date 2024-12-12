@@ -14,7 +14,7 @@ interface Profile {
 
 interface EditPersonnelModalProps {
   assignmentId: string;
-  vehicleId: string;
+  vehicleId: string; // Vehicle ID is passed here
   initialDriver: string;
   initialPAO: string;
   onClose: () => void;
@@ -47,7 +47,6 @@ const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
         setDrivers(driverProfiles);
         setPaos(paoProfiles);
 
-        // If assignmentId is passed, fetch the assignment details
         if (assignmentId) {
           const assignment = await getVehicleAssignmentById(assignmentId);
           if (assignment && assignment.user_profiles) {
@@ -82,23 +81,21 @@ const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
     setLoading(true);
 
     try {
-      // Log payload to verify the data
-      console.log({
+      // Ensure vehicle_id is included in the payload
+      const payload = {
         user_profile_ids: [selectedDriver, selectedPAO],
-        vehicle_id: vehicleId
-      });
+        vehicle_id: vehicleId, // Include vehicle_id explicitly
+      };
 
-      // Update the vehicle assignment with selected driver and PAO
-      const response = await updateVehicleAssignment(assignmentId, {
-        user_profile_ids: [selectedDriver, selectedPAO],
-        vehicle_id: vehicleId,
-      });
+      console.log("Payload sent to API:", payload); // Debug payload
+
+      const response = await updateVehicleAssignment(assignmentId, payload);
 
       if (response.message === "Vehicle Assignment Updated Successfully") {
-        onUpdate(selectedDriver, selectedPAO); // Trigger update on success
-        onClose(); // Close modal after update
+        onUpdate(selectedDriver, selectedPAO);
+        onClose();
       } else {
-        throw new Error("Update failed. Please check your inputs.");
+        throw new Error(response.message || "Update failed.");
       }
     } catch (err) {
       setError("Failed to update personnel. Please try again.");

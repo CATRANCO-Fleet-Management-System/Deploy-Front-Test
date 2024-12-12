@@ -15,13 +15,10 @@ import HistoryModal from "../components/HistoryModal";
 
 const extractHistoryFromProfiles = (profiles) => {
   return profiles.map((profile) => ({
-    action:
-      profile.profile.created_at === profile.profile.updated_at
-        ? "Created"
-        : "Updated",
-    performed_by: "Admin", // Replace with actual user if available
-    timestamp: profile.profile.updated_at,
-    details: `Profile: ${profile.profile.first_name} ${profile.profile.last_name}`,
+    details: `${profile.profile.first_name} ${profile.profile.last_name}`,
+    position: profile.profile.position,
+    date_hired: profile.profile.date_hired || "N/A", // Assuming created_at as date hired
+    status: profile.profile.status || "Active", // Replace with the correct status field if available
   }));
 };
 
