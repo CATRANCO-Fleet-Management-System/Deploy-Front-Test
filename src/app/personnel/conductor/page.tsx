@@ -15,7 +15,6 @@ const DashboardHeader = () => {
     first_name: "",
     middle_initial: "",
     position: "passenger_assistant_officer",
-    license_number: "",
     sex: "Male",
     contact_number: "",
     contact_person: "",
@@ -33,7 +32,10 @@ const DashboardHeader = () => {
   // Close dropdown if clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownVisible(false);
       }
     };
@@ -49,7 +51,10 @@ const DashboardHeader = () => {
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDifference = today.getMonth() - birthDate.getMonth();
-      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+      ) {
         calculatedAge--;
       }
       setAge(calculatedAge);
@@ -59,7 +64,11 @@ const DashboardHeader = () => {
   }, [birthday]);
 
   // Handle form field changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -116,7 +125,6 @@ const DashboardHeader = () => {
         first_name: formData.first_name,
         middle_initial: formData.middle_initial,
         position: formData.position,
-        license_number: formData.license_number,
         sex: formData.sex,
         contact_number: formData.contact_number,
         contact_person: formData.contact_person,
@@ -184,15 +192,7 @@ const DashboardHeader = () => {
                     type="text"
                     disabled
                   />
-                  <h1>License Number:</h1>
-                  <Input
-                    name="license_number"
-                    value={formData.license_number}
-                    onChange={handleInputChange}
-                    className="h-10 text-lg"
-                    type="text"
-                    placeholder="ex: N03-12-123456"
-                  />
+
                   <h1>Date of Birth</h1>
                   <Input
                     name="birthday"

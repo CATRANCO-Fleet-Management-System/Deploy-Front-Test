@@ -12,7 +12,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
     first_name: "",
     middle_initial: "",
     position: "passenger_assistant_officer",
-    license_number: "",
     sex: "Male",
     contact_number: "",
     contact_person: "",
@@ -185,18 +184,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               className="focus:outline-none"
             />
 
-<label className="block text-sm font-medium text-gray-700 mt-4">
-              License Number
-            </label>
-            <Input
-              name="license_number"
-              value={formData.license_number}
-              onChange={handleInputChange}
-              placeholder="e.g. N03-12-123456"
-              required
-              className="focus:ring-2 focus:ring-blue-500"
-            />
-            
             <label className="block text-sm font-medium text-gray-700 mt-4">
               Date Hired
             </label>
@@ -211,7 +198,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Right Column */}
           <div>
-          <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-4">
               Date of Birth
             </label>
             <Input
@@ -315,7 +302,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
           </div>
           {/* Buttons */}
           <div className="col-span-2 flex justify-end space-x-4 -mt-3">
-          <button
+            <button
               type="button"
               onClick={handleSubmit}
               className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
