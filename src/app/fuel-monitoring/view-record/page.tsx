@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { FaBus, FaCalendar, FaTrash } from "react-icons/fa";
+import { FaBus } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
-import DatePicker from "react-datepicker";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "react-datepicker/dist/react-datepicker.css";
 import FuelAddModal from "@/app/components/FuelAddModal";
 import FuelViewDetailsModal from "@/app/components/FuelViewDetailsModal";
@@ -14,6 +15,7 @@ import {
   fetchAllFuelLogs,
   deleteFuelLog,
 } from "@/app/services/fuellogsService";
+import { groupByTimeInterval } from "@/app/helper/fuel-helper";
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
@@ -44,7 +46,45 @@ const ViewRecord = () => {
     };
     fetchLogs();
   }, [selectedBus]);
+  // Generate chart data based on time interval and selected bus
+  const chartData = {
+    daily: groupByTimeInterval(
+      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
+      "daily"
+    ),
 
+    weekly: groupByTimeInterval(
+      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
+      "weekly"
+    ),
+    monthly: groupByTimeInterval(
+      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
+      "monthly"
+    ),
+    yearly: groupByTimeInterval(
+      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
+      "yearly"
+    ),
+  };
+  const currentData = chartData[timeInterval] || chartData.daily;
+
+  const data = {
+    labels: currentData.map((entry) => entry.label), // Labels based on time interval
+    datasets: [
+      {
+        label: "Distance (KM)",
+        data: currentData.map((entry) => entry.distance), // Distance data
+        borderColor: "red", // Red color for distance
+        backgroundColor: "rgba(255, 99, 132, 0.2)", // Light red background for distance
+      },
+      {
+        label: "Liters Used (L)",
+        data: currentData.map((entry) => entry.liters), // Liters data
+        borderColor: "blue", // Blue color for liters
+        backgroundColor: "rgba(54, 162, 235, 0.2)", // Light blue background for liters
+      },
+    ],
+  };
   // Handle deletion of a fuel log
   const handleDeleteFuelLog = async (fuelLogId) => {
     try {
@@ -98,37 +138,39 @@ const ViewRecord = () => {
     setIsViewDetailsOpen(true);
   };
 
-  // Chart data
-  const chartData = {
-    daily: {
-      labels: fuelLogs.map((log) => log.purchase_date),
-      distance: fuelLogs.map(
-        (log) => log.distance_travelled || log.distance_traveled || 0
-      ), // Fixing to check both fields
-      liters: fuelLogs.map((log) => log.fuel_liters_quantity || 0),
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 45, // Adjust the rotation
+          minRotation: 0,
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        enabled: true,
+        mode: "index",
+        intersect: false,
+        callbacks: {
+          title: (tooltipItem) => {
+            return tooltipItem[0].label;
+          },
+          label: (tooltipItem) => {
+            const datasetIndex = tooltipItem.datasetIndex;
+            const data = tooltipItem.raw;
+            if (datasetIndex === 0) {
+              return `Distance: ${data} KM`;
+            } else if (datasetIndex === 1) {
+              return `Liters: ${data} L`;
+            }
+          },
+        },
+      },
     },
   };
-
-  const currentData = chartData[timeInterval];
-  const data = {
-    labels: currentData.labels,
-    datasets: [
-      {
-        label: "Distance (KM)",
-        data: currentData.distance,
-        borderColor: "red",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "Liters Used (L)",
-        data: currentData.liters,
-        borderColor: "blue",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-      },
-    ],
-  };
-
-  const options = { responsive: true, maintainAspectRatio: false };
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(fuelLogs.length / itemsPerPage);
@@ -141,6 +183,24 @@ const ViewRecord = () => {
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+    }
+  };
+  const handlePrint = async () => {
+    const chartElement = document.querySelector(".chart-container");
+
+    if (!chartElement) return;
+
+    try {
+      const canvas = await html2canvas(chartElement);
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("landscape");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+      pdf.save(`view-record-bus-${selectedBus}.pdf`);
+    } catch (err) {
+      console.error("Error generating PDF:", err);
     }
   };
 
@@ -161,7 +221,39 @@ const ViewRecord = () => {
               {busStatus}
             </span>
           </div>
+          <div className="top-btns flex flex-col">
+            {/* Time Interval Buttons */}
+            <div className="time-intervals flex space-x-3 mb-4">
+              {["daily", "weekly", "monthly", "yearly"].map((interval) => (
+                <button
+                  key={interval}
+                  className={`px-4 py-2 rounded ${
+                    timeInterval === interval
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-500 text-white"
+                  }`}
+                  onClick={() => setTimeInterval(interval)}
+                >
+                  {interval.charAt(0).toUpperCase() + interval.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="flex absolute right-[8%]">
+              <button
+                onClick={handlePrint}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Print Chart as PDF
+              </button>
+            </div>
+          </div>
+
           <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg">
+            <div className="absolute inset-0 flex justify-center items-center opacity-10">
+              <span className="text-6xl font-bold text-gray-500">
+                {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
+              </span>
+            </div>
             <Line data={data} options={options} />
           </div>
           <div className="table-container w-5/6 mt-4 bg-white p-4 rounded-lg shadow-lg">
