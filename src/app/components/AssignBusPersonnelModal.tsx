@@ -197,14 +197,7 @@ const AssignBusPersonnelModal = ({
               </select>
             )}
           </div>
-          <div className="mt-4">
-            <label className="text-xl">Route Assigned</label>
-            <select className="mt-4 h-10 text-lg border border-gray-300 rounded-md p-2 w-full">
-              <option value="canitoan_to_cogon">Canitoan To Cogon</option>
-              <option value="silvercreek_to_cogon">SilverCreek To Cogon</option>
-            </select>
-          </div>
-          {error && <p className="text-red-500">{error}</p>}
+
           <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
