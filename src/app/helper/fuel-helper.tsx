@@ -13,29 +13,34 @@ export const groupByTimeInterval = (logs, interval) => {
         break;
 
       case "weekly":
-        key = startOfWeek(date, { weekStartsOn: 1 }); // Group by week
+        // Get the start of the week and format it as "yyyy-MM-dd"
+        key = format(startOfWeek(date, { weekStartsOn: 1 }), "yyyy-MM-dd");
         break;
+
       case "monthly":
-        key = startOfMonth(date); // Group by month
+        // Get the start of the month and format it as "yyyy-MM-dd"
+        key = format(startOfMonth(date), "yyyy-MM-dd");
         break;
+
       case "yearly":
-        key = startOfYear(date); // Group by year
+        // Get the start of the year and format it as "yyyy-MM-dd"
+        key = format(startOfYear(date), "yyyy-MM-dd");
         break;
+
       default:
         key = format(date, "yyyy-MM-dd"); // Default to daily
         break;
     }
 
-    const keyString = key.toString();
-
-    if (!groupedData[keyString]) {
-      groupedData[keyString] = { distance: 0, liters: 0 };
+    if (!groupedData[key]) {
+      groupedData[key] = { distance: 0, liters: 0 };
     }
 
-    groupedData[keyString].distance += log.distance_traveled;
-    groupedData[keyString].liters += log.fuel_liters_quantity;
+    groupedData[key].distance += log.distance_traveled;
+    groupedData[key].liters += log.fuel_liters_quantity;
   });
 
+  // Return the grouped data with the formatted key and values
   return Object.entries(groupedData).map(([key, value]) => ({
     label: key,
     ...value,
