@@ -25,8 +25,19 @@ api.interceptors.request.use(
 );
 
 // Feedback Services
-
-// Create Feedback Log
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('Response Error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+/**
+ * Create a new feedback log.
+ * @param {Object} feedbackData - The feedback data { vehicle_id, rating, comments }.
+ * @returns {Object} - Response data containing the feedback log ID.
+ */
 export const createFeedbackLog = async (feedbackData) => {
   try {
     const response = await api.post('/user/feedback', feedbackData);
@@ -37,12 +48,14 @@ export const createFeedbackLog = async (feedbackData) => {
   }
 };
 
-// Generate OTP for Feedback
-export const generateOTP = async (feedbackLogsId) => {
+/**
+ * Generate OTP for phone number verification.
+ * @param {Object} otpData - The OTP request data { feedback_logs_id, phone_number }.
+ * @returns {Object} - Response data with OTP details.
+ */
+export const generateOTP = async (otpData) => {
   try {
-    const response = await api.post('/user/otp/generate', {
-      feedback_logs_id: feedbackLogsId,
-    });
+    const response = await api.post('/user/otp/generate', otpData);
     return response.data;
   } catch (error) {
     console.error('Error generating OTP:', error);
@@ -50,12 +63,15 @@ export const generateOTP = async (feedbackLogsId) => {
   }
 };
 
-// Verify Phone Number for Feedback
-export const verifyPhoneNumber = async (feedbackLogsId, otpCode) => {
+/**
+ * Verify the phone number using OTP.
+ * @param {Object} verificationData - The verification request { phone_number, otp }.
+ * @param {string} feedbackLogsId - The feedback log ID.
+ * @returns {Object} - Response data confirming verification.
+ */
+export const verifyPhoneNumber = async (feedbackLogsId, verificationData) => {
   try {
-    const response = await api.post(`/user/feedback/${feedbackLogsId}/verify-phone`, {
-      otp_code: otpCode,
-    });
+    const response = await api.post(`/user/feedback/${feedbackLogsId}/verify-phone`, verificationData);
     return response.data;
   } catch (error) {
     console.error('Error verifying phone number:', error);
@@ -63,24 +79,35 @@ export const verifyPhoneNumber = async (feedbackLogsId, otpCode) => {
   }
 };
 
-// Get All Feedback Logs
-export const getAllFeedbackLogs = async () => {
+// **Fuel Logs Service Functions**
+
+/**
+ * Fetch all fuel logs.
+ * @returns {Promise<Object[]>} - An array of fuel logs.
+ */
+export const fetchAllFuelLogs = async () => {
   try {
-    const response = await api.get('/user/feedback-logs');
+    const response = await api.get('/user/admin/feedbacks/all');
+    console.log('Fetched Fuel Logs:', response.data); // Debugging log
     return response.data;
   } catch (error) {
-    console.error('Error fetching feedback logs:', error);
+    console.error('Error fetching all fuel logs:', error);
     throw error.response ? error.response.data : error;
   }
 };
 
-// Get Feedback Log by ID
-export const getFeedbackLogById = async (feedbackLogsId) => {
+/**
+ * Fetch a single fuel log by ID.
+ * @param {number} id - The ID of the fuel log.
+ * @returns {Promise<Object>} - The fuel log data.
+ */
+export const fetchFuelLogById = async (id) => {
   try {
-    const response = await api.get(`/user/feedback/${feedbackLogsId}`);
+    const response = await api.get(`/user/admin/feedbacks/${id}`);
+    console.log('Fetched Fuel Log:', response.data); // Debugging log
     return response.data;
   } catch (error) {
-    console.error('Error fetching feedback log by ID:', error);
+    console.error(`Error fetching fuel log with ID ${id}:`, error);
     throw error.response ? error.response.data : error;
   }
 };

@@ -92,16 +92,6 @@ const BusRecord: React.FC<BusBoxProps> = ({
     fetchOrCreateAssignment();
   }, [assignmentId, vehicle_id, assignedDriver, assignedPAO]);
 
-  // Delete vehicle handler
-  const handleDelete = async () => {
-    try {
-      await deleteVehicle(vehicle_id);
-      onDelete(); // Update parent state after deletion
-    } catch (error) {
-      console.error("Error deleting vehicle:", error);
-      alert("Failed to delete the vehicle. Please try again.");
-    }
-  };
 
   // Open modal for editing bus record
   const handleEditBus = () => {
@@ -113,6 +103,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
   const handleEditPersonnel = () => {
     setIsEditPersonnelModalOpen(true);
     setDropdownOpen(false);
+    console.log("BusRecord vehicle_id:", vehicle_id);
   };
 
   // Close modals

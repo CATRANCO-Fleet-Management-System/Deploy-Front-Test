@@ -1,7 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { createFeedbackLog, generateOTP, verifyPhoneNumber } from "../services/feedbackService";
+import {
+  createFeedbackLog,
+  generateOTP,
+  verifyPhoneNumber,
+} from "../services/feedbackService";
 import { getAllVehicles } from "../services/vehicleService";
 
 const FeedbackForm: React.FC = () => {
@@ -11,304 +15,201 @@ const FeedbackForm: React.FC = () => {
   const [comments, setComments] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [feedbackLogsId, setFeedbackLogsId] = useState(null);
+  const [feedbackLogsId, setFeedbackLogsId] = useState<number | null>(null);
   const [buses, setBuses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch bus numbers
+  // Fetch available buses
   useEffect(() => {
     const fetchBuses = async () => {
       try {
+        setLoading(true);
         const busList = await getAllVehicles();
         setBuses(busList);
       } catch (error) {
-        console.error("Error fetching buses:", error);
+        alert("Failed to fetch bus list. Please refresh the page.");
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchBuses();
   }, []);
 
-  const handleBusNumberChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setBusNumber(event.target.value);
-  };
-
-  const handleRatingChange = (index: number) => {
-    setRating(index);
-  };
-
-  const handleCommentsChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComments(event.target.value);
-  };
-
-  const handleSendFeedback = () => {
-    setCurrentStep("feedback");
-  };
-
+  // Submit feedback data
   const handleSubmitFeedback = async () => {
     if (!busNumber || rating === 0 || !comments.trim()) {
-        alert("Please fill in all required fields.");
-        return;
+      alert("Please fill in all required fields.");
+      return;
     }
     try {
-        const feedbackData = { vehicle_id: busNumber, rating, comments };
-        console.log("Submitting feedback data:", feedbackData);
-        const response = await createFeedbackLog(feedbackData);
-        console.log("Feedback response:", response);
-        setFeedbackLogsId(response.feedback_logs_id);
-        setCurrentStep("phoneInput");
-        console.log("Moved to phone input step");
+      setLoading(true);
+      const feedbackData = { vehicle_id: busNumber, rating, comments };
+      const response = await createFeedbackLog(feedbackData);
+      setFeedbackLogsId(response.feedback_logs_id);
+      setCurrentStep("phoneInput");
     } catch (error) {
-        console.error("Error submitting feedback:", error);
-        alert("Failed to submit feedback. Please try again.");
-    }
-};
-  
-
-  const handlePhoneInputSubmit = async () => {
-    try {
-      await generateOTP(feedbackLogsId);
-      setCurrentStep("verification");
-    } catch (error) {
-      console.error("Error generating OTP:", error);
-      alert("Failed to generate OTP. Please try again.");
+      alert("Failed to submit feedback. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVerificationSubmit = async () => {
+  // Send OTP for phone number verification
+  const handlePhoneInputSubmit = async () => {
+    if (!phoneNumber.trim()) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
     try {
-      await verifyPhoneNumber(feedbackLogsId, verificationCode);
+      setLoading(true);
+      await generateOTP({ phone_number: phoneNumber, feedback_logs_id: feedbackLogsId });
+      setCurrentStep("verification");
+    } catch (error) {
+      alert("Failed to generate OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Verify the phone number using OTP
+  const handleVerificationSubmit = async () => {
+    if (!verificationCode.trim()) {
+      alert("Please enter the verification code.");
+      return;
+    }
+    try {
+      setLoading(true);
+      await verifyPhoneNumber(feedbackLogsId, { phone_number: phoneNumber, otp: verificationCode });
       setCurrentStep("thankYou");
     } catch (error) {
-      console.error("Error verifying phone number:", error);
       alert("Invalid verification code. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Reset the feedback form
+  const resetForm = () => {
+    setBusNumber("");
+    setRating(0);
+    setComments("");
+    setPhoneNumber("");
+    setVerificationCode("");
+    setFeedbackLogsId(null);
+    setCurrentStep("initial");
   };
 
   return (
-    <section
-      className="h-screen w-full flex justify-center items-center"
-      style={{ background: "linear-gradient(135deg, #e0f7fa, #d1c4e9)" }}
-    >
-      <div className="w-full h-full flex flex-col justify-center items-center">
+    <section className="h-screen w-full flex justify-center items-center bg-gradient-to-br from-teal-200 to-indigo-300">
+      <div className="p-6 bg-white shadow-md rounded-md w-96">
         {currentStep === "initial" && (
-          <div style={styles.container}>
-            <div className="w-full flex justify-center items-center mb-4">
-              <img
-                src="/logo.png"
-                alt="TransitTrack Logo"
-                className="w-4/5 object-contain"
-                style={styles.logo}
-              />
-            </div>
-            <button onClick={handleSendFeedback} style={styles.submitButton}>
+          <div>
+            <h2 className="text-xl font-bold mb-4">Welcome to TransitTrack Feedback</h2>
+            <button
+              onClick={() => setCurrentStep("feedback")}
+              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
               Send Feedback
             </button>
           </div>
         )}
-
         {currentStep === "feedback" && (
-          <div style={styles.container}>
-            <h2 style={styles.title}>Give feedback</h2>
-
-            <div style={styles.dropdown}>
-              <label>Select Bus Number</label>
-              <select value={busNumber} onChange={handleBusNumberChange} style={styles.input}>
-                <option value="">Select Bus Number</option>
-                {buses.map((bus) => (
-                  <option key={bus.vehicle_id} value={bus.vehicle_id}>
-                    {bus.plate_number || `Bus ${bus.vehicle_id}`}
-                  </option>
-                ))}
-              </select>
+          <div>
+            <h2 className="text-xl font-bold mb-4">Give Feedback</h2>
+            <select
+              value={busNumber}
+              onChange={(e) => setBusNumber(e.target.value)}
+              className="w-full mb-4 p-2 border rounded"
+            >
+              <option value="">Select Bus Number</option>
+              {buses.map((bus) => (
+                <option key={bus.vehicle_id} value={bus.vehicle_id}>
+                  {bus.plate_number || `Bus ${bus.vehicle_id}`}
+                </option>
+              ))}
+            </select>
+            <div className="mb-4">
+              <label className="block mb-2">Rate your experience:</label>
+              {[1, 2, 3, 4, 5].map((index) => (
+                <span
+                  key={index}
+                  onClick={() => setRating(index)}
+                  className={`text-3xl cursor-pointer ${
+                    rating >= index ? "text-yellow-500" : "text-gray-400"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
             </div>
-
-            <div style={styles.ratingSection}>
-              <label>How was your experience?</label>
-              <div style={styles.stars}>
-                {[1, 2, 3, 4, 5].map((index) => (
-                  <span
-                    key={index}
-                    style={{
-                      cursor: "pointer",
-                      fontSize: "30px",
-                      color: rating >= index ? "#FFD700" : "#CCCCCC",
-                    }}
-                    onClick={() => handleRatingChange(index)}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div style={styles.commentsSection}>
-              <textarea
-                value={comments}
-                onChange={handleCommentsChange}
-                placeholder="Your comments..."
-                style={styles.textarea}
-              />
-            </div>
-
-            <button onClick={handleSubmitFeedback} style={styles.submitButton}>
-  Submit Feedback
-</button>
+            <textarea
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Your comments..."
+              className="w-full mb-4 p-2 border rounded h-20"
+            />
+            <button
+              onClick={handleSubmitFeedback}
+              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={loading}
+            >
+              {loading ? "Submitting..." : "Submit Feedback"}
+            </button>
           </div>
         )}
-
         {currentStep === "phoneInput" && (
-          <div style={styles.container}>
-            <button onClick={() => setCurrentStep("feedback")} style={styles.backButton}>
-              ←
-            </button>
-            <h2 style={styles.title}>Phone Number</h2>
+          <div>
+            <h2 className="text-xl font-bold mb-4">Phone Number</h2>
             <input
               type="text"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Phone Number"
-              style={styles.input}
+              className="w-full mb-4 p-2 border rounded"
+              placeholder="Enter your phone number"
             />
-            <button onClick={handlePhoneInputSubmit} style={styles.submitButton}>
-              Next
+            <button
+              onClick={handlePhoneInputSubmit}
+              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={loading}
+            >
+              {loading ? "Sending OTP..." : "Next"}
             </button>
           </div>
         )}
-
         {currentStep === "verification" && (
-          <div style={styles.container}>
-            <button onClick={() => setCurrentStep("phoneInput")} style={styles.backButton}>
-              ←
-            </button>
-            <h2 style={styles.title}>Enter Verification Code</h2>
-            <p>Your verification code is sent by SMS to: {phoneNumber}</p>
+          <div>
+            <h2 className="text-xl font-bold mb-4">Verify Phone Number</h2>
             <input
               type="text"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
-              placeholder="Enter Code"
-              style={styles.input}
+              className="w-full mb-4 p-2 border rounded"
+              placeholder="Enter the verification code"
             />
-            <button onClick={handleVerificationSubmit} style={styles.submitButton}>
-              Confirm
+            <button
+              onClick={handleVerificationSubmit}
+              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={loading}
+            >
+              {loading ? "Verifying..." : "Verify"}
             </button>
           </div>
         )}
-
         {currentStep === "thankYou" && (
-          <div style={styles.thankYouContainer}>
-            <h2 style={styles.thankYouTitle}>Thank you for your feedback!</h2>
-            <p>We appreciate your input and will use it to improve our services.</p>
-            <button onClick={() => setCurrentStep("initial")} style={styles.submitButton}>
-              Ok
+          <div>
+            <h2 className="text-xl font-bold mb-4">Thank You!</h2>
+            <p>Your feedback has been submitted successfully.</p>
+            <button
+              onClick={resetForm}
+              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4"
+            >
+              Done
             </button>
           </div>
         )}
       </div>
     </section>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '500px',
-    height: 'auto',
-    padding: '40px',
-    background: '#ffffff',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center',
-  },
-  logo: {
-    maxWidth: '150%',
-    height: 'auto',
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: '10px',
-    background: 'none',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-  },
-  title: {
-    marginBottom: '20px',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  dropdown: {
-    marginBottom: '20px',
-    textAlign: 'left',
-    width: '100%',
-  },
-  ratingSection: {
-    marginBottom: '20px',
-    textAlign: 'left',
-    width: '100%',
-  },
-  stars: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: '10px',
-  },
-  commentsSection: {
-    marginBottom: '10px',
-    textAlign: 'left',
-    width: '100%',
-  },
-  textarea: {
-    width: '100%',
-    height: '100px',
-    padding: '10px',
-    marginBottom: '20px',
-    borderRadius: '5px',
-    border: '1px solid #cccccc',
-  },
-  submitButton: {
-    padding: '12px',
-    width: '100%',
-    backgroundColor: '#007BFF',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-  },
-  input: {
-    width: '100%',
-    padding: '12px',
-    marginBottom: '20px',
-    borderRadius: '5px',
-    border: '1px solid #cccccc', 
-  },
-  thankYouContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '500px',
-    padding: '50px', 
-    background: '#ffffff', 
-    borderRadius: '12px', 
-    boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
-    textAlign: 'center',
-  },
-  thankYouTitle: {
-    fontSize: '28px', 
-    fontWeight: 'bold',
-    marginBottom: '20px',
-    color: '#333',
-  },
-  feedbackLink: {
-    marginTop: '15px',
-    color: '#007BFF',
-    textDecoration: 'underline',
-    cursor: 'pointer',
-  },
 };
 
 export default FeedbackForm;

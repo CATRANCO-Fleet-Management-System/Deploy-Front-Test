@@ -57,9 +57,9 @@ const DashboardHeader: React.FC = () => {
             longitude: firstBus.longitude || 0,
             time: "",
             speed: 0,
-            driver: firstBus.driver || "Unknown Driver",
-            conductor: firstBus.conductor || "Unknown Conductor",
-            plateNumber: firstBus.plateNumber || "Unknown Plate",
+            driver: firstBus.driver || "Khen Paler",
+            conductor: firstBus.conductor || "Juan Murillo",
+            plateNumber: firstBus.plateNumber || "NOV-1232-123-12",
             dispatchStatus: "idle",
           });
         }

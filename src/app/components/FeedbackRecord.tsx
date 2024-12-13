@@ -9,25 +9,22 @@ interface FeedbackRecordProps {
 }
 
 const FeedbackRecord: React.FC<FeedbackRecordProps> = ({
-  phoneNumber,
-  rating,
-  comment,
-  date,
+  phoneNumber = "N/A",
+  rating = 0,
+  comment = "No comments provided",
+  date = "N/A",
   onDelete,
 }) => {
-  // Function to render stars based on rating
+  // Function to render stars
   const renderStars = (rating: number) => {
-    const totalStars = 5; // Total number of stars to display
-    const stars = [];
-
-    for (let i = 1; i <= totalStars; i++) {
-      if (i <= rating) {
-        stars.push(<span key={i} className="text-yellow-500">&#9733;</span>); // Filled star
-      } else {
-        stars.push(<span key={i} className="text-gray-300">&#9734;</span>); // Empty star
-      }
-    }
-    return stars;
+    const totalStars = 5;
+    return Array.from({ length: totalStars }, (_, i) =>
+      i < rating ? (
+        <span key={i} className="text-yellow-500">&#9733;</span>
+      ) : (
+        <span key={i} className="text-gray-300">&#9734;</span>
+      )
+    );
   };
 
   return (

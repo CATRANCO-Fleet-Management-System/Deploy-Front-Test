@@ -220,6 +220,7 @@ const cancelDelete = () => {
               onEdit={() => {
                 setSelectedVehicleId(record.vehicle_id);
                 setIsEditModalOpen(true);
+                console.log("BusRecordDisplay vehicle_id:", record.vehicle_id);
                 }}
               />
             );
@@ -265,13 +266,29 @@ const cancelDelete = () => {
 )}
 
 {isAssignPersonnelModalOpen && (
-  <AssignBusPersonnelModal
+  <EditPersonnelModal
+    assignmentId={vehicleAssignments.find(
+      (assignment) => assignment.vehicle_id === selectedVehicleId
+    )?.vehicle_assignment_id || ""}
+    vehicleId={selectedVehicleId || ""}
+    initialDriver={getAssignedProfiles(selectedVehicleId).driver}
+    initialPAO={getAssignedProfiles(selectedVehicleId).conductor}
     onClose={() => setIsAssignPersonnelModalOpen(false)}
-    refreshData={fetchData} // Ensure consistency
-    onAssign={(newAssignment) => {
-      handleAddVehicleAssignment(newAssignment); // Dynamically update state
+    onUpdate={(updatedDriver, updatedPAO) => {
+      const updatedAssignments = vehicleAssignments.map((assignment) =>
+        assignment.vehicle_id === selectedVehicleId
+          ? {
+              ...assignment,
+              user_profiles: [
+                { position: "driver", user_profile_id: updatedDriver },
+                { position: "passenger_assistant_officer", user_profile_id: updatedPAO },
+              ],
+            }
+          : assignment
+      );
+      setVehicleAssignments(updatedAssignments);
+      fetchData(); // Ensure UI reflects backend updates
     }}
-    vehicleId={selectedVehicleId} // Pass the selected vehicle ID
   />
 )}
 
