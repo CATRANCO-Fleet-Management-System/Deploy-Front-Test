@@ -8,7 +8,7 @@ import AddAssistantOfficerModal from "../components/AddAssistantOfficerModal";
 import EditDriverModal from "../components/EditDriverModal";
 import EditAssistantOfficerModal from "../components/EditAssistantOfficerModal";
 import Pagination from "../components/Pagination"; // Import Pagination Component
-import { FaSearch, FaPlus, FaHistory } from "react-icons/fa";
+import { FaPlus, FaHistory } from "react-icons/fa";
 import PersonnelRecord from "@/app/components/PersonnelRecord";
 import { getAllProfiles, deleteProfile } from "@/app/services/userProfile";
 import HistoryModal from "../components/HistoryModal";
@@ -218,9 +218,7 @@ const Personnel = () => {
                     onDelete={() =>
                       handleDelete(profile.profile.user_profile_id)
                     }
-                    onEdit={() =>
-                      handleEdit(profile.profile.user_profile_id)
-                    }
+                    onEdit={() => handleEdit(profile.profile.user_profile_id)}
                   />
                 ))}
               </div>

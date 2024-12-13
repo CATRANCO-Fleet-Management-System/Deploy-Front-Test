@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { FaBus } from "react-icons/fa";
+import { FaBus, FaHistory } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import Sidebar from "@/app/components/Sidebar";
@@ -16,7 +16,7 @@ import {
   deleteFuelLog,
 } from "@/app/services/fuellogsService";
 import { groupByTimeInterval } from "@/app/helper/fuel-helper";
-
+import FuelHistoryModal from "@/app/components/FuelHistoryModal";
 const ViewRecord = () => {
   const searchParams = useSearchParams();
   const busNumber = searchParams.get("bus") || "001";
@@ -30,6 +30,8 @@ const ViewRecord = () => {
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
   const [viewData, setViewData] = useState(null);
   const [editData, setEditData] = useState(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
 
   // Fetch fuel logs for the selected bus
   useEffect(() => {
@@ -171,7 +173,21 @@ const ViewRecord = () => {
       },
     },
   };
+  // Function to open the history modal
+  const handleOpenHistoryModal = () => {
+    const filteredHistory = fuelLogs.filter(
+      (log) => log.vehicle_id === selectedBus
+    );
+    setHistoryData(filteredHistory);
+    setIsHistoryModalOpen(true);
+  };
 
+  // Function to close the history modal
+  const handleCloseHistoryModal = () => {
+    console.log("Closing the history modal"); // Log when closing the modal
+    setIsHistoryModalOpen(false); // Close the modal
+    console.log("isHistoryModalOpen state set to false");
+  };
   const itemsPerPage = 5;
   const totalPages = Math.ceil(fuelLogs.length / itemsPerPage);
 
@@ -315,20 +331,45 @@ const ViewRecord = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-2 bg-gray-300 text-gray-500 rounded disabled:cursor-not-allowed"
+              className="px-3 py-2 bg-gray-300 text-gray-500 rounded disabled:cursor-not-allowed ml-40"
             >
               Next
             </button>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Add New Record
-            </button>
+            <div className="right-btn flex flex-row space-x-3">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 flex items-center"
+                onClick={handleOpenHistoryModal}
+              >
+                <FaHistory className="mr-2" />
+                View History
+              </button>
+              {isHistoryModalOpen && (
+                <FuelHistoryModal
+                  isOpen={isHistoryModalOpen} // Correct prop for modal visibility
+                  onClose={handleCloseHistoryModal} // Correct function to close the modal
+                  history={historyData}
+                />
+              )}
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Add New Record
+              </button>
+            </div>
           </div>
         </section>
       </div>
 
+      {isHistoryModalOpen &&
+        (console.log("Rendering FuelHistoryModal..."), // Log when rendering the modal
+        (
+          <FuelHistoryModal
+            onClose={handleCloseHistoryModal}
+            historyData={fuelLogs}
+            selectedBus={selectedBus}
+          />
+        ))}
       {isModalOpen && (
         <FuelAddModal
           selectedBus={selectedBus}
