@@ -1,17 +1,7 @@
 "use client";
 
 import React from "react";
-import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Custom Marker Icon for buses
-const busIcon = new L.Icon({
-  iconUrl: "/bus-icon.png", // Ensure the bus icon is located in `public/`
-  iconSize: [30, 40],
-  iconAnchor: [15, 40],
-  popupAnchor: [0, -40],
-});
+import { GoogleMap, Marker, Polyline, InfoWindow } from "@react-google-maps/api";
 
 interface BusData {
   number: string;
@@ -21,51 +11,139 @@ interface BusData {
   longitude: number;
   time: string;
   speed: number;
+  dispatchStatus: string; // Either 'idle', 'on alley', or 'on road'
 }
 
 interface DispatchMapProps {
   busData: BusData[];
-  pathData: [number, number][];
+  pathData: { lat: number; lng: number }[];
   onBusClick: (busNumber: string) => void;
+  selectedBus?: string | null; // Added to track the selected bus for InfoWindow
 }
 
-const DispatchMap: React.FC<DispatchMapProps> = ({ busData, pathData, onBusClick }) => {
+const staticLocations = [
+  {
+    id: 1,
+    title: "Canitoan",
+    coordinate: { lat: 8.4663228, lng: 124.5853069 },
+  },
+  {
+    id: 2,
+    title: "Silver Creek",
+    coordinate: { lat: 8.475946, lng: 124.6120194 },
+  },
+  {
+    id: 3,
+    title: "Cogon",
+    coordinate: { lat: 8.4759094, lng: 124.6514315 },
+  },
+];
+
+// Styling for the map container
+const mapContainerStyle = {
+  width: "100%",
+  height: "450px",
+  borderRadius: "10px",
+};
+
+// Default center coordinates
+const defaultMapCenter = {
+  lat: 8.48325558794408,
+  lng: 124.5866112118501,
+};
+
+// Map options
+const mapOptions = {
+  zoomControl: true,
+  streetViewControl: false,
+  fullscreenControl: false,
+  gestureHandling: "auto",
+  mapTypeId: "roadmap",
+};
+
+// Icon URLs based on dispatch status
+const getIconUrl = (status: string) => {
+  switch (status) {
+    case "on alley":
+      return "/bus_on_alley.png";
+    case "on road":
+      return "/bus_on_road.png";
+    default:
+      return "/bus_idle.png";
+  }
+};
+
+const DispatchMap: React.FC<DispatchMapProps> = ({
+  busData,
+  pathData,
+  onBusClick,
+  selectedBus,
+}) => {
   return (
-    <MapContainer
-      center={[8.48325558794408, 124.5866112118501]}
-      zoom={13}
-      style={{ height: "450px", width: "100%" }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="&copy; OpenStreetMap contributors"
-      />
-      {/* Render the bus trail */}
-      {pathData.length > 0 && <Polyline positions={pathData} color="blue" weight={4} />}
-      {/* Render buses */}
-      {busData.map((bus) => (
-        <Marker
-          key={bus.number}
-          position={[bus.latitude, bus.longitude]}
-          icon={busIcon}
-          eventHandlers={{
-            click: () => onBusClick(bus.number),
-          }}
-        >
-          <Popup>
-            <div>
-              <strong>Bus {bus.number}</strong>
-              <br />
-              Status: {bus.status}
-              <br />
-              Lat: {bus.latitude}, Lon: {bus.longitude}
-              <br />
-              Time: {bus.time}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+    <div className="relative w-full">
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={defaultMapCenter}
+        zoom={13}
+        options={mapOptions}
+      >
+        {/* Render the bus trail (polyline) */}
+        {pathData.length > 0 && (
+          <Polyline
+            path={pathData}
+            options={{
+              strokeColor: "blue",
+              strokeWeight: 4,
+            }}
+          />
+        )}
+
+        {/* Render dynamic bus markers */}
+        {busData.map((bus) => (
+          <Marker
+            key={bus.number}
+            position={{ lat: bus.latitude, lng: bus.longitude }}
+            icon={{
+              url: getIconUrl(bus.dispatchStatus),
+              scaledSize: new window.google.maps.Size(30, 40),
+            }}
+            onClick={() => onBusClick(bus.number)}
+          >
+            {selectedBus === bus.number && (
+              <InfoWindow position={{ lat: bus.latitude, lng: bus.longitude }}>
+                <div>
+                  <strong>Bus {bus.number}</strong>
+                  <br />
+                  Status: {bus.status}
+                  <br />
+                  Latitude: {bus.latitude.toFixed(6)}, Longitude:{" "}
+                  {bus.longitude.toFixed(6)}
+                  <br />
+                  Time: {bus.time}
+                </div>
+              </InfoWindow>
+            )}
+          </Marker>
+        ))}
+
+        {/* Render static location markers */}
+        {staticLocations.map((location) => (
+          <Marker
+            key={location.id}
+            position={location.coordinate}
+            icon={{
+              url: `/${location.title.toLowerCase().replace(" ", "_")}.png`,
+              scaledSize: new window.google.maps.Size(30, 40),
+            }}
+            title={location.title}
+          >
+            <InfoWindow position={location.coordinate}>
+              <div>{location.title}</div>
+            </InfoWindow>
+          </Marker>
+        ))}
+      </GoogleMap>
+    </div>
   );
 };
 

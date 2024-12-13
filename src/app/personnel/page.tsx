@@ -12,6 +12,7 @@ import { FaPlus, FaHistory } from "react-icons/fa";
 import PersonnelRecord from "@/app/components/PersonnelRecord";
 import { getAllProfiles, deleteProfile } from "@/app/services/userProfile";
 import HistoryModal from "../components/HistoryModal";
+import ViewBioDataModal from "../components/ViewBioDataModal";
 
 const extractHistoryFromProfiles = (profiles) => {
   return profiles.map((profile) => ({
@@ -73,6 +74,8 @@ const Personnel = () => {
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [personnelHistory, setPersonnelHistory] = useState([]);
+  const [isViewBioDataModalOpen, setIsViewBioDataModalOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   // Fetch profiles on component mount
   useEffect(() => {
@@ -119,6 +122,16 @@ const Personnel = () => {
       setCurrentPage(page);
     }
   };
+
+
+  const handleViewBioData = (profileId) => {
+    const profile = profiles.find(
+      (profile) => profile.profile.user_profile_id === profileId
+    );
+    setSelectedProfile(profile);
+    setIsViewBioDataModalOpen(true);
+  };
+
 
   const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
@@ -173,6 +186,7 @@ const Personnel = () => {
       )
     );
     setIsEditModalOpen(false);
+    
   };
 
   return (
@@ -219,6 +233,7 @@ const Personnel = () => {
                       handleDelete(profile.profile.user_profile_id)
                     }
                     onEdit={() => handleEdit(profile.profile.user_profile_id)}
+                    onView={() => handleViewBioData(profile.profile.user_profile_id)}
                   />
                 ))}
               </div>
@@ -258,6 +273,11 @@ const Personnel = () => {
             onSave={handleSaveEdit}
           />
         )}
+        <ViewBioDataModal
+        isOpen={isViewBioDataModalOpen}
+        onClose={() => setIsViewBioDataModalOpen(false)}
+        profile={selectedProfile}
+      />
         <Confirmpopup
           isOpen={isDeletePopupOpen}
           onConfirm={confirmDelete}

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaBus } from "react-icons/fa";
-
-// Ensure `getFuelLogById` and `updateFuelLog` are imported correctly
-// import { getFuelLogById, updateFuelLog } from "../services/fuelLogService";
+import { updateFuelLog } from "@/app/services/fuellogsService";
 
 const FuelEditModal = ({
   selectedBus,
@@ -24,12 +22,10 @@ const FuelEditModal = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log("MODAL Selected Bus:", selectedBus);
-    console.log("MODAL Selected Fuel Log:", selectedFuelLog);
-
     if (selectedFuelLog && selectedBus) {
       setIsLoading(true);
 
+      // Populate form with selected fuel log data
       setFormData({
         date: selectedFuelLog.purchase_date?.split(" ")[0] || "",
         distanceTraveled: selectedFuelLog.odometer_km || "",
@@ -46,16 +42,13 @@ const FuelEditModal = ({
     }
   }, [selectedFuelLog, selectedBus]);
 
-  useEffect(() => {
-    console.log("Form Data updated:", formData);
-  }, [formData]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prevData) => {
       const updatedData = { ...prevData, [name]: value };
 
+      // Update total expense when fuel price or quantity changes
       if (name === "fuelPrice" || name === "fuel_liters_quantity") {
         const price = parseFloat(updatedData.fuelPrice) || 0;
         const quantity = parseFloat(updatedData.fuel_liters_quantity) || 0;
@@ -68,12 +61,13 @@ const FuelEditModal = ({
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: files[0] }));
+
+    if (files.length > 0) {
+      setFormData((prevData) => ({ ...prevData, [name]: files[0] }));
+    }
   };
 
   const handleSubmit = async () => {
-    console.log("Form data before submit:", formData);
-
     if (
       !formData.date ||
       !formData.distanceTraveled ||
@@ -89,46 +83,27 @@ const FuelEditModal = ({
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("purchase_date", formData.date);
     formDataToSubmit.append("odometer_km", formData.distanceTraveled);
-    formDataToSubmit.append(
-      "fuel_liters_quantity",
-      formData.fuel_liters_quantity
-    );
+    formDataToSubmit.append("fuel_liters_quantity", formData.fuel_liters_quantity);
     formDataToSubmit.append("fuel_price", formData.fuelPrice);
     formDataToSubmit.append("fuel_type", formData.fuelType);
     formDataToSubmit.append("vehicle_id", selectedBus);
 
     if (formData.odometerProof) {
-      formDataToSubmit.append(
-        "odometer_distance_proof",
-        formData.odometerProof
-      );
+      formDataToSubmit.append("odometer_distance_proof", formData.odometerProof);
     }
     if (formData.fuelReceiptProof) {
       formDataToSubmit.append("fuel_receipt_proof", formData.fuelReceiptProof);
     }
 
-    console.log("Submitting the following data:");
-    for (let [key, value] of formDataToSubmit.entries()) {
-      console.log(`${key}:`, value);
-    }
-
     setIsSubmitting(true);
+
     try {
-      const response = await updateFuelLog(
-        selectedFuelLog.id,
-        formDataToSubmit
-      );
-      console.log("Updated Fuel Log:", response.data.fuel_log);
+      const response = await updateFuelLog(selectedFuelLog.id, formDataToSubmit);
       onUpdate(response.data.fuel_log);
       onClose();
     } catch (error) {
-      console.error(
-        "Failed to update fuel log:",
-        error.response?.data || error.message || error
-      );
-      alert(
-        "An error occurred while updating the fuel log. Check the console for details."
-      );
+      console.error("Failed to update fuel log:", error);
+      alert("An error occurred while updating the fuel log.");
     } finally {
       setIsSubmitting(false);
     }
@@ -158,9 +133,7 @@ const FuelEditModal = ({
                 />
               </div>
               <div className="mb-4">
-                <label className="block font-medium">
-                  Distance Traveled (KM)
-                </label>
+                <label className="block font-medium">Distance Traveled (KM)</label>
                 <input
                   type="number"
                   name="distanceTraveled"

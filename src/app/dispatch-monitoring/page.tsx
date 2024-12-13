@@ -4,9 +4,11 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import DispatchMap from "../components/DispatchMap";
-import mqtt from "mqtt";
+import Pusher from "pusher-js";
+import Echo from "laravel-echo";
 import { FaBus } from "react-icons/fa";
-import { getAllVehicles } from "../services/vehicleService"; // Import the API service
+import { getAllVehicles } from "../services/vehicleService";
+import { MapProvider } from "@/providers/MapProvider";
 
 interface BusData {
   number: string;
@@ -16,139 +18,164 @@ interface BusData {
   longitude: number;
   time: string;
   speed: number;
+  dispatchStatus: string; // Either 'idle', 'on alley', or 'on road'
 }
 
 const DispatchMonitoring: React.FC = () => {
   const [busData, setBusData] = useState<BusData[]>([]);
-  const [pathData, setPathData] = useState<[number, number][]>([]);
+  const [pathData, setPathData] = useState<{ lat: number; lng: number }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedBus, setSelectedBus] = useState<string | null>(null);
 
-  // Fetch vehicles from the backend
-  const fetchVehicles = async () => {
-    try {
-      const vehicles = await getAllVehicles(); // Fetch vehicles from API
-      const mappedVehicles = vehicles.map((vehicle: any) => ({
-        number: vehicle.vehicle_id, // Use `vehicle_id` for the vehicle number
-        name: `Vehicle ${vehicle.vehicle_id}`, // Default name
-        status: "Stationary", // Default status
-        latitude: vehicle.latitude || 0, // Default latitude
-        longitude: vehicle.longitude || 0, // Default longitude
-        time: "", // Default time
-        speed: 0, // Default speed
-      }));
-      setBusData(mappedVehicles);
-    } catch (err) {
-      console.error("Error fetching vehicles:", err);
-      setError("Failed to load vehicles.");
-    }
-  };
-
+  // Fetch initial bus data
   useEffect(() => {
-    fetchVehicles(); // Fetch vehicles on component mount
+    const fetchVehicles = async () => {
+      try {
+        const vehicles = await getAllVehicles();
+        const mappedVehicles = vehicles.map((vehicle: any) => ({
+          number: vehicle.vehicle_id,
+          name: `Vehicle ${vehicle.vehicle_id}`,
+          status: "Stationary",
+          latitude: vehicle.latitude || 8.4663228,
+          longitude: vehicle.longitude || 124.585,
+          time: "",
+          speed: 0,
+          dispatchStatus: "idle", // Default status
+        }));
+        setBusData(mappedVehicles);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching vehicles:", error);
+      }
+    };
+
+    fetchVehicles();
   }, []);
 
+  // Set up real-time data updates via Pusher
   useEffect(() => {
-    const client = mqtt.connect("wss://mqtt.flespi.io", {
-      username: process.env.NEXT_PUBLIC_FLESPI_TOKEN || "",
+    const echo = new Echo({
+      broadcaster: "pusher",
+      client: new Pusher(process.env.NEXT_PUBLIC_PUSHER_APP_KEY, {
+        cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER,
+        wsHost: process.env.NEXT_PUBLIC_PUSHER_HOST || undefined,
+        wsPort: process.env.NEXT_PUBLIC_PUSHER_PORT
+          ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT, 10)
+          : undefined,
+        wssPort: process.env.NEXT_PUBLIC_PUSHER_PORT
+          ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT, 10)
+          : 443,
+        forceTLS: process.env.NEXT_PUBLIC_PUSHER_SCHEME === "https",
+        disableStats: true,
+      }),
     });
 
-    client.on("connect", () => {
-      console.log("Connected to Flespi MQTT broker");
-      client.subscribe("flespi/message/gw/devices/#", (err) => {
-        if (err) {
-          console.error("Failed to subscribe to MQTT topic", err);
-        } else {
-          setLoading(false);
-        }
-      });
-    });
+    const channel = echo.channel("flespi-data");
 
-    client.on("message", (topic, message) => {
-      try {
-        const parsedMessage = JSON.parse(message.toString());
-        const deviceId = parsedMessage["device.id"];
-        const latitude = parsedMessage["position.latitude"];
-        const longitude = parsedMessage["position.longitude"];
-        const speed = parsedMessage["position.speed"] || 0;
-        const timestamp = parsedMessage["timestamp"];
+    channel
+      .subscribed(() => {
+        console.log("Subscribed to flespi-data channel");
+      })
+      .listen("FlespiDataReceived", (event: any) => {
+        console.log("Real-time Data Received:", event);
 
-        if (latitude === undefined || longitude === undefined) return;
+        const { tracker_ident, location, dispatch_log } = event;
 
-        const time = new Date(timestamp * 1000).toISOString();
-
-        if (speed > 0 && selectedBus === deviceId?.toString()) {
-          setPathData((prevPath) => [...prevPath, [latitude, longitude]]);
+        if (selectedBus === tracker_ident) {
+          setPathData((prevPath) => [
+            ...prevPath,
+            { lat: location.latitude, lng: location.longitude },
+          ]);
         }
 
         setBusData((prevData) => {
-          const existingBus = prevData.find((bus) => bus.number === deviceId?.toString());
+          const existingBus = prevData.find(
+            (bus) => bus.number === tracker_ident
+          );
 
           if (existingBus) {
             return prevData.map((bus) =>
-              bus.number === deviceId?.toString()
-                ? { ...bus, latitude, longitude, speed, status: `Speed: ${speed} km/h`, time }
+              bus.number === tracker_ident
+                ? {
+                    ...bus,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    speed: location.speed || 0,
+                    status: `Speed: ${location.speed} km/h`,
+                    time: new Date(event.timestamp * 1000).toISOString(),
+                    dispatchStatus: dispatch_log?.status || "idle",
+                  }
                 : bus
             );
           } else {
             return [
               ...prevData,
               {
-                number: deviceId?.toString(),
-                name: `Bus ${deviceId}`,
-                status: `Speed: ${speed} km/h`,
-                latitude,
-                longitude,
-                time,
-                speed,
+                number: tracker_ident,
+                name: `Bus ${tracker_ident}`,
+                latitude: location.latitude,
+                longitude: location.longitude,
+                speed: location.speed || 0,
+                status: `Speed: ${location.speed} km/h`,
+                time: new Date(event.timestamp * 1000).toISOString(),
+                dispatchStatus: dispatch_log?.status || "idle",
               },
             ];
           }
         });
-      } catch (err) {
-        console.error("Error processing MQTT message:", err);
-      }
-    });
-
-    client.on("error", (err) => {
-      console.error("MQTT connection error:", err);
-      setError("Failed to connect to MQTT broker.");
-    });
+      });
 
     return () => {
-      client.end();
+      echo.leaveChannel("flespi-data");
     };
   }, [selectedBus]);
+
+  // Button color based on dispatch status
+  const getButtonColor = (dispatchStatus: string) => {
+    switch (dispatchStatus) {
+      case "on road":
+        return "bg-green-500 text-white";
+      case "on alley":
+        return "bg-yellow-500 text-black";
+      default:
+        return "bg-gray-300 text-black";
+    }
+  };
 
   return (
     <Layout>
       <Header title="Dispatch Monitoring" />
       <section className="p-4 flex flex-col items-center">
-        <div className="w-5/6 flex flex-col h-full">
-          {loading ? (
-            <div className="text-center mt-8">Loading map...</div>
-          ) : (
-            <DispatchMap
-              busData={busData}
-              pathData={pathData}
-              onBusClick={(busNumber) => setSelectedBus(busNumber)}
-            />
-          )}
-          {error && <div className="text-center text-red-500 mt-8">{error}</div>}
-          <div className="bus-info flex flex-row mt-12 space-x-4">
+        <div className="w-5/6 flex flex-col h-full space-y-6">
+          {/* Map Display */}
+          <MapProvider>
+            {loading ? (
+              <div className="text-center mt-8">Loading map...</div>
+            ) : (
+              <DispatchMap
+  busData={busData}
+  pathData={pathData}
+  onBusClick={(busNumber) => setSelectedBus(busNumber)}
+  selectedBus={selectedBus}
+/>
+            )}
+          </MapProvider>
+
+          {/* Vehicle Buttons */}
+          <div className="bus-info flex flex-wrap gap-4 justify-center">
             {busData.map((bus) => (
               <button
                 key={bus.number}
                 onClick={() => setSelectedBus(bus.number)}
-                className={`container w-80 p-4 rounded-lg flex flex-row space-x-8 ${
-                  selectedBus === bus.number ? "bg-blue-500 text-white" : "bg-gray-300 text-black"
-                } transition-all duration-200`}
+                className={`w-64 p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
+                  bus.dispatchStatus
+                )}`}
               >
                 <FaBus size={30} />
-                <h1 className="font-bold">
-                  Vehicle {bus.number} (ID: {bus.number})
-                </h1>
+                <div className="flex flex-col">
+                  <span className="font-bold">Vehicle ID: {bus.number}</span>
+                  <span>Status: {bus.dispatchStatus}</span>
+                </div>
               </button>
             ))}
           </div>
