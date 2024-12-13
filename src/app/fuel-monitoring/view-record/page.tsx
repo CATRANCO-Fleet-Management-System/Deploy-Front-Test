@@ -10,6 +10,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import "react-datepicker/dist/react-datepicker.css";
 import FuelAddModal from "@/app/components/FuelAddModal";
+import FuelEditModal from "@/app/components/FuelEditModal";
 import FuelViewDetailsModal from "@/app/components/FuelViewDetailsModal";
 import {
   fetchAllFuelLogs,
@@ -22,6 +23,10 @@ const ViewRecord = () => {
   const busNumber = searchParams.get("bus") || "001";
   const busStatus = searchParams.get("status") || "On Operation";
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedFuelLog, setSelectedFuelLog] = useState(null);
+
   const [selectedBus, setSelectedBus] = useState(busNumber);
   const [fuelLogs, setFuelLogs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,11 +38,12 @@ const ViewRecord = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
 
-  // Fetch fuel logs for the selected bus
   useEffect(() => {
     const fetchLogs = async () => {
       try {
         const logs = await fetchAllFuelLogs();
+        // Check if logs contain fuel_logs_id
+        console.log(logs); // Logs should have fuel_logs_id
         const filteredLogs = logs.filter(
           (log) => log.vehicle_id === selectedBus
         );
@@ -48,6 +54,7 @@ const ViewRecord = () => {
     };
     fetchLogs();
   }, [selectedBus]);
+
   // Generate chart data based on time interval and selected bus
   const chartData = {
     daily: groupByTimeInterval(
@@ -87,6 +94,57 @@ const ViewRecord = () => {
       },
     ],
   };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 0,
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        enabled: true,
+        mode: "nearest", // Ensures nearest point is selected when hovering
+        intersect: true, // Tooltip only appears when hovering over a point
+        callbacks: {
+          title: (tooltipItem) => {
+            // Return the label (usually the date) for the hovered point
+            return tooltipItem[0].label;
+          },
+          label: (tooltipItem) => {
+            const datasetIndex = tooltipItem.datasetIndex;
+            const data = tooltipItem.raw;
+            const distance =
+              tooltipItem.chart.data.datasets[0].data[tooltipItem.dataIndex];
+            const liters =
+              tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex];
+
+            let tooltipText = "";
+            if (datasetIndex === 0) {
+              tooltipText = `Distance: ${distance} KM`;
+            }
+            if (datasetIndex === 1) {
+              tooltipText = `Liters: ${liters} L`;
+            }
+
+            if (
+              datasetIndex === 0 &&
+              tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex] !==
+                undefined
+            ) {
+              tooltipText = `Distance: ${distance} KM\nLiters: ${liters} L`;
+            }
+            return tooltipText;
+          },
+        },
+      },
+    },
+  };
   // Handle deletion of a fuel log
   const handleDeleteFuelLog = async (fuelLogId) => {
     try {
@@ -101,38 +159,15 @@ const ViewRecord = () => {
     }
   };
 
-  // Handle edit of a fuel log
   const handleEdit = (record) => {
-    setEditData(record); // Populate editData with the selected record
-    setIsModalOpen(true); // Open the modal for editing
-  };
+    // First, set the selected bus and edit data
+    setSelectedBus(record.vehicle_id);
+    setEditData(record);
 
-  // Handle new record addition or update
-  const handleAddOrUpdateRecord = (updatedRecord) => {
-    setFuelLogs((prevLogs) => {
-      const index = prevLogs.findIndex(
-        (log) => log.fuel_logs_id === updatedRecord.fuel_logs_id
-      );
-      if (index !== -1) {
-        // Update existing record
-        const updatedLogs = [...prevLogs];
-        updatedLogs[index] = updatedRecord;
-        return updatedLogs;
-      }
-      // Add new record
-      return [...prevLogs, updatedRecord];
-    });
-    setSelectedBus(updatedRecord.vehicle_id); // Ensures correct data is fetched on next render
-  };
+    // Log the selected bus and edit data to check if they're being set correctly
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditData(null);
-  };
-
-  const closeViewDetailsModal = () => {
-    setIsViewDetailsOpen(false);
-    setViewData(null);
+    // Open the modal only after the state has been updated
+    setIsEditModalOpen(true);
   };
 
   const handleViewDetails = (record) => {
@@ -140,39 +175,31 @@ const ViewRecord = () => {
     setIsViewDetailsOpen(true);
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        ticks: {
-          maxRotation: 45, // Adjust the rotation
-          minRotation: 0,
-        },
-      },
-    },
-    plugins: {
-      tooltip: {
-        enabled: true,
-        mode: "index",
-        intersect: false,
-        callbacks: {
-          title: (tooltipItem) => {
-            return tooltipItem[0].label;
-          },
-          label: (tooltipItem) => {
-            const datasetIndex = tooltipItem.datasetIndex;
-            const data = tooltipItem.raw;
-            if (datasetIndex === 0) {
-              return `Distance: ${data} KM`;
-            } else if (datasetIndex === 1) {
-              return `Liters: ${data} L`;
-            }
-          },
-        },
-      },
-    },
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditData(null);
   };
+
+  // Handle new record addition or update
+  const handleAdd = (updatedRecord) => {
+    setFuelLogs((prevLogs) => {
+      const index = prevLogs.findIndex(
+        (log) => log.fuel_logs_id === updatedRecord.fuel_logs_id
+      );
+      return [...prevLogs, updatedRecord];
+    });
+    setSelectedBus(updatedRecord.vehicle_id);
+  };
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const closeViewDetailsModal = () => {
+    setIsViewDetailsOpen(false);
+    setViewData(null);
+  };
+
   // Function to open the history modal
   const handleOpenHistoryModal = () => {
     const filteredHistory = fuelLogs.filter(
@@ -265,13 +292,14 @@ const ViewRecord = () => {
           </div>
 
           <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg">
-            <div className="absolute inset-0 flex justify-center items-center opacity-10">
+            <div className="absolute inset-0 flex justify-center items-center opacity-10 z-0">
               <span className="text-6xl font-bold text-gray-500">
                 {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
               </span>
             </div>
-            <Line data={data} options={options} />
+            <Line data={data} options={options} className="relative z-10" />
           </div>
+
           <div className="table-container w-5/6 mt-4 bg-white p-4 rounded-lg shadow-lg">
             <table className="w-full text-left">
               <thead>
@@ -285,41 +313,49 @@ const ViewRecord = () => {
                 </tr>
               </thead>
               <tbody>
-                {displayedRecords.map((entry) => (
-                  <tr key={entry.fuel_logs_id} className="border-t">
-                    <td className="py-2 px-4">{entry.purchase_date}</td>
-                    <td className="py-2 px-4">{entry.odometer_km} KM</td>
-                    <td className="py-2 px-4">{entry.fuel_type}</td>
-                    <td className="py-2 px-4">{entry.fuel_price}</td>
-                    <td className="py-2 px-4">
-                      {entry.fuel_liters_quantity} L
-                    </td>
-                    <td className="py-2 px-4">{entry.total_expense} PHP</td>
-                    <td className="py-2 text-right flex items-center space-x-2">
-                      <button
-                        onClick={() => handleViewDetails(entry)}
-                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => handleEdit(entry)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteFuelLog(entry.fuel_logs_id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {displayedRecords
+                  .sort(
+                    (a, b) =>
+                      new Date(a.purchase_date) - new Date(b.purchase_date)
+                  ) // Sort by date ascending
+                  .map((entry) => (
+                    <tr key={entry.fuel_logs_id} className="border-t">
+                      <td className="py-2 px-4">{entry.purchase_date}</td>
+                      <td className="py-2 px-4">{entry.odometer_km} KM</td>
+                      <td className="py-2 px-4">{entry.fuel_type}</td>
+                      <td className="py-2 px-4">{entry.fuel_price}</td>
+                      <td className="py-2 px-4">
+                        {entry.fuel_liters_quantity} L
+                      </td>
+                      <td className="py-2 px-4">{entry.total_expense} PHP</td>
+                      <td className="py-2 text-right flex items-center space-x-2">
+                        <button
+                          onClick={() => handleViewDetails(entry)}
+                          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => handleEdit(entry)}
+                          className="px-3 py-1 bg-blue-500 text-white rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleDeleteFuelLog(entry.fuel_logs_id)
+                          }
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
+
           <div className="mt-4 flex justify-between w-5/6">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
@@ -351,7 +387,7 @@ const ViewRecord = () => {
                 />
               )}
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => setIsAddModalOpen(true)}
                 className="px-4 py-2 bg-blue-500 text-white rounded"
               >
                 Add New Record
@@ -370,12 +406,20 @@ const ViewRecord = () => {
             selectedBus={selectedBus}
           />
         ))}
-      {isModalOpen && (
+      {isAddModalOpen && (
         <FuelAddModal
           selectedBus={selectedBus}
-          onClose={closeModal}
-          onAdd={handleAddOrUpdateRecord}
-          editData={editData}
+          onClose={closeAddModal}
+          onAdd={handleAdd}
+        />
+      )}
+
+      {isEditModalOpen && (
+        <FuelEditModal
+          selectedBus={selectedBus}
+          selectedFuelLog={editData}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleEdit}
         />
       )}
 

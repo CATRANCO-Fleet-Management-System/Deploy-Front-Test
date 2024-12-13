@@ -186,12 +186,12 @@ const FuelMonitoring = () => {
         <div className="flex justify-center items-center w-full">
           <div className="relative" style={{ width: `${chartWidth}px` }}>
             <div className="relative chart-container w-full h-[500px] bg-white p-4 rounded-lg shadow-lg">
-              <div className="absolute inset-0 flex justify-center items-center opacity-10">
+              <div className="absolute inset-0 flex justify-center items-center opacity-10 z-0">
                 <span className="text-6xl font-bold text-gray-500">
                   {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
                 </span>
               </div>
-              <Line data={data} options={options} />
+              <Line data={data} options={options} className="relative z-10" />
             </div>
           </div>
         </div>

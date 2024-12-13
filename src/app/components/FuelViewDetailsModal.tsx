@@ -1,17 +1,23 @@
 import React from "react";
 import { FaBus } from "react-icons/fa";
 
-const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
+const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose = () => {} }) => {
   const {
     purchase_date = "N/A",
     odometer_km = "N/A",
     fuel_price = "N/A",
     fuel_type = "N/A",
     fuel_liters_quantity = "N/A",
-    total_expense = "N/A",
+    total_expense,
     odometer_distance_proof = null,
     fuel_receipt_proof = null,
   } = viewData;
+
+  const calculatedTotalExpense =
+    total_expense ||
+    (!isNaN(fuel_price) && !isNaN(fuel_liters_quantity)
+      ? (parseFloat(fuel_price) * parseFloat(fuel_liters_quantity)).toFixed(2)
+      : "N/A");
 
   const BASE_URL =
     process.env.NEXT_PUBLIC_STORAGE_URL ||
@@ -33,68 +39,48 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
           <FaBus size={32} className="mr-3" />
           <span className="text-xl font-bold">BUS {selectedBus}</span>
         </div>
-        <div className="flex space-x-6">
+        <div className="flex flex-col md:flex-row md:space-x-6">
           {/* Left Section */}
-          <div className="w-1/2">
+          <div className="w-full md:w-1/2">
             <div className="mb-4">
               <label className="block font-medium">Date</label>
-              <input
-                type="text"
-                value={formatDate(purchase_date)}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded bg-gray-100"
-              />
+              <p className="border border-gray-300 p-2 rounded bg-gray-100">
+                {formatDate(purchase_date)}
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium">Odometer (KM)</label>
-              <input
-                type="text"
-                value={odometer_km}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded bg-gray-100"
-              />
+              <p className="border border-gray-300 p-2 rounded bg-gray-100">
+                {odometer_km}
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium">Fuel Type</label>
-              <input
-                type="text"
-                value={fuel_type}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded bg-gray-100"
-              />
+              <p className="border border-gray-300 p-2 rounded bg-gray-100">
+                {fuel_type}
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium">Fuel Price (PHP)</label>
-              <input
-                type="text"
-                value={fuel_price}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded bg-gray-100"
-              />
+              <p className="border border-gray-300 p-2 rounded bg-gray-100">
+                {fuel_price}
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium">Fuel Quantity (L)</label>
-              <input
-                type="number"
-                name="fuel_liters_quantity"
-                value={fuel_liters_quantity}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded"
-              />
+              <p className="border border-gray-300 p-2 rounded bg-gray-100">
+                {fuel_liters_quantity}
+              </p>
             </div>
           </div>
 
           {/* Right Section */}
-          <div className="w-1/2">
+          <div className="w-full md:w-1/2">
             <div className="mb-4">
               <label className="block font-medium">Total Expense (PHP)</label>
-              <input
-                type="number"
-                name="total_expense"
-                value={total_expense}
-                disabled
-                className="w-full border border-gray-300 p-2 rounded"
-              />
+              <p className="border border-gray-300 p-2 rounded bg-gray-100">
+                {calculatedTotalExpense}
+              </p>
             </div>
             <div className="mb-4">
               <label className="block font-medium">Odometer Proof</label>
@@ -102,7 +88,7 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
                 <img
                   src={`${BASE_URL}${odometer_distance_proof}`}
                   alt={`Odometer proof for Bus ${selectedBus}`}
-                  className="w-full border border-gray-300 p-2 rounded"
+                  className="max-h-48 w-auto border border-gray-300 p-2 rounded"
                 />
               ) : (
                 <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center">
@@ -116,7 +102,7 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
                 <img
                   src={`${BASE_URL}${fuel_receipt_proof}`}
                   alt={`Fuel receipt proof for Bus ${selectedBus}`}
-                  className="w-full border border-gray-300 p-2 rounded"
+                  className="max-h-48 w-auto border border-gray-300 p-2 rounded"
                 />
               ) : (
                 <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center">
@@ -131,7 +117,8 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose }) => {
         <div className="flex justify-end mt-6">
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-gray-500 text-white rounded"
+            className="px-5 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none"
+            aria-label="Close modal"
           >
             Close
           </button>
