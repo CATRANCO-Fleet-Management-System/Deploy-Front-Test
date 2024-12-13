@@ -29,7 +29,7 @@ api.interceptors.request.use(
 // Create Feedback Log
 export const createFeedbackLog = async (feedbackData) => {
   try {
-    const response = await api.post('/feedback', feedbackData);
+    const response = await api.post('/user/feedback', feedbackData);
     return response.data;
   } catch (error) {
     console.error('Error creating feedback log:', error);
@@ -40,7 +40,7 @@ export const createFeedbackLog = async (feedbackData) => {
 // Generate OTP for Feedback
 export const generateOTP = async (feedbackLogsId) => {
   try {
-    const response = await api.post('/otp/generate', {
+    const response = await api.post('/user/otp/generate', {
       feedback_logs_id: feedbackLogsId,
     });
     return response.data;
@@ -53,7 +53,7 @@ export const generateOTP = async (feedbackLogsId) => {
 // Verify Phone Number for Feedback
 export const verifyPhoneNumber = async (feedbackLogsId, otpCode) => {
   try {
-    const response = await api.post(`/feedback/${feedbackLogsId}/verify-phone`, {
+    const response = await api.post(`/user/feedback/${feedbackLogsId}/verify-phone`, {
       otp_code: otpCode,
     });
     return response.data;
@@ -66,7 +66,7 @@ export const verifyPhoneNumber = async (feedbackLogsId, otpCode) => {
 // Get All Feedback Logs
 export const getAllFeedbackLogs = async () => {
   try {
-    const response = await api.get('/feedback-logs');
+    const response = await api.get('/user/feedback-logs');
     return response.data;
   } catch (error) {
     console.error('Error fetching feedback logs:', error);
@@ -77,7 +77,7 @@ export const getAllFeedbackLogs = async () => {
 // Get Feedback Log by ID
 export const getFeedbackLogById = async (feedbackLogsId) => {
   try {
-    const response = await api.get(`/feedback/${feedbackLogsId}`);
+    const response = await api.get(`/user/feedback/${feedbackLogsId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching feedback log by ID:', error);

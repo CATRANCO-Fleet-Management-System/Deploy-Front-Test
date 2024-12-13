@@ -16,7 +16,7 @@ interface BusBoxProps {
   CRNumber: string;
   plateNumber: string;
   thirdLBI: string;
-  ci?: string;
+  ci: string;
   assignedDriver: string;
   assignedPAO: string;
   assignmentId: string | null;
@@ -32,7 +32,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
   CRNumber,
   plateNumber,
   thirdLBI,
-  comprehensiveInsurance,
+  ci,
   assignedDriver,
   assignedPAO,
   assignmentId: initialAssignmentId,
@@ -146,10 +146,10 @@ const BusRecord: React.FC<BusBoxProps> = ({
             <td className="border p-2 font-bold">Third LBI:</td>
             <td className="border p-2">{thirdLBI}</td>
           </tr>
-          {comprehensiveInsurance && (
+          {ci && (
             <tr>
               <td className="border p-2 font-bold">Comprehensive Insurance:</td>
-              <td className="border p-2">{comprehensiveInsurance}</td>
+              <td className="border p-2">{ci}</td>
             </tr>
           )}
           <tr>
@@ -219,7 +219,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
           CRNumber,
           plateNumber,
           thirdLBI,
-          comprehensiveInsurance,
+          ci,
           assignedDriver,
           assignedPAO,
           route,

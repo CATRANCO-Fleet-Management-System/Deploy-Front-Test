@@ -212,7 +212,7 @@ const cancelDelete = () => {
               CRNumber={record.cr_id}
               plateNumber={record.plate_number}
               thirdLBI={record.third_pli}
-              comprehensiveInsurance={record.comprehensive_insurance || "N/A"}
+              ci={record.ci || "N/A"}
               assignedDriver={driver}
               assignedPAO={conductor}
               route={record.route || "Not Assigned"}
