@@ -35,14 +35,15 @@ export const groupByTimeInterval = (logs, interval) => {
     if (!groupedData[key]) {
       groupedData[key] = { distance: 0, liters: 0 };
     }
-
     groupedData[key].distance += log.distance_traveled;
-    groupedData[key].liters += log.fuel_liters_quantity;
-  });
 
+    groupedData[key].liters += log.fuel_liters_quantity;
+
+  });
   // Return the grouped data with the formatted key and values
+  label: key,
   return Object.entries(groupedData).map(([key, value]) => ({
-    label: key,
     ...value,
   }));
+
 };
