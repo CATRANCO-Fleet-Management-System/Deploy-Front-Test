@@ -5,11 +5,13 @@ import Sidebar2 from "../components/Sidebar2";
 import Header from "../components/Header";
 import {
   getProfile,
-  updateAccount, updateOwnAccount,
+  updateAccount,
+  updateOwnAccount,
   getOwnProfile,
 } from "../services/authService";
+
 const EditProfile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"account" | "profile">("account"); // Toggle between tabs
+  const [activeTab, setActiveTab] = useState<"account" | "profile">("account");
   const [profileSettings, setProfileSettings] = useState({
     lastName: "",
     firstName: "",
@@ -25,13 +27,10 @@ const EditProfile: React.FC = () => {
   const [accountSettings, setAccountSettings] = useState({
     username: "",
     email: "",
-    password: "",
     newPassword: "",
   });
 
-  const [selectedImage, setSelectedImage] = useState<
-    string | ArrayBuffer | null
-  >(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -39,17 +38,15 @@ const EditProfile: React.FC = () => {
       try {
         setLoading(true);
 
-        // Fetch account data
         const accountData = await getProfile();
+        const profileData = await getOwnProfile();
+
         setAccountSettings({
           username: accountData.username,
           email: accountData.email,
-          password: "",
           newPassword: "",
         });
 
-        // Fetch profile data
-        const profileData = await getOwnProfile();
         setProfileSettings({
           lastName: profileData.profile.last_name || "",
           firstName: profileData.profile.first_name || "",
@@ -85,15 +82,14 @@ const EditProfile: React.FC = () => {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setSelectedImage(reader.result);
-      reader.readAsDataURL(file);
-
       try {
         setLoading(true);
         const formData = new FormData();
         formData.append("user_profile_image", file);
-        await updateOwnAccount({ user_profile_image: file });
+
+        const result = await updateOwnAccount(formData);
+
+        setSelectedImage(URL.createObjectURL(file));
         alert("Profile image updated successfully!");
       } catch (error) {
         console.error("Error updating profile image:", error);
@@ -104,44 +100,59 @@ const EditProfile: React.FC = () => {
     }
   };
 
-  const handleSubmitAccount = async (e: React.FormEvent) => {
+  const handleSubmitProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
-      await updateAccount({
-        username: accountSettings.username,
-        email: accountSettings.email,
-        password: accountSettings.newPassword,
-      });
-      alert("Account updated successfully!");
-    } catch (error) {
-      console.error("Error updating account settings:", error);
-      alert("Failed to update account settings.");
+      const payload = {
+        last_name: profileSettings.lastName,
+        first_name: profileSettings.firstName,
+        middle_initial: profileSettings.middleInitial,
+        address: profileSettings.address,
+        date_of_birth: profileSettings.dateOfBirth,
+        sex: profileSettings.sex,
+        contact_number: profileSettings.contactNumber,
+        contact_person: profileSettings.contactPerson,
+        contact_person_number: profileSettings.contactPersonNumber,
+      };
+
+      await updateOwnAccount(payload);
+      alert("Profile settings updated successfully!");
+    } catch (error: any) {
+      console.error("Error updating profile settings:", error);
+      if (error.response && error.response.data) {
+        const backendErrors = error.response.data.errors || {};
+        const errorMessages = Object.values(backendErrors).flat().join("\n");
+        alert(`Failed to update profile settings:\n${errorMessages}`);
+      } else {
+        alert("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmitProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdateEmail = async () => {
     try {
       setLoading(true);
-      // Use the current state `profileSettings` for the payload
-      await updateOwnAccount({
-        lastName: profileSettings.lastName,
-        firstName: profileSettings.firstName,
-        middleInitial: profileSettings.middleInitial,
-        address: profileSettings.address,
-        dateOfBirth: profileSettings.dateOfBirth,
-        sex: profileSettings.sex,
-        contactNumber: profileSettings.contactNumber,
-        contactPerson: profileSettings.contactPerson,
-        contactPersonNumber: profileSettings.contactPersonNumber,
-      });
-      alert("Profile settings updated successfully!");
+      await updateAccount({ email: accountSettings.email });
+      alert("Email updated successfully!");
     } catch (error) {
-      console.error("Error updating profile settings:", error);
-      alert("Failed to update profile settings.");
+      console.error("Error updating email:", error);
+      alert("Failed to update email.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    try {
+      setLoading(true);
+      await updateAccount({ password: accountSettings.newPassword });
+      alert("Password updated successfully!");
+    } catch (error) {
+      console.error("Error updating password:", error);
+      alert("Failed to update password.");
     } finally {
       setLoading(false);
     }
@@ -155,7 +166,6 @@ const EditProfile: React.FC = () => {
         <div className="content flex flex-col h-full px-10 py-4">
           {loading && <p className="text-center">Loading...</p>}
           <div className="bg-white rounded-lg shadow-lg w-full px-6 py-4">
-            {/* Tab Navigation */}
             <div className="flex justify-center mb-6">
               <button
                 className={`px-4 py-2 mr-4 ${
@@ -179,59 +189,47 @@ const EditProfile: React.FC = () => {
               </button>
             </div>
 
-            {/* Account Settings Form */}
             {activeTab === "account" && (
-              <form className="space-y-6" onSubmit={handleSubmitAccount}>
-                <h2 className="text-lg font-semibold">Account Settings</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label>Username</label>
-                    <input
-                      type="text"
-                      value={accountSettings.username}
-                      onChange={(e) =>
-                        handleAccountChange("username", e.target.value)
-                      }
-                      className="block w-full mt-1 px-3 py-2 border rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      value={accountSettings.email}
-                      onChange={(e) =>
-                        handleAccountChange("email", e.target.value)
-                      }
-                      className="block w-full mt-1 px-3 py-2 border rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label>New Password</label>
-                    <input
-                      type="password"
-                      value={accountSettings.newPassword}
-                      onChange={(e) =>
-                        handleAccountChange("newPassword", e.target.value)
-                      }
-                      className="block w-full mt-1 px-3 py-2 border rounded-md"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
+              <div className="space-y-6">
+                <div>
+                  <label className="block font-medium">Email</label>
+                  <input
+                    type="email"
+                    value={accountSettings.email}
+                    onChange={(e) =>
+                      handleAccountChange("email", e.target.value)
+                    }
+                    className="block w-full mt-1 px-3 py-2 border rounded-md"
+                  />
                   <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md mt-4"
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+                    onClick={handleUpdateEmail}
                   >
-                    Save Account Settings
+                    Update Email
                   </button>
                 </div>
-              </form>
+                <div>
+                  <label className="block font-medium">New Password</label>
+                  <input
+                    type="password"
+                    value={accountSettings.newPassword}
+                    onChange={(e) =>
+                      handleAccountChange("newPassword", e.target.value)
+                    }
+                    className="block w-full mt-1 px-3 py-2 border rounded-md"
+                  />
+                  <button
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+                    onClick={handleUpdatePassword}
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </div>
             )}
 
-            {/* Profile Settings Form */}
             {activeTab === "profile" && (
-              <form className="space-y-6" onSubmit={handleSubmitProfile}>
+              <form onSubmit={handleSubmitProfile} className="space-y-6">
                 <h2 className="text-lg font-semibold">Profile Settings</h2>
                 <div className="grid grid-cols-2 gap-4">
                   {[
@@ -239,18 +237,11 @@ const EditProfile: React.FC = () => {
                     { label: "First Name", field: "firstName" },
                     { label: "Middle Initial", field: "middleInitial" },
                     { label: "Address", field: "address" },
-                    {
-                      label: "Date of Birth",
-                      field: "dateOfBirth",
-                      type: "date",
-                    },
+                    { label: "Date of Birth", field: "dateOfBirth", type: "date" },
                     { label: "Sex", field: "sex" },
                     { label: "Contact Number", field: "contactNumber" },
                     { label: "Contact Person", field: "contactPerson" },
-                    {
-                      label: "Contact Person Number",
-                      field: "contactPersonNumber",
-                    },
+                    { label: "Contact Person Number", field: "contactPersonNumber" },
                   ].map(({ label, field, type = "text" }) => (
                     <div key={field}>
                       <label>{label}</label>
@@ -268,51 +259,13 @@ const EditProfile: React.FC = () => {
                       />
                     </div>
                   ))}
-                  <div>
-                    <label className="text-gray-700 mb-2">Profile Photo</label>
-                    <div className="relative w-44 h-12 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                      {selectedImage ? (
-                        <img
-                          src={selectedImage as string}
-                          alt="Profile"
-                          className=" object-cover rounded-lg"
-                        />
-                      ) : (
-                        <span className="text-gray-500">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 inline-block mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 4v16m8-8H4"
-                            />
-                          </svg>
-                          Add Attachment
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 </div>
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
-                  >
-                    Save Profile Settings
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
+                >
+                  Save Profile Settings
+                </button>
               </form>
             )}
           </div>

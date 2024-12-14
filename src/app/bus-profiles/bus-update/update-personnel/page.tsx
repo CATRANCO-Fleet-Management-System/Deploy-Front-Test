@@ -8,7 +8,7 @@ import { getVehicleAssignmentById, updateVehicleAssignment } from "@/app/service
 
 const UpdatePersonnel = () => {
   const searchParams = useSearchParams();
-  const assignmentId = searchParams.get("assignment_id");
+  const assignmentId = searchParams.get("vehicle_assignment_id");
   const router = useRouter();
 
   const [drivers, setDrivers] = useState([]);

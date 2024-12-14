@@ -13,15 +13,15 @@ interface Profile {
 }
 
 interface EditPersonnelModalProps {
-  assignmentId: string;
+  assignmentId: string; // Assignment ID
   vehicleId: string; // Vehicle ID is passed here
   initialDriver: string;
   initialPAO: string;
   onClose: () => void;
-  onUpdate: (driverId: string, paoId: string) => void;
+  onUpdate: (updatedDriver: string, updatedPAO: string) => void;
 }
 
-const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
+const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
   assignmentId,
   vehicleId,
   initialDriver,
@@ -38,39 +38,18 @@ const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
 
   useEffect(() => {
     const fetchProfiles = async () => {
-      setLoading(true);
       try {
         const profiles = await getAllProfiles();
-        const driverProfiles = profiles.filter((profile) => profile.profile.position === "driver");
-        const paoProfiles = profiles.filter((profile) => profile.profile.position === "passenger_assistant_officer");
-
-        setDrivers(driverProfiles);
-        setPaos(paoProfiles);
-
-        if (assignmentId) {
-          const assignment = await getVehicleAssignmentById(assignmentId);
-          if (assignment && assignment.user_profiles) {
-            const currentDriver = assignment.user_profiles.find(
-              (p) => p.position === "driver"
-            )?.user_profile_id || "";
-            const currentPAO = assignment.user_profiles.find(
-              (p) => p.position === "passenger_assistant_officer"
-            )?.user_profile_id || "";
-
-            setSelectedDriver(currentDriver);
-            setSelectedPAO(currentPAO);
-          }
-        }
+        setDrivers(profiles.filter((p) => p.profile.position === "driver"));
+        setPaos(profiles.filter((p) => p.profile.position === "passenger_assistant_officer"));
       } catch (err) {
-        setError("Failed to fetch profiles.");
         console.error("Error fetching profiles:", err);
-      } finally {
-        setLoading(false);
+        setError("Failed to load personnel. Please try again.");
       }
     };
 
     fetchProfiles();
-  }, [assignmentId]);
+  }, []);
 
   const handleSubmit = async () => {
     if (!selectedDriver || !selectedPAO) {
@@ -79,27 +58,21 @@ const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
     }
 
     setLoading(true);
-
     try {
-      // Ensure vehicle_id is included in the payload
-      const payload = {
+      const response = await updateVehicleAssignment(assignmentId, {
         user_profile_ids: [selectedDriver, selectedPAO],
-        vehicle_id: vehicleId, // Include vehicle_id explicitly
-      };
+        vehicle_id: vehicleId,
+      });
 
-      console.log("Payload sent to API:", payload); // Debug payload
-
-      const response = await updateVehicleAssignment(assignmentId, payload);
-
-      if (response.message === "Vehicle Assignment Updated Successfully") {
+      if (response?.message === "Vehicle Assignment Updated Successfully") {
         onUpdate(selectedDriver, selectedPAO);
         onClose();
       } else {
-        throw new Error(response.message || "Update failed.");
+        throw new Error(response?.message || "Update failed.");
       }
     } catch (err) {
+      console.error("Error updating personnel assignment:", err);
       setError("Failed to update personnel. Please try again.");
-      console.error("Error updating vehicle assignment:", err);
     } finally {
       setLoading(false);
     }
@@ -107,56 +80,63 @@ const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
-      <div className="bg-white p-8 rounded-lg w-96">
-        <h2 className="text-xl mb-4">Edit Personnel Assignment</h2>
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 className="text-xl font-bold mb-4">Edit Personnel Assignment</h2>
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        <div>
-          <label className="block text-sm">Select Driver</label>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Driver</label>
           <select
             value={selectedDriver}
             onChange={(e) => setSelectedDriver(e.target.value)}
-            className="w-full p-2 mt-2 border rounded"
+            className="w-full p-2 border rounded"
             disabled={loading}
           >
             <option value="">Select a Driver</option>
             {drivers.map((driver) => (
-              <option key={driver.profile.user_profile_id} value={driver.profile.user_profile_id}>
+              <option
+                key={driver.profile.user_profile_id}
+                value={driver.profile.user_profile_id}
+              >
                 {`${driver.profile.first_name} ${driver.profile.last_name}`}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="mt-4">
-          <label className="block text-sm">Select PAO</label>
+        <div className="mb-6">
+          <label className="block text-sm font-medium">PAO</label>
           <select
             value={selectedPAO}
             onChange={(e) => setSelectedPAO(e.target.value)}
-            className="w-full p-2 mt-2 border rounded"
+            className="w-full p-2 border rounded"
             disabled={loading}
           >
             <option value="">Select a PAO</option>
             {paos.map((pao) => (
-              <option key={pao.profile.user_profile_id} value={pao.profile.user_profile_id}>
+              <option
+                key={pao.profile.user_profile_id}
+                value={pao.profile.user_profile_id}
+              >
                 {`${pao.profile.first_name} ${pao.profile.last_name}`}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="mt-6 flex justify-between">
+        <div className="flex justify-between">
           <button
             onClick={handleSubmit}
-            className={`px-4 py-2 bg-blue-500 text-white rounded ${loading ? "cursor-not-allowed" : ""}`}
+            className={`px-4 py-2 bg-blue-500 text-white rounded ${loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             disabled={loading}
           >
             {loading ? "Updating..." : "Update"}
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-red-500 text-white rounded"
+            className="px-4 py-2 bg-gray-300 rounded"
           >
             Cancel
           </button>
@@ -166,4 +146,4 @@ const EditPersonnelModal: React.FC<EditPersonnelModalProps> = ({
   );
 };
 
-export default EditPersonnelModal;
+export default EditPersonnel;

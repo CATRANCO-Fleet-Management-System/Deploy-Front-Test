@@ -8,8 +8,8 @@ import {
   FaTruck,
   FaGasPump,
   FaCommentDots,
+  FaTools,
   FaWrench,
-  FaMicrochip,
 } from "react-icons/fa";
 import Link from "next/link";
 
@@ -25,11 +25,6 @@ export default function Sidebar() {
       label: "Bus Personnel Management",
     },
     { href: "/bus-profiles", icon: <FaBus size={25} />, label: "Bus Profiles" },
-    {
-      href: "/devices",
-      icon: <FaMicrochip size={25} />,
-      label: "Device Management",
-    },
     {
       href: "/bus-maintenance",
       icon: <FaWrench size={25} />,

@@ -1,10 +1,12 @@
 "use client";
-import React, { useState } from "react";
-import Layout from "../components/Layout"; 
+
+import React, { useState, useEffect } from "react";
+import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch } from "react-icons/fa";
 import FeedbackRecord from "../components/FeedbackRecord";
+import { fetchAllFuelLogs } from "../services/feedbackService";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const handlePageChange = (page) => {
@@ -68,13 +70,26 @@ const FeedbackRecordDisplay = () => {
   const [itemsPerPage] = useState(4);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
-  const [feedbackRecords, setFeedbackRecords] = useState([
-    { id: "001", phoneNumber: "0937421865", rating: 5, comment: "Great service!", date: "2024-10-10" },
-    { id: "002", phoneNumber: "0993451661", rating: 4, comment: "Good experience overall.", date: "2024-10-11" },
-    { id: "003", phoneNumber: "0927435472", rating: 3, comment: "Average service.", date: "2024-10-12" },
-    { id: "004", phoneNumber: "0916625935", rating: 5, comment: "Excellent support!", date: "2024-10-13" },
-    { id: "005", phoneNumber: "0906685652", rating: 2, comment: "Not satisfied with the service.", date: "2024-10-14" },
-  ]);
+  const [feedbackRecords, setFeedbackRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeedbackLogs = async () => {
+      try {
+        setLoading(true);
+        const logs = await fetchAllFuelLogs(); // Use the correct service
+        console.log("Fetched Feedback Logs:", logs); // Debug response
+        setFeedbackRecords(logs.data || []); // Set feedback records
+      } catch (error) {
+        console.error("Error fetching feedback logs:", error);
+        alert("Failed to fetch feedback records. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeedbackLogs();
+  }, []);
+
 
   const handleDelete = (recordId: string) => {
     setDeleteRecordId(recordId);
@@ -84,7 +99,7 @@ const FeedbackRecordDisplay = () => {
   const confirmDelete = () => {
     if (deleteRecordId) {
       setFeedbackRecords((prevRecords) =>
-        prevRecords.filter((record) => record.id !== deleteRecordId)
+        prevRecords.filter((record) => record.feedback_logs_id !== deleteRecordId)
       );
       setDeleteRecordId(null);
       setIsDeletePopupOpen(false);
@@ -97,7 +112,8 @@ const FeedbackRecordDisplay = () => {
   };
 
   const filteredRecords = feedbackRecords.filter((record) =>
-    record.comment.toLowerCase().includes(searchTerm.toLowerCase()) || record.phoneNumber.includes(searchTerm)
+    record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    record.phone_number?.includes(searchTerm)
   );
 
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
@@ -108,48 +124,56 @@ const FeedbackRecordDisplay = () => {
 
   return (
     <Layout>
-      <Header title="Feedback" />
+      <Header title="Feedback Records" />
       <div className="content flex flex-col flex-1">
         <div className="options flex items-center space-x-10 p-4 w-9/12 ml-8">
           <input
             type="text"
-            placeholder="Find feedback via phone number"
+            placeholder="Search by phone number or comment"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
+          <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 hover:bg-blue-50">
             <FaSearch size={22} className="mr-2" />
             Search
           </button>
         </div>
-        <div className="records flex flex-col h-full">
-          <div className="output flex mt-2 items-center ml-8">
-            {paginatedRecords.map((record) => (
-              <FeedbackRecord
-                key={record.id}
-                phoneNumber={record.phoneNumber}
-                rating={record.rating}
-                comment={record.comment}
-                date={record.date}
-                onDelete={() => handleDelete(record.id)}
-              />
-            ))}
-          </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        {loading ? (
+  <div className="text-center text-blue-500 mt-10">Loading feedback...</div>
+) : feedbackRecords.length === 0 ? (
+  <div className="text-center text-gray-500 mt-10">No feedback records found.</div>
+) : (
+  <div className="records flex flex-col h-full">
+    <div className="output flex mt-2 items-center ml-8 flex-wrap gap-4">
+      {paginatedRecords.map((record) => (
+        <FeedbackRecord
+          key={record.feedback_logs_id}
+          phoneNumber={record.phone_number || "N/A"}
+          rating={record.rating || 0}
+          comment={record.comments || "No comments available"}
+          date={new Date(record.created_at).toLocaleString()}
+          onDelete={() => handleDelete(record.feedback_logs_id)}
+        />
+      ))}
+    </div>
+    <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage}
+    />
+  </div>
+)}
       </div>
       <Confirmpopup
         isOpen={isDeletePopupOpen}
         onClose={cancelDelete}
         onConfirm={confirmDelete}
+        title="Delete Feedback"
+        message="Are you sure you want to delete this feedback?"
       />
     </Layout>
   );
 };
 
-export default FeedbackRecordDisplay; 
+export default FeedbackRecordDisplay;
