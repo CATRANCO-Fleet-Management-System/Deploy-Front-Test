@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import { GoogleMap, Marker, Polyline, InfoWindow } from "@react-google-maps/api";
 
 interface BusData {
@@ -79,13 +79,36 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
   onBusClick,
   selectedBus,
 }) => {
+  const [zoomLevel, setZoomLevel] = useState(13); // Default zoom level
+  const mapRef = useRef<google.maps.Map | null>(null); // Store map instance
+
+  // Capture the map instance when the map is loaded
+  const handleMapLoad = (map: google.maps.Map) => {
+    mapRef.current = map;
+
+    // Listen to zoom level changes
+    map.addListener("zoom_changed", () => {
+      const currentZoom = map.getZoom() || 13;
+      setZoomLevel(currentZoom);
+    });
+  };
+
+  // Calculate marker size dynamically based on zoom level
+  const calculateMarkerSize = (zoom: number) => {
+    const baseSize = 50; // Minimum size
+    const scaleFactor = 4; // Scaling factor for size increase
+    const size = Math.max(baseSize, zoom * scaleFactor);
+    return new window.google.maps.Size(size, size * 1.5); // Maintain aspect ratio
+  };
+
   return (
     <div className="relative w-full">
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={defaultMapCenter}
-        zoom={13}
+        zoom={zoomLevel}
         options={mapOptions}
+        onLoad={handleMapLoad} // Capture the map instance
       >
         {/* Render the bus trail (polyline) */}
         {pathData.length > 0 && (
@@ -105,7 +128,7 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
             position={{ lat: bus.latitude, lng: bus.longitude }}
             icon={{
               url: getIconUrl(bus.dispatchStatus),
-              scaledSize: new window.google.maps.Size(30, 40),
+              scaledSize: calculateMarkerSize(zoomLevel), // Dynamic size
             }}
             onClick={() => onBusClick(bus.number)}
           >
@@ -133,7 +156,7 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
             position={location.coordinate}
             icon={{
               url: `/${location.title.toLowerCase().replace(" ", "_")}.png`,
-              scaledSize: new window.google.maps.Size(30, 40),
+              scaledSize: calculateMarkerSize(zoomLevel), // Dynamic size
             }}
             title={location.title}
           >

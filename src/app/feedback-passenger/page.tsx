@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  createFeedbackLog,
-  generateOTP,
-  verifyPhoneNumber,
-} from "../services/feedbackService";
+import { createFeedbackLog, generateOTP, verifyPhoneNumber } from "../services/feedbackService";
 import { getAllVehicles } from "../services/vehicleService";
 
 const FeedbackForm: React.FC = () => {
@@ -88,121 +84,105 @@ const FeedbackForm: React.FC = () => {
     }
   };
 
-  // Reset the feedback form
-  const resetForm = () => {
-    setBusNumber("");
-    setRating(0);
-    setComments("");
-    setPhoneNumber("");
-    setVerificationCode("");
-    setFeedbackLogsId(null);
-    setCurrentStep("initial");
-  };
-
   return (
-    <section className="h-screen w-full flex justify-center items-center bg-gradient-to-br from-teal-200 to-indigo-300">
-      <div className="p-6 bg-white shadow-md rounded-md w-96">
+    <section
+      className="h-screen w-full flex justify-center items-center"
+      style={{ background: "linear-gradient(135deg, #e0f7fa, #d1c4e9)" }}
+    >
+      <div className="w-full h-full flex flex-col justify-center items-center">
         {currentStep === "initial" && (
-          <div>
-            <h2 className="text-xl font-bold mb-4">Welcome to TransitTrack Feedback</h2>
-            <button
-              onClick={() => setCurrentStep("feedback")}
-              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
+          <div style={styles.container}>
+            <h2 style={styles.title}>Welcome to TransitTrack Feedback</h2>
+            <button onClick={() => setCurrentStep("feedback")} style={styles.submitButton}>
               Send Feedback
             </button>
           </div>
         )}
+
         {currentStep === "feedback" && (
-          <div>
-            <h2 className="text-xl font-bold mb-4">Give Feedback</h2>
-            <select
-              value={busNumber}
-              onChange={(e) => setBusNumber(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
-            >
-              <option value="">Select Bus Number</option>
-              {buses.map((bus) => (
-                <option key={bus.vehicle_id} value={bus.vehicle_id}>
-                  {bus.plate_number || `Bus ${bus.vehicle_id}`}
-                </option>
-              ))}
-            </select>
-            <div className="mb-4">
-              <label className="block mb-2">Rate your experience:</label>
-              {[1, 2, 3, 4, 5].map((index) => (
-                <span
-                  key={index}
-                  onClick={() => setRating(index)}
-                  className={`text-3xl cursor-pointer ${
-                    rating >= index ? "text-yellow-500" : "text-gray-400"
-                  }`}
-                >
-                  ★
-                </span>
-              ))}
+          <div style={styles.container}>
+            <h2 style={styles.title}>Give Feedback</h2>
+            <div style={styles.dropdown}>
+              <label>Select Bus Number</label>
+              <select
+                value={busNumber}
+                onChange={(e) => setBusNumber(e.target.value)}
+                style={styles.input}
+              >
+                <option value="">Select Bus Number</option>
+                {buses.map((bus) => (
+                  <option key={bus.vehicle_id} value={bus.vehicle_id}>
+                    {bus.plate_number || `Bus ${bus.vehicle_id}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={styles.ratingSection}>
+              <label>How was your experience?</label>
+              <div style={styles.stars}>
+                {[1, 2, 3, 4, 5].map((index) => (
+                  <span
+                    key={index}
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "30px",
+                      color: rating >= index ? "#FFD700" : "#CCCCCC",
+                    }}
+                    onClick={() => setRating(index)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
             </div>
             <textarea
               value={comments}
               onChange={(e) => setComments(e.target.value)}
               placeholder="Your comments..."
-              className="w-full mb-4 p-2 border rounded h-20"
+              style={styles.textarea}
             />
-            <button
-              onClick={handleSubmitFeedback}
-              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-              disabled={loading}
-            >
+            <button onClick={handleSubmitFeedback} style={styles.submitButton}>
               {loading ? "Submitting..." : "Submit Feedback"}
             </button>
           </div>
         )}
+
         {currentStep === "phoneInput" && (
-          <div>
-            <h2 className="text-xl font-bold mb-4">Phone Number</h2>
+          <div style={styles.container}>
+            <h2 style={styles.title}>Phone Number</h2>
             <input
               type="text"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
               placeholder="Enter your phone number"
+              style={styles.input}
             />
-            <button
-              onClick={handlePhoneInputSubmit}
-              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-              disabled={loading}
-            >
+            <button onClick={handlePhoneInputSubmit} style={styles.submitButton}>
               {loading ? "Sending OTP..." : "Next"}
             </button>
           </div>
         )}
+
         {currentStep === "verification" && (
-          <div>
-            <h2 className="text-xl font-bold mb-4">Verify Phone Number</h2>
+          <div style={styles.container}>
+            <h2 style={styles.title}>Verify Phone Number</h2>
             <input
               type="text"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
-              className="w-full mb-4 p-2 border rounded"
               placeholder="Enter the verification code"
+              style={styles.input}
             />
-            <button
-              onClick={handleVerificationSubmit}
-              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-              disabled={loading}
-            >
+            <button onClick={handleVerificationSubmit} style={styles.submitButton}>
               {loading ? "Verifying..." : "Verify"}
             </button>
           </div>
         )}
+
         {currentStep === "thankYou" && (
-          <div>
-            <h2 className="text-xl font-bold mb-4">Thank You!</h2>
-            <p>Your feedback has been submitted successfully.</p>
-            <button
-              onClick={resetForm}
-              className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4"
-            >
+          <div style={styles.thankYouContainer}>
+            <h2 style={styles.thankYouTitle}>Thank you for your feedback!</h2>
+            <button onClick={() => setCurrentStep("initial")} style={styles.submitButton}>
               Done
             </button>
           </div>
@@ -212,4 +192,107 @@ const FeedbackForm: React.FC = () => {
   );
 };
 
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '500px',
+    height: 'auto',
+    padding: '40px',
+    background: '#ffffff',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center',
+  },
+  logo: {
+    maxWidth: '150%',
+    height: 'auto',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: '10px',
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    cursor: 'pointer',
+  },
+  title: {
+    marginBottom: '20px',
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  dropdown: {
+    marginBottom: '20px',
+    textAlign: 'left',
+    width: '100%',
+  },
+  ratingSection: {
+    marginBottom: '20px',
+    textAlign: 'left',
+    width: '100%',
+  },
+  stars: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '10px',
+  },
+  commentsSection: {
+    marginBottom: '10px',
+    textAlign: 'left',
+    width: '100%',
+  },
+  textarea: {
+    width: '100%',
+    height: '100px',
+    padding: '10px',
+    marginBottom: '20px',
+    borderRadius: '5px',
+    border: '1px solid #cccccc',
+  },
+  submitButton: {
+    padding: '12px',
+    width: '100%',
+    backgroundColor: '#007BFF',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  },
+  input: {
+    width: '100%',
+    padding: '12px',
+    marginBottom: '20px',
+    borderRadius: '5px',
+    border: '1px solid #cccccc', 
+  },
+  thankYouContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '500px',
+    padding: '50px', 
+    background: '#ffffff', 
+    borderRadius: '12px', 
+    boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
+    textAlign: 'center',
+  },
+  thankYouTitle: {
+    fontSize: '28px', 
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#333',
+  },
+  feedbackLink: {
+    marginTop: '15px',
+    color: '#007BFF',
+    textDecoration: 'underline',
+    cursor: 'pointer',
+  },
+};
+
 export default FeedbackForm;
+

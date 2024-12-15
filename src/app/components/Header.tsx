@@ -82,8 +82,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           {dropdownVisible && (
             <div
               ref={dropdownRef}
-              className="absolute right-0 mr-2 mt-28 w-32 text-base bg-white border border-gray-300 rounded shadow-lg"
-            >
+              className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 w-36 text-base bg-white border border-gray-300 rounded shadow-lg z-50 mr-10"
+  >
               <Link
                 href="/editprofile"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100"

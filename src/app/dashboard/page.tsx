@@ -90,7 +90,7 @@ const DashboardHeader: React.FC = () => {
     });
 
     const channel = echo.channel("flespi-data");
-
+    console.log("Subscribed to flespi-data channel");
     channel.listen("FlespiDataReceived", (event: any) => {
       const { tracker_ident, location, dispatch_log } = event;
 

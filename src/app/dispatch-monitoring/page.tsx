@@ -43,6 +43,13 @@ const DispatchMonitoring: React.FC = () => {
           dispatchStatus: "idle", // Default status
         }));
         setBusData(mappedVehicles);
+
+        // Set map path to the first vehicle’s position if no selected bus
+        if (mappedVehicles.length > 0 && !selectedBus) {
+          const firstVehicle = mappedVehicles[0];
+          setPathData([{ lat: firstVehicle.latitude, lng: firstVehicle.longitude }]);
+        }
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching vehicles:", error);
@@ -50,7 +57,7 @@ const DispatchMonitoring: React.FC = () => {
     };
 
     fetchVehicles();
-  }, []);
+  }, [selectedBus]);
 
   // Set up real-time data updates via Pusher
   useEffect(() => {
@@ -81,6 +88,7 @@ const DispatchMonitoring: React.FC = () => {
 
         const { tracker_ident, location, dispatch_log } = event;
 
+        // Update path data for the selected bus
         if (selectedBus === tracker_ident) {
           setPathData((prevPath) => [
             ...prevPath,
@@ -88,10 +96,9 @@ const DispatchMonitoring: React.FC = () => {
           ]);
         }
 
+        // Update bus data
         setBusData((prevData) => {
-          const existingBus = prevData.find(
-            (bus) => bus.number === tracker_ident
-          );
+          const existingBus = prevData.find((bus) => bus.number === tracker_ident);
 
           if (existingBus) {
             return prevData.map((bus) =>
@@ -101,7 +108,7 @@ const DispatchMonitoring: React.FC = () => {
                     latitude: location.latitude,
                     longitude: location.longitude,
                     speed: location.speed || 0,
-                    status: `Speed: ${location.speed} km/h`,
+                    status: `Speed: ${location.speed || 0} km/h`,
                     time: new Date(event.timestamp * 1000).toISOString(),
                     dispatchStatus: dispatch_log?.status || "idle",
                   }
@@ -116,7 +123,7 @@ const DispatchMonitoring: React.FC = () => {
                 latitude: location.latitude,
                 longitude: location.longitude,
                 speed: location.speed || 0,
-                status: `Speed: ${location.speed} km/h`,
+                status: `Speed: ${location.speed || 0} km/h`,
                 time: new Date(event.timestamp * 1000).toISOString(),
                 dispatchStatus: dispatch_log?.status || "idle",
               },
@@ -153,11 +160,19 @@ const DispatchMonitoring: React.FC = () => {
               <div className="text-center mt-8">Loading map...</div>
             ) : (
               <DispatchMap
-  busData={busData}
-  pathData={pathData}
-  onBusClick={(busNumber) => setSelectedBus(busNumber)}
-  selectedBus={selectedBus}
-/>
+                busData={busData}
+                pathData={pathData}
+                onBusClick={(busNumber) => {
+                  setSelectedBus(busNumber);
+
+                  // Update path data for the clicked bus
+                  const clickedBus = busData.find((bus) => bus.number === busNumber);
+                  if (clickedBus) {
+                    setPathData([{ lat: clickedBus.latitude, lng: clickedBus.longitude }]);
+                  }
+                }}
+                selectedBus={selectedBus}
+              />
             )}
           </MapProvider>
 

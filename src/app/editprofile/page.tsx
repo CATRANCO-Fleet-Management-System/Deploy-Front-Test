@@ -27,6 +27,7 @@ const EditProfile: React.FC = () => {
   const [accountSettings, setAccountSettings] = useState({
     username: "",
     email: "",
+    oldPassword: "", // Add old password field
     newPassword: "",
   });
 
@@ -44,6 +45,7 @@ const EditProfile: React.FC = () => {
         setAccountSettings({
           username: accountData.username,
           email: accountData.email,
+          oldPassword: "",
           newPassword: "",
         });
 
@@ -146,13 +148,21 @@ const EditProfile: React.FC = () => {
   };
 
   const handleUpdatePassword = async () => {
+    if (!accountSettings.oldPassword || !accountSettings.newPassword) {
+      alert("Both old and new passwords are required.");
+      return;
+    }
+
     try {
       setLoading(true);
-      await updateAccount({ password: accountSettings.newPassword });
+      await updateAccount({
+        old_password: accountSettings.oldPassword, // Include oldPassword in the payload
+        password: accountSettings.newPassword,
+      });
       alert("Password updated successfully!");
     } catch (error) {
       console.error("Error updating password:", error);
-      alert("Failed to update password.");
+      alert("Failed to update password. Please ensure the old password is correct.");
     } finally {
       setLoading(false);
     }
@@ -203,10 +213,21 @@ const EditProfile: React.FC = () => {
                   />
                   <button
                     className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
-                    onClick={handleUpdateEmail}
+                    onClick={() => alert("Email update functionality is not shown")}
                   >
                     Update Email
                   </button>
+                </div>
+                <div>
+                  <label className="block font-medium">Old Password</label>
+                  <input
+                    type="password"
+                    value={accountSettings.oldPassword}
+                    onChange={(e) =>
+                      handleAccountChange("oldPassword", e.target.value)
+                    }
+                    className="block w-full mt-1 px-3 py-2 border rounded-md"
+                  />
                 </div>
                 <div>
                   <label className="block font-medium">New Password</label>

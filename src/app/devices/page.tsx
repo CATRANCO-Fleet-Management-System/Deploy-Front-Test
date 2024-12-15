@@ -7,36 +7,39 @@ import AddDeviceModal from "../components/AddDeviceModal";
 import Pagination from "../components/Pagination";
 import { FaPlus } from "react-icons/fa";
 import DeviceRecord from "../components/DeviceRecord";
-import { getAllDevices, deleteDevice } from "../services/deviceService";
+import {
+  getAllTrackerVehicleMappings,
+  deleteTrackerVehicleMapping,
+} from "@/app/services/trackerService";
 import EditDeviceModal from "../components/EditDeviceModal";
 
 const DeviceManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [devices, setDevices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Number of items per page
+  const itemsPerPage = 3; // Updated for better grid pagination
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
 
-  // Fetch devices on component mount
+  // Fetch tracker-to-vehicle mappings on component mount
   useEffect(() => {
-    const fetchDevices = async () => {
+    const fetchTrackerMappings = async () => {
       try {
-        const data = await getAllDevices();
-        setDevices(data);
+        const mappings = await getAllTrackerVehicleMappings();
+        setDevices(mappings); // Map tracker-to-vehicle mappings to devices
       } catch (error) {
-        console.error("Error fetching devices:", error);
+        console.error("Error fetching tracker-to-vehicle mappings:", error);
       }
     };
 
-    fetchDevices();
+    fetchTrackerMappings();
   }, []);
 
   const filteredDevices = devices.filter((device) =>
-    device.name.toLowerCase().includes(searchTerm.toLowerCase())
+    device.device_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
@@ -51,6 +54,11 @@ const DeviceManagement = () => {
     }
   };
 
+  const handleAddNewDevice = (newDevice) => {
+    setDevices((prevDevices) => [...prevDevices, newDevice]);
+    setIsAddModalOpen(false);
+  };
+
   const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true);
@@ -59,14 +67,14 @@ const DeviceManagement = () => {
   const confirmDelete = async () => {
     if (deleteRecordId) {
       try {
-        await deleteDevice(deleteRecordId);
+        await deleteTrackerVehicleMapping(deleteRecordId);
         setDevices((prevDevices) =>
           prevDevices.filter((device) => device.id !== deleteRecordId)
         );
         setDeleteRecordId(null);
         setIsDeletePopupOpen(false);
       } catch (error) {
-        console.error("Error deleting device:", error);
+        console.error("Error deleting tracker-to-vehicle mapping:", error);
       }
     }
   };
@@ -74,15 +82,6 @@ const DeviceManagement = () => {
   const cancelDelete = () => {
     setDeleteRecordId(null);
     setIsDeletePopupOpen(false);
-  };
-
-  const handleAddNew = async (newDevice) => {
-    try {
-      setDevices((prevDevices) => [...prevDevices, newDevice]);
-      setIsAddModalOpen(false);
-    } catch (error) {
-      console.error("Error adding new device:", error);
-    }
   };
 
   const handleEdit = (deviceId) => {
@@ -93,7 +92,9 @@ const DeviceManagement = () => {
   const handleSaveEdit = (updatedDevice) => {
     setDevices((prevDevices) =>
       prevDevices.map((device) =>
-        device.id === updatedDevice.id ? updatedDevice : device
+        device.id === updatedDevice.id
+          ? { ...device, ...updatedDevice } // Merge the updated device fields
+          : device
       )
     );
     setIsEditModalOpen(false);
@@ -102,13 +103,14 @@ const DeviceManagement = () => {
   return (
     <Layout>
       <section className="flex flex-row h-screen bg-white">
-        <div className="w-full flex flex-col bg-slate-200">
+      <div className="w-full flex flex-col bg-slate-200">
           <Header title="Device Management" />
-          <div className="content flex flex-col flex-1">
-            <div className="options flex items-center space-x-10 p-4 w-9/12 ml-10">
+          <div className="content flex flex-col flex-1 p-6">
+            {/* Search & Add New */}
+            <div className="options flex items-center space-x-4 mb-6">
               <input
                 type="text"
-                placeholder="Find Trackers"
+                placeholder="Search Trackers"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -117,36 +119,44 @@ const DeviceManagement = () => {
                 className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
                 onClick={() => setIsAddModalOpen(true)}
               >
-                <FaPlus size={22} className="mr-2" />
-                Add New
+                <FaPlus className="mr-2" /> Add New
               </button>
             </div>
+
+            {/* Devices Grid */}
             <div className="records flex flex-col h-full">
-              <div className="output flex flex-wrap mt-4 items-center ml-14">
+              <div className="output flex flex-wrap mt-4 items-center ml-14 space-x-6" >
                 {paginatedDevices.map((device) => (
-                  <DeviceRecord
-                    deviceId={device.id}
-                    deviceName={device.name}
-                    serialNumber={device.serial_number}
-                    busNumber={device.bus_number} // Pass bus number from device object
-                    status={device.status}
-                    onDelete={() => handleDelete(device.id)}
-                    onEdit={() => handleEdit(device.id)}
-                  />
-                ))}
+                <DeviceRecord
+                  key={device.id}
+                  deviceId={device.id}
+                  deviceName={device.device_name}
+                  serialNumber={device.tracker_ident}
+                  busNumber={device.vehicle_id || "Unassigned"}
+                  status={device.status}
+                  onDelete={() => handleDelete(device.id)}
+                  onEdit={() => handleEdit(device.id)}
+                />
+              ))}
               </div>
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+
+            {/* Pagination */}
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </div>
         </div>
+
+        {/* Modals */}
         <AddDeviceModal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          onSave={handleAddNew}
+          onSave={handleAddNewDevice}
         />
         <EditDeviceModal
           isOpen={isEditModalOpen}
@@ -159,7 +169,7 @@ const DeviceManagement = () => {
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
           title="Delete Device"
-          message="Are you sure you want to delete this device?"
+          message="Are you sure you want to delete this tracker-to-vehicle mapping?"
         />
       </section>
     </Layout>

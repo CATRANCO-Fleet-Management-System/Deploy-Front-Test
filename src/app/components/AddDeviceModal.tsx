@@ -1,29 +1,61 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getAllVehicles } from "../services/vehicleService"; // Service to fetch vehicles
+import { createTrackerVehicleMapping } from "../services/trackerService"; // Service to create tracker-vehicle mapping
 
 const AddDeviceModal = ({ isOpen, onClose, onSave }) => {
   const [deviceName, setDeviceName] = useState("");
-  const [serialNumber, setSerialNumber] = useState("");
-  const [busNumber, setBusNumber] = useState(""); // New state for bus number
-  const [status, setStatus] = useState("Active");
+  const [trackerIdent, setTrackerIdent] = useState("");
+  const [vehicleId, setVehicleId] = useState("");
+  const [busOptions, setBusOptions] = useState([]); // Store available vehicles
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSave = () => {
-    const newDevice = {
-      id: Math.random().toString(36).substr(2, 9), // Generate a random ID
-      name: deviceName,
-      serial_number: serialNumber,
-      bus_number: busNumber,
-      status,
+  // Fetch available vehicles dynamically
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        setLoading(true);
+        const vehicles = await getAllVehicles();
+        setBusOptions(vehicles);
+      } catch (err) {
+        console.error("Error fetching vehicles:", err);
+        setError("Failed to load vehicles. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     };
-    onSave(newDevice);
-    resetForm();
+
+    fetchVehicles();
+  }, []);
+
+  const handleSave = async () => {
+    if (!deviceName || !trackerIdent || !vehicleId) {
+      setError("All fields are required.");
+      return;
+    }
+
+    try {
+      const mappingData = {
+        device_name: deviceName,
+        tracker_ident: trackerIdent,
+        vehicle_id: vehicleId,
+      };
+      const newMapping = await createTrackerVehicleMapping(mappingData);
+      onSave(newMapping);
+      resetForm();
+      onClose();
+    } catch (err) {
+      console.error("Error creating tracker-to-vehicle mapping:", err);
+      setError("Failed to create mapping. Please try again.");
+    }
   };
 
   const resetForm = () => {
     setDeviceName("");
-    setSerialNumber("");
-    setBusNumber("");
-    setStatus("Active");
+    setTrackerIdent("");
+    setVehicleId("");
+    setError("");
   };
 
   if (!isOpen) return null;
@@ -31,7 +63,8 @@ const AddDeviceModal = ({ isOpen, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-1/3 rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Add New Device</h2>
+        <h2 className="text-xl font-bold mb-4">Add Tracker-to-Vehicle Mapping</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">
             Device Name
@@ -46,48 +79,33 @@ const AddDeviceModal = ({ isOpen, onClose, onSave }) => {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">
-            Serial Number
+            Tracker Identifier
           </label>
           <input
             type="text"
-            value={serialNumber}
-            onChange={(e) => setSerialNumber(e.target.value)}
+            value={trackerIdent}
+            onChange={(e) => setTrackerIdent(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter serial number"
+            placeholder="Enter tracker identifier"
           />
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">
-            Bus Number
+            Vehicle
           </label>
           <select
-            value={busNumber}
-            onChange={(e) => setBusNumber(e.target.value)}
+            value={vehicleId}
+            onChange={(e) => setVehicleId(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="" disabled>
-              Select Bus Number
+              {loading ? "Loading vehicles..." : "Select a vehicle"}
             </option>
-            <option value="Bus001">Bus001</option>
-            <option value="Bus002">Bus002</option>
-            <option value="Bus003">Bus003</option>
-            <option value="Bus004">Bus004</option>
-            <option value="Bus005">Bus005</option>
-            <option value="Bus006">Bus006</option>
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2">
-            Status
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-            <option value="Maintenance">Maintenance</option>
+            {busOptions.map((bus) => (
+              <option key={bus.vehicle_id} value={bus.vehicle_id}>
+                {`ID: ${bus.vehicle_id} - Plate: ${bus.plate_number}`}
+              </option>
+            ))}
           </select>
         </div>
         <div className="flex justify-end space-x-4">
