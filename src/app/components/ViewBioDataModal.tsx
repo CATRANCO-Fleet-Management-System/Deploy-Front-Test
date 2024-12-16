@@ -4,19 +4,34 @@ import React from "react";
 const ViewBioDataModal = ({ isOpen, onClose, profile }) => {
   if (!isOpen || !profile) return null;
 
-  const { first_name, last_name, date_of_birth, license_number, address, contact_number, contact_person, sex, date_hired, status } = profile.profile;
+  const {
+    first_name,
+    last_name,
+    date_of_birth,
+    license_number,
+    address,
+    contact_number,
+    contact_person,
+    sex,
+    date_hired,
+    status,
+  } = profile.profile;
 
   const age = calculateAge(date_of_birth);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-md w-1/2">
-        <h2 className="text-2xl font-bold mb-4">Bio Data of {first_name} {last_name}</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          Full Data of {first_name} {last_name}
+        </h2>
         <table className="w-full">
           <tbody>
             <tr>
               <td className="border p-2 font-bold">Name:</td>
-              <td className="border p-2">{first_name} {last_name}</td>
+              <td className="border p-2">
+                {first_name} {last_name}
+              </td>
             </tr>
             <tr>
               <td className="border p-2 font-bold">Birthday:</td>

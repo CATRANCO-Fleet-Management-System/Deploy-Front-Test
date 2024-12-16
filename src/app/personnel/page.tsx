@@ -123,7 +123,6 @@ const Personnel = () => {
     }
   };
 
-
   const handleViewBioData = (profileId) => {
     const profile = profiles.find(
       (profile) => profile.profile.user_profile_id === profileId
@@ -132,12 +131,15 @@ const Personnel = () => {
     setIsViewBioDataModalOpen(true);
   };
 
-
   const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true);
   };
 
+  const cancelDelete = () => {
+    setDeleteRecordId(null);
+    setIsDeletePopupOpen(false); // Close the popup when Cancel is clicked
+  };
   const confirmDelete = async () => {
     if (deleteRecordId) {
       try {
@@ -153,11 +155,6 @@ const Personnel = () => {
         console.error("Error deleting profile:", error);
       }
     }
-  };
-
-  const cancelDelete = () => {
-    setDeleteRecordId(null);
-    setIsDeletePopupOpen(false);
   };
 
   const handleAddNew = async (newProfile) => {
@@ -186,7 +183,6 @@ const Personnel = () => {
       )
     );
     setIsEditModalOpen(false);
-    
   };
 
   return (
@@ -217,7 +213,7 @@ const Personnel = () => {
               </button>
             </div>
             <div className="records flex flex-col h-full">
-              <div className="output flex flex-wrap mt-4 items-center ml-14">
+              <div className="output flex flex-wrap mt-4 items-center ml-14 mr-8">
                 {paginatedProfiles.map((profile) => (
                   <PersonnelRecord
                     key={profile.profile.user_profile_id}
@@ -233,7 +229,9 @@ const Personnel = () => {
                       handleDelete(profile.profile.user_profile_id)
                     }
                     onEdit={() => handleEdit(profile.profile.user_profile_id)}
-                    onView={() => handleViewBioData(profile.profile.user_profile_id)}
+                    onView={() =>
+                      handleViewBioData(profile.profile.user_profile_id)
+                    }
                   />
                 ))}
               </div>
@@ -274,14 +272,14 @@ const Personnel = () => {
           />
         )}
         <ViewBioDataModal
-        isOpen={isViewBioDataModalOpen}
-        onClose={() => setIsViewBioDataModalOpen(false)}
-        profile={selectedProfile}
-      />
+          isOpen={isViewBioDataModalOpen}
+          onClose={() => setIsViewBioDataModalOpen(false)}
+          profile={selectedProfile}
+        />
         <Confirmpopup
           isOpen={isDeletePopupOpen}
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
+          onClose={cancelDelete} // This will be called when Cancel is clicked
+          onConfirm={confirmDelete} // This will be called when Confirm is clicked
           title="Delete Profile"
           message="Are you sure you want to delete this profile?"
         />

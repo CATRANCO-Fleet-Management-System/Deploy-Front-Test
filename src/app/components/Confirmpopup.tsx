@@ -1,10 +1,10 @@
-// components/Confirmpopup.tsx (or .js)
+// components/Confirmpopup.tsx
 import React from "react";
 
 interface ConfirmpopupProps {
   isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
+  onClose: () => void; // Close handler passed as onClose
+  onConfirm: () => void; // Confirm handler passed as onConfirm
 }
 
 const Confirmpopup: React.FC<ConfirmpopupProps> = ({
@@ -12,7 +12,7 @@ const Confirmpopup: React.FC<ConfirmpopupProps> = ({
   onClose,
   onConfirm,
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Don't render if modal isn't open
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

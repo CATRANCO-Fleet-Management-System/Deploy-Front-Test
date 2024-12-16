@@ -29,10 +29,10 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
   contactPersonNumber,
   onDelete,
   onEdit,
-  onView
+  onView,
 }) => {
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4">
+    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm flex-1">
       <table className="w-full border-collapse">
         <tbody>
           <tr>
@@ -86,7 +86,10 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
       <div className="flex space-x-2 mt-4">
         <button
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          onClick={onDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
         >
           Remove
         </button>
@@ -100,7 +103,7 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           onClick={onView}
         >
-          View Bio Data
+          View Full Data
         </button>
       </div>
     </div>
