@@ -100,7 +100,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 h-[98vh] max-h-screen overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">
             Add Passenger Assistant Officer Record
@@ -174,7 +174,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-5">
               Position
             </label>
             <Input
@@ -184,7 +184,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               className="focus:outline-none"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-5">
               Date Hired
             </label>
             <Input
@@ -198,7 +198,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Right Column */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700">
               Date of Birth
             </label>
             <Input
@@ -209,7 +209,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 ">
+            <label className="block text-sm font-medium text-gray-700 mt-1">
               Age
             </label>
             <Input
@@ -217,7 +217,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               readOnly
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Gender
             </label>
             <select
@@ -229,7 +229,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Number
             </label>
             <Input
@@ -240,7 +240,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Person
             </label>
             <Input
@@ -251,7 +251,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Person Number
             </label>
             <Input
@@ -262,7 +262,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Address
             </label>
             <textarea
@@ -270,11 +270,11 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               value={formData.address}
               onChange={handleInputChange}
               placeholder="Enter Address"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-0 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
             />
             {/* Personnel Status */}
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Personnel Status
             </label>
             <select
@@ -301,7 +301,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
             )}
           </div>
           {/* Buttons */}
-          <div className="col-span-2 flex justify-end space-x-4 -mt-3">
+          <div className="col-span-2 flex justify-end space-x-4 mt-2">
             <button
               type="button"
               onClick={handleSubmit}

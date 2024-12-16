@@ -39,7 +39,7 @@ const HistoryModal = ({ isOpen, onClose, history }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
-      <div className="bg-white w-11/12 max-w-4xl p-6 rounded-lg shadow-lg">
+      <div className="bg-white w-full max-w-5xl p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Personnel Record History</h2>
           <button
@@ -71,10 +71,18 @@ const HistoryModal = ({ isOpen, onClose, history }) => {
               <tbody>
                 {history.map((record, index) => (
                   <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 border-b">{record.details || "N/A"}</td>
-                    <td className="px-4 py-2 border-b">{record.position || "N/A"}</td>
-                    <td className="px-4 py-2 border-b">{record.date_hired || "N/A"}</td>
-                    <td className="px-4 py-2 border-b">{record.status || "N/A"}</td>
+                    <td className="px-4 py-2 border-b">
+                      {record.details || "N/A"}
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      {record.position || "N/A"}
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      {record.date_hired || "N/A"}
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      {record.status || "N/A"}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -50,7 +50,7 @@ const HistoryModalForBus = ({ isOpen, onClose, history = [] }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
-      <div className="bg-white w-11/12 max-w-4xl p-6 rounded-lg shadow-lg">
+      <div className="bg-white w-full max-w-5xl p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Bus Records History</h2>
           <button

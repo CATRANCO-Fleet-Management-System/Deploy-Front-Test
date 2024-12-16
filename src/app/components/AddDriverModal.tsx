@@ -11,7 +11,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
     last_name: "",
     first_name: "",
     middle_initial: "",
-    position: "driver", 
+    position: "driver",
     license_number: "",
     sex: "Male",
     contact_number: "",
@@ -102,7 +102,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 h-[98vh] max-h-screen overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">Add Driver Record</h2>
           <button
@@ -113,7 +113,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
           </button>
         </div>
 
-        <form className="grid grid-cols-2 gap-4 mt-4">
+        <form className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           {/* Left Column */}
           <div>
             <div className="flex flex-col items-center space-y-4 mb-2">
@@ -150,7 +150,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               First Name
             </label>
             <Input
@@ -162,7 +162,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Middle Initial
             </label>
             <Input
@@ -174,7 +174,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Position
             </label>
             <Input
@@ -211,7 +211,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Right Column */}
           <div>
-          <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Date of Birth
+            </label>
             <Input
               name="birthday"
               value={birthday}
@@ -220,7 +222,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mt-1">
               Age
             </label>
             <Input
@@ -229,7 +231,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-3">
               Gender
             </label>
             <select
@@ -242,7 +244,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               <option value="Female">Female</option>
             </select>
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Number
             </label>
             <Input
@@ -253,7 +255,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Person
             </label>
             <Input
@@ -264,7 +266,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Person Number
             </label>
             <Input
@@ -275,19 +277,19 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               className="focus:ring-2 focus:ring-blue-500"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-2">
               Address
             </label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
             />
 
             {/* Personnel Status */}
-            <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-3">
               Personnel Status
             </label>
             <select
@@ -313,24 +315,24 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               />
             )}
           </div>
-          {/* Buttons */}
-          <div className="col-span-2 flex justify-end space-x-4 -mt-12 mb-4">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-            >
-              Cancel
-            </button>
-          </div>
         </form>
+        {/* Buttons */}
+        <div className="col-span-2 flex justify-end space-x-4 mt-4">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
