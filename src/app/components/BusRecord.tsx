@@ -4,7 +4,6 @@ import {
   getVehicleAssignmentById,
   createVehicleAssignment,
 } from "@/app/services/vehicleAssignService";
-import { deleteVehicle } from "@/app/services/vehicleService";
 import EditBusRecordModal from "@/app/components/EditBusRecordModal";
 import EditPersonnelModal from "@/app/components/EditPersonnelModal";
 import FullRecordModal from "@/app/components/FullRecordModal";
@@ -22,7 +21,7 @@ interface BusBoxProps {
   assignmentId: string | null;
   route?: string;
   onDelete: () => void;
-  onUpdate: (updatedBus: any) => void; // Ensure onUpdate is passed from the parent
+  onUpdate: (updatedBus: any) => void;
 }
 
 const BusRecord: React.FC<BusBoxProps> = ({
@@ -40,23 +39,31 @@ const BusRecord: React.FC<BusBoxProps> = ({
   onDelete,
   onUpdate,
 }) => {
-  const [assignmentId, setAssignmentId] = useState<string | null>(initialAssignmentId);
+  const [assignmentId, setAssignmentId] = useState<string | null>(
+    initialAssignmentId
+  );
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isEditBusModalOpen, setIsEditBusModalOpen] = useState(false);
-  const [isEditPersonnelModalOpen, setIsEditPersonnelModalOpen] = useState(false);
+  const [isEditPersonnelModalOpen, setIsEditPersonnelModalOpen] =
+    useState(false);
   const [isFullRecordModalOpen, setIsFullRecordModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
   const openFullRecordModal = () => setIsFullRecordModalOpen(true);
   const closeFullRecordModal = () => setIsFullRecordModalOpen(false);
-  const toggleDropdown = useCallback(() => setDropdownOpen((prev) => !prev), []);
+  const toggleDropdown = useCallback(
+    () => setDropdownOpen((prev) => !prev),
+    []
+  );
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -64,7 +71,6 @@ const BusRecord: React.FC<BusBoxProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch or create vehicle assignment
   useEffect(() => {
     const fetchOrCreateAssignment = async () => {
       if (!assignmentId) {
@@ -92,30 +98,25 @@ const BusRecord: React.FC<BusBoxProps> = ({
     fetchOrCreateAssignment();
   }, [assignmentId, vehicle_id, assignedDriver, assignedPAO]);
 
-
-  // Open modal for editing bus record
   const handleEditBus = () => {
     setIsEditBusModalOpen(true);
     setDropdownOpen(false);
   };
 
-  // Open modal for editing personnel assignment
   const handleEditPersonnel = () => {
     setIsEditPersonnelModalOpen(true);
     setDropdownOpen(false);
-    console.log("BusRecord vehicle_id:", vehicle_id);
   };
 
-  // Close modals
   const handleModalClose = () => {
     setIsEditBusModalOpen(false);
     setIsEditPersonnelModalOpen(false);
   };
 
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4">
-      {/* Bus Record Details */}
-      <table className="w-full border-collapse text-sm">
+    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
+      {/* Table Content */}
+      <table className="w-full border-collapse mb-16">
         <tbody>
           <tr>
             <td className="border p-2 font-bold">Bus Number:</td>
@@ -159,32 +160,31 @@ const BusRecord: React.FC<BusBoxProps> = ({
       </table>
 
       {/* Action Buttons */}
-      <div className="flex flex-col space-y-2 mt-4">
-      <button
-  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full"
-  onClick={() => onDelete()} // Trigger the parent’s delete handler
->
-  Remove
-</button>
+      <div className="absolute bottom-4 left-4 right-4 flex justify-between space-x-2">
+        <button
+          className="px-4 py-2 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 h-12"
+          onClick={onDelete}
+        >
+          Remove
+        </button>
 
-        {/* Edit Dropdown */}
-        <div className="relative w-full" ref={dropdownRef}>
+        <div className="relative flex-1 mt-3" ref={dropdownRef}>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+            className="px-4 py-2  bg-blue-500 text-white rounded hover:bg-blue-600 w-full h-12"
             onClick={toggleDropdown}
           >
             Edit
           </button>
           {dropdownOpen && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-4/5 bg-white border border-gray-300 rounded shadow-lg z-10">
+            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 w-60">
               <button
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 focus:outline-none"
                 onClick={handleEditBus}
               >
                 Edit Bus Record
               </button>
               <button
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 focus:outline-none"
                 onClick={handleEditPersonnel}
               >
                 Edit Personnel Assignment
@@ -192,16 +192,17 @@ const BusRecord: React.FC<BusBoxProps> = ({
             </div>
           )}
         </div>
+
         <button
-  onClick={openFullRecordModal}
-  className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
->
-  View Full Record
-</button>
+          onClick={openFullRecordModal}
+          className="px-4 py-2 mt-3 bg-green-500 text-white rounded hover:bg-green-600 flex-1 h-12"
+        >
+          View Full Record
+        </button>
       </div>
 
-       {/* Full Record Modal */}
-       <FullRecordModal
+      {/* Modals */}
+      <FullRecordModal
         isOpen={isFullRecordModalOpen}
         onClose={closeFullRecordModal}
         busDetails={{
@@ -217,7 +218,6 @@ const BusRecord: React.FC<BusBoxProps> = ({
         }}
       />
 
-      {/* Modals */}
       {isEditBusModalOpen && (
         <EditBusRecordModal
           vehicle_id={vehicle_id}

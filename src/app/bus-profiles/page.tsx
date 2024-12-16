@@ -20,7 +20,8 @@ const BusRecordDisplay = () => {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isAssignPersonnelModalOpen, setIsAssignPersonnelModalOpen] = useState(false);
+  const [isAssignPersonnelModalOpen, setIsAssignPersonnelModalOpen] =
+    useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [busRecords, setBusRecords] = useState([]);
   const [vehicleAssignments, setVehicleAssignments] = useState([]);
@@ -63,45 +64,44 @@ const BusRecordDisplay = () => {
   };
 
   // Handle deleting a vehicle
-// Handle deleting a vehicle
-const handleDelete = (recordId) => {
-  setDeleteRecordId(recordId);
-  setIsDeletePopupOpen(true); // Open the confirmation popup
-};
+  // Handle deleting a vehicle
+  const handleDelete = (recordId) => {
+    setDeleteRecordId(recordId);
+    setIsDeletePopupOpen(true); // Open the confirmation popup
+  };
 
-const confirmDelete = async () => {
-  if (deleteRecordId) {
-    try {
-      // Optimistically remove the record from the UI
-      setBusRecords((prev) =>
-        prev.filter((record) => record.vehicle_id !== deleteRecordId)
-      );
+  const confirmDelete = async () => {
+    if (deleteRecordId) {
+      try {
+        // Optimistically remove the record from the UI
+        setBusRecords((prev) =>
+          prev.filter((record) => record.vehicle_id !== deleteRecordId)
+        );
 
-      // Call the delete API
-      const response = await deleteVehicle(deleteRecordId);
+        // Call the delete API
+        const response = await deleteVehicle(deleteRecordId);
 
-      if (!response?.success) {
-        // Re-fetch data if the API fails
+        if (!response?.success) {
+          // Re-fetch data if the API fails
+          await fetchData();
+        }
+      } catch (error) {
+        console.error("Error deleting vehicle:", error);
+        alert("An error occurred while deleting the vehicle.");
+        // Re-fetch data to restore the UI if necessary
         await fetchData();
+      } finally {
+        // Close the confirmation popup
+        setDeleteRecordId(null);
+        setIsDeletePopupOpen(false);
       }
-    } catch (error) {
-      console.error("Error deleting vehicle:", error);
-      alert("An error occurred while deleting the vehicle.");
-      // Re-fetch data to restore the UI if necessary
-      await fetchData();
-    } finally {
-      // Close the confirmation popup
-      setDeleteRecordId(null);
-      setIsDeletePopupOpen(false);
     }
-  }
-};
+  };
 
-
-const cancelDelete = () => {
-  setDeleteRecordId(null);
-  setIsDeletePopupOpen(false);
-};
+  const cancelDelete = () => {
+    setDeleteRecordId(null);
+    setIsDeletePopupOpen(false); // This closes the popup
+  };
 
   // Handle adding a new bus record
   const handleAddNewBus = (newBus) => {
@@ -117,7 +117,7 @@ const cancelDelete = () => {
         record.vehicle_id === updatedBus.vehicle_id ? updatedBus : record
       )
     );
-  
+
     // Handle additional steps like opening personnel modal if needed
     setSelectedVehicleId(updatedBus.vehicle_id);
     setIsAssignPersonnelModalOpen(false); // Optional: Manage modal states
@@ -126,7 +126,10 @@ const cancelDelete = () => {
 
   // Callback for updating vehicle assignments
   const handleAddVehicleAssignment = (newAssignment) => {
-    setVehicleAssignments((prevAssignments) => [...prevAssignments, newAssignment]);
+    setVehicleAssignments((prevAssignments) => [
+      ...prevAssignments,
+      newAssignment,
+    ]);
   };
 
   // Filter bus records by search term
@@ -144,14 +147,18 @@ const cancelDelete = () => {
       return { driver: "N/A", conductor: "N/A" };
     }
 
-    const driver = assignment.user_profiles.find((profile) => profile.position === "driver");
+    const driver = assignment.user_profiles.find(
+      (profile) => profile.position === "driver"
+    );
     const conductor = assignment.user_profiles.find(
       (profile) => profile.position === "passenger_assistant_officer"
     );
 
     return {
       driver: driver ? `${driver.first_name} ${driver.last_name}` : "N/A",
-      conductor: conductor ? `${conductor.first_name} ${conductor.last_name}` : "N/A",
+      conductor: conductor
+        ? `${conductor.first_name} ${conductor.last_name}`
+        : "N/A",
     };
   };
 
@@ -191,52 +198,60 @@ const cancelDelete = () => {
         </button>
 
         <button
-  onClick={openHistoryModal}
-  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
->
-  View History
-</button>
-
+          onClick={openHistoryModal}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+        >
+          View History
+        </button>
       </div>
       <div className="records flex flex-col h-full">
-        <div className="output flex mt-2 items-center ml-8 flex-wrap gap-4">
+        <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mx-14">
           {paginatedRecords.map((record) => {
-            const { driver, conductor } = getAssignedProfiles(record.vehicle_id);
+            const { driver, conductor } = getAssignedProfiles(
+              record.vehicle_id
+            );
 
             return (
               <BusRecord
-              key={record.vehicle_id}
-              vehicle_id={record.vehicle_id}
-              busNumber={record.vehicle_id}
-              ORNumber={record.or_id}
-              CRNumber={record.cr_id}
-              plateNumber={record.plate_number}
-              thirdLBI={record.third_pli}
-              ci={record.ci || "N/A"}
-              assignedDriver={driver}
-              assignedPAO={conductor}
-              route={record.route || "Not Assigned"}
-              onDelete={() => handleDelete(record.vehicle_id)} // Update this line
-              onEdit={() => {
-                setSelectedVehicleId(record.vehicle_id);
-                setIsEditModalOpen(true);
-                console.log("BusRecordDisplay vehicle_id:", record.vehicle_id);
+                key={record.vehicle_id}
+                vehicle_id={record.vehicle_id}
+                busNumber={record.vehicle_id}
+                ORNumber={record.or_id}
+                CRNumber={record.cr_id}
+                plateNumber={record.plate_number}
+                thirdLBI={record.third_pli}
+                ci={record.ci || "N/A"}
+                assignedDriver={driver}
+                assignedPAO={conductor}
+                route={record.route || "Not Assigned"}
+                onDelete={() => handleDelete(record.vehicle_id)} // Update this line
+                onEdit={() => {
+                  setSelectedVehicleId(record.vehicle_id);
+                  setIsEditModalOpen(true);
+                  console.log(
+                    "BusRecordDisplay vehicle_id:",
+                    record.vehicle_id
+                  );
                 }}
               />
             );
           })}
         </div>
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-        </div>
-        {isDeletePopupOpen && (
-  <Confirmpopup
-    isOpen={isDeletePopupOpen}
-    onConfirm={confirmDelete} // Call confirmDelete on confirm
-    onCancel={cancelDelete} // Call cancelDelete on cancel
-    title="Delete Profile"
-    message="Are you sure you want to delete this profile?"
-  />
-)}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
+      {isDeletePopupOpen && (
+        <Confirmpopup
+          isOpen={isDeletePopupOpen}
+          onClose={cancelDelete} // Ensure this is set correctly
+          onConfirm={confirmDelete} // Ensure this is set correctly
+          title="Delete Profile"
+          message="Are you sure you want to delete this profile?"
+        />
+      )}
       {isAddModalOpen && (
         <AddBusRecordModal
           onClose={() => setIsAddModalOpen(false)}
@@ -247,59 +262,63 @@ const cancelDelete = () => {
         />
       )}
       {isAssignPersonnelModalOpen && (
-  <AssignBusPersonnelModal
-    onClose={() => setIsAssignPersonnelModalOpen(false)}
-    refreshData={fetchData}
-    onAssign={handleAddVehicleAssignment}
-    vehicleId={selectedVehicleId} // Pass the selected vehicle_id to the modal
-  />
-)}
-{isEditModalOpen && (
-  <EditBusRecordModal
-    vehicle_id={selectedVehicleId}
-    onClose={() => setIsEditModalOpen(false)}
-    refreshData={fetchData} // Refresh parent data after edit
-    onSubmit={(updatedBus) => {
-      handleEditBus(updatedBus); // Update the current state
-    }}
-  />
-)}
+        <AssignBusPersonnelModal
+          onClose={() => setIsAssignPersonnelModalOpen(false)}
+          refreshData={fetchData}
+          onAssign={handleAddVehicleAssignment}
+          vehicleId={selectedVehicleId} // Pass the selected vehicle_id to the modal
+        />
+      )}
+      {isEditModalOpen && (
+        <EditBusRecordModal
+          vehicle_id={selectedVehicleId}
+          onClose={() => setIsEditModalOpen(false)}
+          refreshData={fetchData} // Refresh parent data after edit
+          onSubmit={(updatedBus) => {
+            handleEditBus(updatedBus); // Update the current state
+          }}
+        />
+      )}
 
-{isAssignPersonnelModalOpen && (
-  <EditPersonnelModal
-    assignmentId={vehicleAssignments.find(
-      (assignment) => assignment.vehicle_id === selectedVehicleId
-    )?.vehicle_assignment_id || ""}
-    vehicleId={selectedVehicleId || ""}
-    initialDriver={getAssignedProfiles(selectedVehicleId).driver}
-    initialPAO={getAssignedProfiles(selectedVehicleId).conductor}
-    onClose={() => setIsAssignPersonnelModalOpen(false)}
-    onUpdate={(updatedDriver, updatedPAO) => {
-      const updatedAssignments = vehicleAssignments.map((assignment) =>
-        assignment.vehicle_id === selectedVehicleId
-          ? {
-              ...assignment,
-              user_profiles: [
-                { position: "driver", user_profile_id: updatedDriver },
-                { position: "passenger_assistant_officer", user_profile_id: updatedPAO },
-              ],
-            }
-          : assignment
-      );
-      setVehicleAssignments(updatedAssignments);
-      fetchData(); // Ensure UI reflects backend updates
-    }}
-  />
-)}
+      {isAssignPersonnelModalOpen && (
+        <EditPersonnelModal
+          assignmentId={
+            vehicleAssignments.find(
+              (assignment) => assignment.vehicle_id === selectedVehicleId
+            )?.vehicle_assignment_id || ""
+          }
+          vehicleId={selectedVehicleId || ""}
+          initialDriver={getAssignedProfiles(selectedVehicleId).driver}
+          initialPAO={getAssignedProfiles(selectedVehicleId).conductor}
+          onClose={() => setIsAssignPersonnelModalOpen(false)}
+          onUpdate={(updatedDriver, updatedPAO) => {
+            const updatedAssignments = vehicleAssignments.map((assignment) =>
+              assignment.vehicle_id === selectedVehicleId
+                ? {
+                    ...assignment,
+                    user_profiles: [
+                      { position: "driver", user_profile_id: updatedDriver },
+                      {
+                        position: "passenger_assistant_officer",
+                        user_profile_id: updatedPAO,
+                      },
+                    ],
+                  }
+                : assignment
+            );
+            setVehicleAssignments(updatedAssignments);
+            fetchData(); // Ensure UI reflects backend updates
+          }}
+        />
+      )}
 
-{isHistoryModalOpen && (
-  <HistoryModalForBus
-    isOpen={isHistoryModalOpen}
-    onClose={() => setIsHistoryModalOpen(false)}
-    history={busHistory}
-  />
-)}
-
+      {isHistoryModalOpen && (
+        <HistoryModalForBus
+          isOpen={isHistoryModalOpen}
+          onClose={() => setIsHistoryModalOpen(false)}
+          history={busHistory}
+        />
+      )}
     </Layout>
   );
 };

@@ -213,7 +213,7 @@ const Personnel = () => {
               </button>
             </div>
             <div className="records flex flex-col h-full">
-              <div className="output flex flex-wrap mt-4 items-center ml-14 mr-8">
+              <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mx-14">
                 {paginatedProfiles.map((profile) => (
                   <PersonnelRecord
                     key={profile.profile.user_profile_id}
@@ -236,6 +236,7 @@ const Personnel = () => {
                 ))}
               </div>
             </div>
+
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

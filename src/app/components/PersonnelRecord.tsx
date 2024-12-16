@@ -32,8 +32,11 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
   onView,
 }) => {
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm flex-1">
-      <table className="w-full border-collapse">
+    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
+      {/* Table Content */}
+      <table className="w-full border-collapse mb-16">
+        {" "}
+        {/* Ensure spacing */}
         <tbody>
           <tr>
             <td className="border p-2 font-bold">Name:</td>
@@ -83,9 +86,11 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
           )}
         </tbody>
       </table>
-      <div className="flex space-x-2 mt-4">
+
+      {/* Buttons */}
+      <div className="absolute bottom-4 left-4 right-4 flex justify-between space-x-2">
         <button
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          className="px-4 py-1 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1"
           onClick={(e) => {
             e.stopPropagation();
             onDelete();
@@ -94,13 +99,13 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
           Remove
         </button>
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-4 py-1 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1"
           onClick={onEdit}
         >
           Edit
         </button>
         <button
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="px-4 py-1 mt-3 bg-green-500 text-white rounded hover:bg-green-600 flex-1"
           onClick={onView}
         >
           View Full Data
