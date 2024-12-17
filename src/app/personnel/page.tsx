@@ -24,7 +24,7 @@ const extractHistoryFromProfiles = (profiles) => {
 };
 
 const ButtonGroup = ({ activeButton, onClick, onViewHistory }) => (
-  <div className="button-type-employee-container flex flex-row space-x-10 m-12">
+  <div className="button-type-employee-container flex flex-row space-x-10 m-5 ml-10  mt-10">
     <button
       className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${
         activeButton === "drivers"

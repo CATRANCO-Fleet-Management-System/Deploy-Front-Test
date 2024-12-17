@@ -132,7 +132,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 h-[95vh] max-h-screen overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">Edit Driver Record</h2>
           <button
@@ -341,7 +341,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
             )}
           </div>
           {/* Buttons */}
-          <div className="col-span-2 flex justify-end space-x-4 -mt-12 mb-4">
+          <div className="col-span-2 flex justify-end space-x-4 -mt-15 mb-1">
             <button
               type="submit"
               className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"

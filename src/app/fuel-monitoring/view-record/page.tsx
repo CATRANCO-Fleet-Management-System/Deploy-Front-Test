@@ -18,6 +18,7 @@ import {
 } from "@/app/services/fuellogsService";
 import { groupByTimeInterval } from "@/app/helper/fuel-helper";
 import FuelHistoryModal from "@/app/components/FuelHistoryModal";
+
 const ViewRecord = () => {
   const searchParams = useSearchParams();
   const busNumber = searchParams.get("bus") || "001";
@@ -26,7 +27,6 @@ const ViewRecord = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedFuelLog, setSelectedFuelLog] = useState(null);
-
   const [selectedBus, setSelectedBus] = useState(busNumber);
   const [fuelLogs, setFuelLogs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,11 +42,8 @@ const ViewRecord = () => {
     const fetchLogs = async () => {
       try {
         const logs = await fetchAllFuelLogs();
-        // Check if logs contain fuel_logs_id
-        console.log(logs); // Logs should have fuel_logs_id
-        const filteredLogs = logs.filter(
-          (log) => log.vehicle_id === selectedBus
-        );
+        console.log(logs);
+        const filteredLogs = logs.filter((log) => log.vehicle_id === selectedBus);
         setFuelLogs(filteredLogs);
       } catch (error) {
         console.error("Failed to fetch fuel logs:", error);
@@ -55,42 +52,28 @@ const ViewRecord = () => {
     fetchLogs();
   }, [selectedBus]);
 
-  // Generate chart data based on time interval and selected bus
   const chartData = {
-    daily: groupByTimeInterval(
-      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
-      "daily"
-    ),
-
-    weekly: groupByTimeInterval(
-      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
-      "weekly"
-    ),
-    monthly: groupByTimeInterval(
-      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
-      "monthly"
-    ),
-    yearly: groupByTimeInterval(
-      fuelLogs.filter((log) => log.vehicle_id === selectedBus),
-      "yearly"
-    ),
+    daily: groupByTimeInterval(fuelLogs.filter((log) => log.vehicle_id === selectedBus), "daily"),
+    weekly: groupByTimeInterval(fuelLogs.filter((log) => log.vehicle_id === selectedBus), "weekly"),
+    monthly: groupByTimeInterval(fuelLogs.filter((log) => log.vehicle_id === selectedBus), "monthly"),
+    yearly: groupByTimeInterval(fuelLogs.filter((log) => log.vehicle_id === selectedBus), "yearly"),
   };
   const currentData = chartData[timeInterval] || chartData.daily;
 
   const data = {
-    labels: currentData.map((entry) => entry.label), // Labels based on time interval
+    labels: currentData.map((entry) => entry.label),
     datasets: [
       {
         label: "Distance (KM)",
-        data: currentData.map((entry) => entry.distance), // Distance data
-        borderColor: "red", // Red color for distance
-        backgroundColor: "rgba(255, 99, 132, 0.2)", // Light red background for distance
+        data: currentData.map((entry) => entry.distance),
+        borderColor: "red",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
       },
       {
         label: "Liters Used (L)",
-        data: currentData.map((entry) => entry.liters), // Liters data
-        borderColor: "blue", // Blue color for liters
-        backgroundColor: "rgba(54, 162, 235, 0.2)", // Light blue background for liters
+        data: currentData.map((entry) => entry.liters),
+        borderColor: "blue",
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
       },
     ],
   };
@@ -109,20 +92,15 @@ const ViewRecord = () => {
     plugins: {
       tooltip: {
         enabled: true,
-        mode: "nearest", // Ensures nearest point is selected when hovering
-        intersect: true, // Tooltip only appears when hovering over a point
+        mode: "nearest",
+        intersect: true,
         callbacks: {
-          title: (tooltipItem) => {
-            // Return the label (usually the date) for the hovered point
-            return tooltipItem[0].label;
-          },
+          title: (tooltipItem) => tooltipItem[0].label,
           label: (tooltipItem) => {
             const datasetIndex = tooltipItem.datasetIndex;
             const data = tooltipItem.raw;
-            const distance =
-              tooltipItem.chart.data.datasets[0].data[tooltipItem.dataIndex];
-            const liters =
-              tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex];
+            const distance = tooltipItem.chart.data.datasets[0].data[tooltipItem.dataIndex];
+            const liters = tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex];
 
             let tooltipText = "";
             if (datasetIndex === 0) {
@@ -132,11 +110,7 @@ const ViewRecord = () => {
               tooltipText = `Liters: ${liters} L`;
             }
 
-            if (
-              datasetIndex === 0 &&
-              tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex] !==
-                undefined
-            ) {
+            if (datasetIndex === 0 && tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex] !== undefined) {
               tooltipText = `Distance: ${distance} KM\nLiters: ${liters} L`;
             }
             return tooltipText;
@@ -145,13 +119,11 @@ const ViewRecord = () => {
       },
     },
   };
-  // Handle deletion of a fuel log
+
   const handleDeleteFuelLog = async (fuelLogId) => {
     try {
-      await deleteFuelLog(fuelLogId); // API call to delete fuel log
-      setFuelLogs((prevLogs) =>
-        prevLogs.filter((log) => log.fuel_logs_id !== fuelLogId)
-      );
+      await deleteFuelLog(fuelLogId);
+      setFuelLogs((prevLogs) => prevLogs.filter((log) => log.fuel_logs_id !== fuelLogId));
       alert("Fuel log deleted successfully");
     } catch (error) {
       console.error(`Error deleting fuel log with ID ${fuelLogId}:`, error);
@@ -160,13 +132,8 @@ const ViewRecord = () => {
   };
 
   const handleEdit = (record) => {
-    // First, set the selected bus and edit data
     setSelectedBus(record.vehicle_id);
     setEditData(record);
-
-    // Log the selected bus and edit data to check if they're being set correctly
-
-    // Open the modal only after the state has been updated
     setIsEditModalOpen(true);
   };
 
@@ -180,14 +147,8 @@ const ViewRecord = () => {
     setEditData(null);
   };
 
-  // Handle new record addition or update
   const handleAdd = (updatedRecord) => {
-    setFuelLogs((prevLogs) => {
-      const index = prevLogs.findIndex(
-        (log) => log.fuel_logs_id === updatedRecord.fuel_logs_id
-      );
-      return [...prevLogs, updatedRecord];
-    });
+    setFuelLogs((prevLogs) => [...prevLogs, updatedRecord]);
     setSelectedBus(updatedRecord.vehicle_id);
   };
 
@@ -200,46 +161,35 @@ const ViewRecord = () => {
     setViewData(null);
   };
 
-  // Function to open the history modal
   const handleOpenHistoryModal = () => {
-    const filteredHistory = fuelLogs.filter(
-      (log) => log.vehicle_id === selectedBus
-    );
+    const filteredHistory = fuelLogs.filter((log) => log.vehicle_id === selectedBus);
     setHistoryData(filteredHistory);
     setIsHistoryModalOpen(true);
   };
 
-  // Function to close the history modal
   const handleCloseHistoryModal = () => {
-    console.log("Closing the history modal"); // Log when closing the modal
-    setIsHistoryModalOpen(false); // Close the modal
-    console.log("isHistoryModalOpen state set to false");
+    setIsHistoryModalOpen(false);
   };
+
   const itemsPerPage = 5;
   const totalPages = Math.ceil(fuelLogs.length / itemsPerPage);
-
-  const displayedRecords = fuelLogs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const displayedRecords = fuelLogs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
+
   const handlePrint = async () => {
     const chartElement = document.querySelector(".chart-container");
-
     if (!chartElement) return;
-
     try {
       const canvas = await html2canvas(chartElement);
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("landscape");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
       pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
       pdf.save(`view-record-bus-${selectedBus}.pdf`);
     } catch (err) {
@@ -248,12 +198,12 @@ const ViewRecord = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
       <Sidebar />
-      <div className="flex-1 flex flex-col bg-slate-200 pb-10">
+      <div className="flex-1 flex flex-col bg-slate-200 pb-10 overflow-y-auto">
         <Header title="Fuel Monitoring" />
         <section className="p-4 flex flex-col items-center">
-          <div className="flex items-center w-5/6 mb-4">
+          <div className="flex items-center w-full md:w-5/6 mb-4">
             <FaBus size={24} className="mr-2" />
             <span className="text-lg font-bold">BUS {selectedBus}</span>
             <span
@@ -264,34 +214,27 @@ const ViewRecord = () => {
               {busStatus}
             </span>
           </div>
-          <div className="top-btns flex flex-col">
-            {/* Time Interval Buttons */}
-            <div className="time-intervals flex space-x-3 mb-4">
+          <div className="top-btns flex flex-col md:flex-row items-center justify-between w-full md:w-5/6">
+            <div className="time-intervals flex space-x-3 mb-4 md:mb-0">
               {["daily", "weekly", "monthly", "yearly"].map((interval) => (
                 <button
                   key={interval}
-                  className={`px-4 py-2 rounded ${
-                    timeInterval === interval
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-500 text-white"
-                  }`}
+                  className={`px-4 py-2 rounded ${timeInterval === interval ? "bg-blue-500 text-white" : "bg-gray-500 text-white"}`}
                   onClick={() => setTimeInterval(interval)}
                 >
                   {interval.charAt(0).toUpperCase() + interval.slice(1)}
                 </button>
               ))}
             </div>
-            <div className="flex absolute right-[8%]">
-              <button
-                onClick={handlePrint}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Print Chart as PDF
-              </button>
-            </div>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mt-4 md:mt-0"
+            >
+              Print Chart as PDF
+            </button>
           </div>
 
-          <div className="relative chart-container w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg">
+          <div className="relative chart-container w-full md:w-5/6 h-[500px] bg-white p-4 rounded-lg shadow-lg mt-4">
             <div className="absolute inset-0 flex justify-center items-center opacity-10 z-0">
               <span className="text-6xl font-bold text-gray-500">
                 {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
@@ -300,7 +243,7 @@ const ViewRecord = () => {
             <Line data={data} options={options} className="relative z-10" />
           </div>
 
-          <div className="table-container w-5/6 mt-4 bg-white p-4 rounded-lg shadow-lg">
+          <div className="table-container w-full md:w-5/6 mt-4 bg-white p-4 rounded-lg shadow-lg">
             <table className="w-full text-left">
               <thead>
                 <tr>
@@ -314,19 +257,14 @@ const ViewRecord = () => {
               </thead>
               <tbody>
                 {displayedRecords
-                  .sort(
-                    (a, b) =>
-                      new Date(a.purchase_date) - new Date(b.purchase_date)
-                  ) // Sort by date ascending
+                  .sort((a, b) => new Date(a.purchase_date) - new Date(b.purchase_date))
                   .map((entry) => (
                     <tr key={entry.fuel_logs_id} className="border-t">
                       <td className="py-2 px-4">{entry.purchase_date}</td>
                       <td className="py-2 px-4">{entry.odometer_km} KM</td>
                       <td className="py-2 px-4">{entry.fuel_type}</td>
                       <td className="py-2 px-4">{entry.fuel_price}</td>
-                      <td className="py-2 px-4">
-                        {entry.fuel_liters_quantity} L
-                      </td>
+                      <td className="py-2 px-4">{entry.fuel_liters_quantity} L</td>
                       <td className="py-2 px-4">{entry.total_expense} PHP</td>
                       <td className="py-2 text-right flex items-center space-x-2">
                         <button
@@ -342,9 +280,7 @@ const ViewRecord = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() =>
-                            handleDeleteFuelLog(entry.fuel_logs_id)
-                          }
+                          onClick={() => handleDeleteFuelLog(entry.fuel_logs_id)}
                           className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                         >
                           Remove
@@ -356,7 +292,7 @@ const ViewRecord = () => {
             </table>
           </div>
 
-          <div className="mt-4 flex justify-between w-5/6">
+          <div className="mt-4 flex justify-between w-full md:w-5/6">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
@@ -381,8 +317,8 @@ const ViewRecord = () => {
               </button>
               {isHistoryModalOpen && (
                 <FuelHistoryModal
-                  isOpen={isHistoryModalOpen} // Correct prop for modal visibility
-                  onClose={handleCloseHistoryModal} // Correct function to close the modal
+                  isOpen={isHistoryModalOpen}
+                  onClose={handleCloseHistoryModal}
                   history={historyData}
                 />
               )}
@@ -397,15 +333,13 @@ const ViewRecord = () => {
         </section>
       </div>
 
-      {isHistoryModalOpen &&
-        (console.log("Rendering FuelHistoryModal..."), // Log when rendering the modal
-        (
-          <FuelHistoryModal
-            onClose={handleCloseHistoryModal}
-            historyData={fuelLogs}
-            selectedBus={selectedBus}
-          />
-        ))}
+      {isHistoryModalOpen && (
+        <FuelHistoryModal
+          onClose={handleCloseHistoryModal}
+          historyData={fuelLogs}
+          selectedBus={selectedBus}
+        />
+      )}
       {isAddModalOpen && (
         <FuelAddModal
           selectedBus={selectedBus}

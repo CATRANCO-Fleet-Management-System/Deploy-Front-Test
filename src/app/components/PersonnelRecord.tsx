@@ -32,7 +32,7 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
   onView,
 }) => {
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
+    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2  flex flex-col p-4 break-words text-sm relative">
       {/* Table Content */}
       <table className="w-full border-collapse mb-16">
         {" "}
@@ -86,30 +86,29 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
           )}
         </tbody>
       </table>
-
-      {/* Buttons */}
-      <div className="absolute bottom-4 left-4 right-4 flex justify-between space-x-2">
-        <button
-          className="px-4 py-1 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-        >
-          Remove
-        </button>
-        <button
-          className="px-4 py-1 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1"
-          onClick={onEdit}
-        >
-          Edit
-        </button>
-        <button
-          className="px-4 py-1 mt-3 bg-green-500 text-white rounded hover:bg-green-600 flex-1"
-          onClick={onView}
-        >
-          View Full Data
-        </button>
+{/* Buttons */}
+<div className="absolute bottom-4 left-4 right-4 flex justify-between space-x-2">
+  <button
+    className="px-3 py-1.5 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 sm:px-1 sm:py-2"
+    onClick={(e) => {
+      e.stopPropagation();
+      onDelete();
+    }}
+  >
+    Remove
+  </button>
+  <button
+    className="px-3 py-1.5 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 sm:px-1 sm:py-2"
+    onClick={onEdit}
+  >
+    Edit
+  </button>
+  <button
+    className="px-3 py-1.5 mt-3 bg-green-500 text-white rounded hover:bg-green-600 flex-1 sm:px-1 sm:py-2"
+    onClick={onView}
+  >
+    View Full Data
+  </button>
       </div>
     </div>
   );

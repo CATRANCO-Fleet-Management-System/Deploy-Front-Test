@@ -106,7 +106,7 @@ const DeviceManagement = () => {
           <Header title="Device Management" />
           <div className="content flex flex-col flex-1 p-6">
             {/* Search & Add New */}
-            <div className="options flex items-center space-x-4 mb-6">
+            <div className="options flex items-center space-x-4 w-[590px] ml-8 -mt-2 mb-6 margin-5">
               <input
                 type="text"
                 placeholder="Search Trackers"

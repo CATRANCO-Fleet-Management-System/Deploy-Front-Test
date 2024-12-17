@@ -177,7 +177,7 @@ const MaintenanceManagement = () => {
   return (
     <Layout>
       <Header title="Bus Maintenance Management" />
-      <div className="options flex items-center space-x-10 p-4 w-11/12 ml-8">
+      <div className="options flex items-center space-x-10 p-4 w-11/12 ml-5 mt-5">
         {/* Active/Completed Toggle Buttons */}
         <button
           className={`px-4 py-2 rounded-md ${
@@ -208,10 +208,6 @@ const MaintenanceManagement = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50">
-          <FaSearch size={20} className="mr-2" />
-          Search
-        </button>
         <button
           className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
           onClick={() => setIsAddModalOpen(true)}

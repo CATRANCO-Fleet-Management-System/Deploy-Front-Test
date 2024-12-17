@@ -138,7 +138,7 @@ const EditAssistantOfficerModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 h-[95vh] max-h-screen overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">
             Edit Passenger Assistant Officer Record
@@ -330,7 +330,7 @@ const EditAssistantOfficerModal = ({
             />
           </div>
           {/* Buttons */}
-          <div className="col-span-2 flex justify-end space-x-4 -mt-3">
+          <div className="col-span-2 flex justify-end space-x-4 -mt-15 mb-1">
             <button
               type="submit"
               className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"

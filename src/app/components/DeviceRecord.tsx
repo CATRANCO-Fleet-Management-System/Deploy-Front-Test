@@ -12,7 +12,7 @@ const DeviceRecord = ({
   onEdit,
 }) => {
   return (
-    <div className="bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative h-full">
+    <div className="bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative ml-8">
       {/* Table Content */}
       <table className="w-full border-collapse mb-16">
         <tbody>
@@ -52,7 +52,7 @@ const DeviceRecord = ({
       </table>
 
       {/* Buttons */}
-      <div className="absolute bottom-4 left-4 right-4 flex justify-between space-x-2">
+      <div className="absolute bottom-5 left-4 right-4 flex justify-between h-12 space-x-2">
         <button
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center justify-center space-x-2 flex-1"
           onClick={(e) => {
@@ -60,13 +60,13 @@ const DeviceRecord = ({
             onDelete();
           }}
         >
-          <FaTrash /> <span>Remove</span>
+           <span>Remove</span>
         </button>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center space-x-2 flex-1"
           onClick={onEdit}
         >
-          <FaEdit /> <span>Edit</span>
+           <span>Edit</span>
         </button>
       </div>
     </div>
