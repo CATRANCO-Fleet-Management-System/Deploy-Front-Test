@@ -26,8 +26,8 @@ const DispatchMonitoring: React.FC = () => {
   const [pathData, setPathData] = useState<{ lat: number; lng: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBus, setSelectedBus] = useState<string | null>(null);
+  const [activeButton, setActiveButton] = useState<string>("all"); // Track active button
 
-  // Fetch initial bus data
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
@@ -44,10 +44,11 @@ const DispatchMonitoring: React.FC = () => {
         }));
         setBusData(mappedVehicles);
 
-        // Set map path to the first vehicle’s position if no selected bus
         if (mappedVehicles.length > 0 && !selectedBus) {
           const firstVehicle = mappedVehicles[0];
-          setPathData([{ lat: firstVehicle.latitude, lng: firstVehicle.longitude }]);
+          setPathData([
+            { lat: firstVehicle.latitude, lng: firstVehicle.longitude },
+          ]);
         }
 
         setLoading(false);
@@ -59,7 +60,6 @@ const DispatchMonitoring: React.FC = () => {
     fetchVehicles();
   }, [selectedBus]);
 
-  // Set up real-time data updates via Pusher
   useEffect(() => {
     const echo = new Echo({
       broadcaster: "pusher",
@@ -88,7 +88,6 @@ const DispatchMonitoring: React.FC = () => {
 
         const { tracker_ident, location, dispatch_log } = event;
 
-        // Update path data for the selected bus
         if (selectedBus === tracker_ident) {
           setPathData((prevPath) => [
             ...prevPath,
@@ -96,9 +95,10 @@ const DispatchMonitoring: React.FC = () => {
           ]);
         }
 
-        // Update bus data
         setBusData((prevData) => {
-          const existingBus = prevData.find((bus) => bus.number === tracker_ident);
+          const existingBus = prevData.find(
+            (bus) => bus.number === tracker_ident
+          );
 
           if (existingBus) {
             return prevData.map((bus) =>
@@ -137,7 +137,6 @@ const DispatchMonitoring: React.FC = () => {
     };
   }, [selectedBus]);
 
-  // Button color based on dispatch status
   const getButtonColor = (dispatchStatus: string) => {
     switch (dispatchStatus) {
       case "on road":
@@ -149,45 +148,75 @@ const DispatchMonitoring: React.FC = () => {
     }
   };
 
+  const filteredBusData =
+    activeButton === "all"
+      ? busData
+      : busData.filter((bus) => bus.dispatchStatus === activeButton);
+
   return (
     <Layout>
       <Header title="Dispatch Monitoring" />
       <section className="p-4 flex flex-col items-center">
-        <div className="w-5/6 flex flex-col h-full space-y-6">
+        <div className="w-full md:w-5/6 flex flex-col h-full">
           {/* Map Display */}
           <MapProvider>
             {loading ? (
               <div className="text-center mt-8">Loading map...</div>
             ) : (
-              <DispatchMap
-                busData={busData}
-                pathData={pathData}
-                onBusClick={(busNumber) => {
-                  setSelectedBus(busNumber);
-
-                  // Update path data for the clicked bus
-                  const clickedBus = busData.find((bus) => bus.number === busNumber);
-                  if (clickedBus) {
-                    setPathData([{ lat: clickedBus.latitude, lng: clickedBus.longitude }]);
-                  }
-                }}
-                selectedBus={selectedBus}
-              />
+              <div className="w-full h-64 sm:h-96 lg:h-[500px]">
+                <DispatchMap
+                  busData={busData}
+                  pathData={pathData}
+                  onBusClick={(busNumber) => {
+                    setSelectedBus(busNumber);
+                    const clickedBus = busData.find(
+                      (bus) => bus.number === busNumber
+                    );
+                    if (clickedBus) {
+                      setPathData([
+                        { lat: clickedBus.latitude, lng: clickedBus.longitude },
+                      ]);
+                    }
+                  }}
+                  selectedBus={selectedBus}
+                />
+              </div>
             )}
           </MapProvider>
 
+          {/* Segregation Buttons */}
+          <div className="flex space-x-4 mb-5 -mt-4">
+            {["all", "idle", "on road", "on alley"].map((status) => (
+              <button
+                key={status}
+                className={`px-6 py-2 rounded-md text-lg font-semibold transition-transform duration-300 ease-in-out shadow-md ${
+                  activeButton === status
+                    ? "transform scale-110 border-2 border-blue-700 shadow-lg"
+                    : "hover:shadow-lg"
+                } ${
+                  status === "all"
+                    ? "bg-blue-500 text-white"
+                    : getButtonColor(status)
+                }`}
+                onClick={() => setActiveButton(status)}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+
           {/* Vehicle Buttons */}
-          <div className="bus-info flex flex-wrap gap-4 justify-center">
-            {busData.map((bus) => (
+          <div className="bus-info grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredBusData.map((bus) => (
               <button
                 key={bus.number}
                 onClick={() => setSelectedBus(bus.number)}
-                className={`w-64 p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
+                className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
                   bus.dispatchStatus
                 )}`}
               >
-                <FaBus size={30} />
-                <div className="flex flex-col">
+                <FaBus size={24} />
+                <div className="flex flex-col text-sm sm:text-base">
                   <span className="font-bold">Vehicle ID: {bus.number}</span>
                   <span>Status: {bus.dispatchStatus}</span>
                 </div>

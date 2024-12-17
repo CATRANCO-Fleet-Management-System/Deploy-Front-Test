@@ -110,7 +110,6 @@ const BusRecordDisplay = () => {
     setIsAssignPersonnelModalOpen(true);
   };
 
-  // Handle editing a bus record
   const handleEditBus = (updatedBus) => {
     setBusRecords((prevRecords) =>
       prevRecords.map((record) =>

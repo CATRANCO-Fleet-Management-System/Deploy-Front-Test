@@ -82,7 +82,7 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
     const value = e.target.value;
     setBusDetails((prev) => ({ ...prev, route: value }));
   };
-  // Handle update
+
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -333,24 +333,24 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               {/* Add more route options as needed */}
             </select>
           </div>
-        </form>
 
-        {/* Buttons */}
-        <div className="col-span-2 mt-4 flex justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md ml-2"
-          >
-            Save
-          </button>
-        </div>
+          {/* Buttons */}
+          <div className="col-span-2 mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md ml-2"
+            >
+              Update
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
