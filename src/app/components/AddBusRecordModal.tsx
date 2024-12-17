@@ -284,26 +284,27 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
               required
             />
           </div>
-{/* Route */}
-<div>
-  <label className="block text-sm font-medium text-gray-700">
-    Route
-  </label>
-  <select
-    value={route}
-    onChange={(e) => setRoute(e.target.value)}
-    className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-    required
-  >
-    <option value="" disabled>
-      Select a Route
-    </option>
-    <option value="Cogon">Cogon</option>
-    <option value="Canitoan">Canitoan</option>
-    <option value="Silver Creek">Silver Creek</option>
-  </select>
-</div>
-          <div className="mt-4 flex justify-end space-x-4">
+          {/* Route */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Route
+            </label>
+            <select
+              value={route}
+              onChange={(e) => setRoute(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="" disabled>
+                Select a Route
+              </option>
+              <option value="Canitoan">Canitoan</option>
+              <option value="Silver Creek">Silver Creek</option>
+            </select>
+          </div>
+
+          {/* Buttons */}
+          <div className="col-span-2 mt-4 flex justify-end">
             <button
               type="button"
               onClick={onClose}
@@ -313,7 +314,7 @@ const AddBusRecordModal = ({ onClose, refreshData }) => {
             </button>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md ml-2"
             >
               Save
             </button>

@@ -5,7 +5,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getVehicleById, updateVehicle } from "@/app/services/vehicleService";
 
-
 const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
   const [busDetails, setBusDetails] = useState({
     vehicle_id: "",
@@ -18,6 +17,7 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
     third_pli_policy_no: "",
     ci: "",
     supplier: "",
+    route: "",
   });
 
   const [third_pli_validity, setTPLValidity] = useState(null);
@@ -48,11 +48,16 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
           third_pli_policy_no: data.third_pli_policy_no || "",
           ci: data.ci || "",
           supplier: data.supplier || "",
+          route: data.route || "",
         });
 
-        setTPLValidity(data.third_pli_validity ? new Date(data.third_pli_validity) : null);
+        setTPLValidity(
+          data.third_pli_validity ? new Date(data.third_pli_validity) : null
+        );
         setCIValidity(data.ci_validity ? new Date(data.ci_validity) : null);
-        setDatePurchased(data.date_purchased ? new Date(data.date_purchased) : null);
+        setDatePurchased(
+          data.date_purchased ? new Date(data.date_purchased) : null
+        );
       } catch (err) {
         console.error("Error fetching vehicle details:", err);
         setError("Failed to fetch vehicle details.");
@@ -72,7 +77,11 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
     const { name, value } = e.target;
     setBusDetails((prev) => ({ ...prev, [name]: value }));
   };
-
+  // Handle route selection
+  const handleRouteChange = (e) => {
+    const value = e.target.value;
+    setBusDetails((prev) => ({ ...prev, route: value }));
+  };
   // Handle update
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -89,6 +98,7 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
       third_pli_validity: formatDate(third_pli_validity),
       ci_validity: formatDate(ci_validity),
       date_purchased: formatDate(date_purchased),
+      route: busDetails.route,
     };
 
     try {
@@ -114,8 +124,7 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
         onClose();
       }
     }
-  }
-
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -133,7 +142,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
         <form onSubmit={handleUpdate} className="grid grid-cols-2 gap-4 mt-4">
           {/* Vehicle ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Bus Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Bus Number
+            </label>
             <input
               type="text"
               name="vehicle_id"
@@ -142,22 +153,11 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               disabled
             />
           </div>
-
-          {/* Plate Number */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Plate Number</label>
-            <input
-              type="text"
-              name="plate_number"
-              value={busDetails.plate_number}
-              className="w-full px-4 py-2 border rounded-md"
-              disabled
-            />
-          </div>
-
           {/* OR Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Official Receipt (OR)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Official Receipt (OR)
+            </label>
             <input
               type="text"
               name="or_id"
@@ -166,10 +166,11 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               className="w-full px-4 py-2 border rounded-md"
             />
           </div>
-
           {/* CR Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Certificate of Registration (CR)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Certificate of Registration (CR)
+            </label>
             <input
               type="text"
               name="cr_id"
@@ -179,9 +180,25 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
             />
           </div>
 
+          {/* Plate Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Plate Number
+            </label>
+            <input
+              type="text"
+              name="plate_number"
+              value={busDetails.plate_number}
+              className="w-full px-4 py-2 border rounded-md"
+              disabled
+            />
+          </div>
+
           {/* Engine Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Engine Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Engine Number
+            </label>
             <input
               type="text"
               name="engine_number"
@@ -193,7 +210,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Chasis Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Chasis Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Chasis Number
+            </label>
             <input
               type="text"
               name="chasis_number"
@@ -205,7 +224,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Third Party Liability Insurance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Liability Insurance</label>
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Liability Insurance
+            </label>
             <input
               type="text"
               name="third_pli"
@@ -217,7 +238,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* 3rd Party Policy Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Policy Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Policy Number
+            </label>
             <input
               type="text"
               name="third_pli_policy_no"
@@ -229,7 +252,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Third Party Validity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">3rd Party Insurance Validity</label>
+            <label className="block text-sm font-medium text-gray-700">
+              3rd Party Insurance Validity
+            </label>
             <DatePicker
               selected={third_pli_validity}
               onChange={(date) => setTPLValidity(date)}
@@ -239,7 +264,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Comprehensive Insurance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Comprehensive Insurance
+            </label>
             <input
               type="text"
               name="ci"
@@ -251,7 +278,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Comprehensive Insurance Validity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Comprehensive Insurance Validity</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Comprehensive Insurance Validity
+            </label>
             <DatePicker
               selected={ci_validity}
               onChange={(date) => setCIValidity(date)}
@@ -261,7 +290,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Date Purchased */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Date Purchased</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Date Purchased
+            </label>
             <DatePicker
               selected={date_purchased}
               onChange={(date) => setDatePurchased(date)}
@@ -271,7 +302,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
           {/* Supplier */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Supplier</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Supplier
+            </label>
             <input
               type="text"
               name="supplier"
@@ -280,9 +313,30 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               className="w-full px-4 py-2 border rounded-md"
             />
           </div>
+          {/* Route */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Route
+            </label>
+            <select
+              name="route"
+              value={busDetails.route}
+              onChange={handleRouteChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="" disabled>
+                Select a Route
+              </option>
+              <option value="Canitoan">Canitoan</option>
+              <option value="Silver Creek">Silver Creek</option>
+              {/* Add more route options as needed */}
+            </select>
+          </div>
         </form>
 
-        <div className="flex justify-end mt-4 space-x-4">
+        {/* Buttons */}
+        <div className="col-span-2 mt-4 flex justify-end">
           <button
             type="button"
             onClick={onClose}
@@ -292,10 +346,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
           </button>
           <button
             type="submit"
-            onClick={handleUpdate}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md ml-2"
           >
-            Update
+            Save
           </button>
         </div>
       </div>
