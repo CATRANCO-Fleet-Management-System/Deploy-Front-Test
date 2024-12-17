@@ -17,19 +17,18 @@ const DeviceManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [devices, setDevices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Updated for better grid pagination
+  const itemsPerPage = 4; // Limit to 4 cards per page
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
 
-  // Fetch tracker-to-vehicle mappings on component mount
   useEffect(() => {
     const fetchTrackerMappings = async () => {
       try {
         const mappings = await getAllTrackerVehicleMappings();
-        setDevices(mappings); // Map tracker-to-vehicle mappings to devices
+        setDevices(mappings);
       } catch (error) {
         console.error("Error fetching tracker-to-vehicle mappings:", error);
       }
@@ -93,7 +92,7 @@ const DeviceManagement = () => {
     setDevices((prevDevices) =>
       prevDevices.map((device) =>
         device.id === updatedDevice.id
-          ? { ...device, ...updatedDevice } // Merge the updated device fields
+          ? { ...device, ...updatedDevice }
           : device
       )
     );
@@ -103,7 +102,7 @@ const DeviceManagement = () => {
   return (
     <Layout>
       <section className="flex flex-row h-screen bg-white">
-      <div className="w-full flex flex-col bg-slate-200">
+        <div className="w-full flex flex-col bg-slate-200">
           <Header title="Device Management" />
           <div className="content flex flex-col flex-1 p-6">
             {/* Search & Add New */}
@@ -124,9 +123,8 @@ const DeviceManagement = () => {
             </div>
 
             {/* Devices Grid */}
-            <div className="records flex flex-col h-full">
-              <div className="output flex flex-wrap mt-4 items-center ml-14 space-x-6" >
-                {paginatedDevices.map((device) => (
+            <div className="records grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {paginatedDevices.map((device) => (
                 <DeviceRecord
                   key={device.id}
                   deviceId={device.id}
@@ -138,7 +136,6 @@ const DeviceManagement = () => {
                   onEdit={() => handleEdit(device.id)}
                 />
               ))}
-              </div>
             </div>
 
             {/* Pagination */}
@@ -167,7 +164,7 @@ const DeviceManagement = () => {
         <Confirmpopup
           isOpen={isDeletePopupOpen}
           onConfirm={confirmDelete}
-          onCancel={cancelDelete}
+          onClose={cancelDelete}
           title="Delete Device"
           message="Are you sure you want to delete this tracker-to-vehicle mapping?"
         />
