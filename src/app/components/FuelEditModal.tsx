@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaBus } from "react-icons/fa";
 import { updateFuelLog } from "@/app/services/fuellogsService";
+import axios from "axios";
 
 const FuelEditModal = ({
   selectedBus,
@@ -23,24 +24,125 @@ const FuelEditModal = ({
 
   useEffect(() => {
     if (selectedFuelLog && selectedBus) {
-      setIsLoading(true);
+      console.log("Selected Bus:", selectedBus); // Log the selected bus
+      console.log("Selected Fuel Log Object:", selectedFuelLog); // Log the full selectedFuelLog object
 
-      // Populate form with selected fuel log data
-      setFormData({
-        date: selectedFuelLog.purchase_date?.split(" ")[0] || "",
-        distanceTraveled: selectedFuelLog.odometer_km || "",
-        fuelType: selectedFuelLog.fuel_type || "",
-        fuelPrice: selectedFuelLog.fuel_price?.replace(/[^0-9.]/g, "") || "",
-        fuel_liters_quantity: selectedFuelLog.fuel_liters_quantity || "",
-        total_expense:
-          selectedFuelLog.total_expense?.replace(/[^0-9.]/g, "") || "",
-        odometerProof: null,
-        fuelReceiptProof: null,
-      });
-
-      setIsLoading(false);
+      if (selectedFuelLog.fuel_logs_id) {
+        console.log(
+          "Fuel Log ID (fuel_logs_id) CHILD:",
+          selectedFuelLog.fuel_logs_id
+        ); // Log fuel_logs_id
+        setFormData({
+          date: selectedFuelLog.purchase_date?.split(" ")[0] || "",
+          distanceTraveled: selectedFuelLog.odometer_km || "",
+          fuelType: selectedFuelLog.fuel_type || "",
+          fuelPrice: selectedFuelLog.fuel_price?.replace(/[^0-9.]/g, "") || "",
+          fuel_liters_quantity: selectedFuelLog.fuel_liters_quantity || "",
+          total_expense:
+            selectedFuelLog.total_expense?.replace(/[^0-9.]/g, "") || "",
+          odometerProof: null,
+          fuelReceiptProof: null,
+        });
+      } else {
+        console.error("Fuel log ID (fuel_logs_id) is missing or invalid.");
+      }
+    } else {
+      console.log("Fuel log or Bus is missing:", selectedFuelLog, selectedBus);
     }
   }, [selectedFuelLog, selectedBus]);
+
+  const handleSubmit = async () => {
+    console.log("Submitting form data for update:", formData);
+    console.log("Selected Fuel Log ID:", selectedFuelLog?.fuel_logs_id);
+
+    // Validation for required fields
+    if (
+      !formData.date ||
+      !formData.distanceTraveled ||
+      !formData.fuelType ||
+      !formData.fuelPrice ||
+      !formData.fuel_liters_quantity ||
+      !formData.total_expense
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // Check if fuel log ID exists
+    if (!selectedFuelLog?.fuel_logs_id) {
+      alert("Fuel log ID is missing!");
+      return;
+    }
+
+    // Prepare the form data for submission
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append("purchase_date", formData.date);
+    formDataToSubmit.append("odometer_km", formData.distanceTraveled);
+    formDataToSubmit.append(
+      "fuel_liters_quantity",
+      formData.fuel_liters_quantity
+    );
+    formDataToSubmit.append("fuel_price", formData.fuelPrice);
+    formDataToSubmit.append("fuel_type", formData.fuelType);
+    formDataToSubmit.append("vehicle_id", selectedBus);
+
+    // Append file data if available
+    if (formData.odometerProof) {
+      formDataToSubmit.append(
+        "odometer_distance_proof",
+        formData.odometerProof
+      );
+    }
+    if (formData.fuelReceiptProof) {
+      formDataToSubmit.append("fuel_receipt_proof", formData.fuelReceiptProof);
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      console.log("Final FormData being submitted:", formDataToSubmit);
+
+      // Call the updateFuelLog API function
+      const response = await updateFuelLog(
+        selectedFuelLog.fuel_logs_id,
+        formDataToSubmit
+      );
+
+      // Log the entire response for debugging
+      console.log("Update response:", response);
+
+      // Check the response object directly (no need for .data if it's already the result)
+      if (response?.message === "Fuel Log Updated Successfully") {
+        console.log("Fuel log successfully updated:", response.fuel_log);
+
+        // Use the onUpdate callback to update the parent component
+        onUpdate(response.fuel_log);
+
+        // Close the modal
+        onClose();
+
+        // Refresh the page or trigger re-render
+        window.location.reload(); // This will reload the page to reflect the updates
+      } else {
+        console.error("Unexpected response message:", response?.message);
+        throw new Error("Unexpected response structure or failure message.");
+      }
+    } catch (error) {
+      // Log the error details for debugging
+      console.error("Failed to update fuel log:", error);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+      }
+      alert(
+        `An error occurred while updating the fuel log: ${
+          error.message || "Unknown error"
+        }`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,49 +165,10 @@ const FuelEditModal = ({
     const { name, files } = e.target;
 
     if (files.length > 0) {
-      setFormData((prevData) => ({ ...prevData, [name]: files[0] }));
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (
-      !formData.date ||
-      !formData.distanceTraveled ||
-      !formData.fuelType ||
-      !formData.fuelPrice ||
-      !formData.fuel_liters_quantity ||
-      !formData.total_expense
-    ) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append("purchase_date", formData.date);
-    formDataToSubmit.append("odometer_km", formData.distanceTraveled);
-    formDataToSubmit.append("fuel_liters_quantity", formData.fuel_liters_quantity);
-    formDataToSubmit.append("fuel_price", formData.fuelPrice);
-    formDataToSubmit.append("fuel_type", formData.fuelType);
-    formDataToSubmit.append("vehicle_id", selectedBus);
-
-    if (formData.odometerProof) {
-      formDataToSubmit.append("odometer_distance_proof", formData.odometerProof);
-    }
-    if (formData.fuelReceiptProof) {
-      formDataToSubmit.append("fuel_receipt_proof", formData.fuelReceiptProof);
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await updateFuelLog(selectedFuelLog.id, formDataToSubmit);
-      onUpdate(response.data.fuel_log);
-      onClose();
-    } catch (error) {
-      console.error("Failed to update fuel log:", error);
-      alert("An error occurred while updating the fuel log.");
-    } finally {
-      setIsSubmitting(false);
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: files[0], // Store the first file selected
+      }));
     }
   };
 
@@ -133,7 +196,9 @@ const FuelEditModal = ({
                 />
               </div>
               <div className="mb-4">
-                <label className="block font-medium">Distance Traveled (KM)</label>
+                <label className="block font-medium">
+                  Distance Traveled (KM)
+                </label>
                 <input
                   type="number"
                   name="distanceTraveled"
