@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaBus } from "react-icons/fa";
 
-const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose = () => {} }) => {
+const FuelViewDetailsModal = ({
+  selectedBus,
+  viewData = {},
+  onClose = () => {},
+}) => {
   const {
     purchase_date = "N/A",
     odometer_km = "N/A",
@@ -12,6 +16,12 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose = () => {} }
     odometer_distance_proof = null,
     fuel_receipt_proof = null,
   } = viewData;
+
+  const [isOdometerImageLoading, setIsOdometerImageLoading] = useState(true);
+  const [isFuelReceiptImageLoading, setIsFuelReceiptImageLoading] =
+    useState(true);
+  const [odometerImageError, setOdometerImageError] = useState(false);
+  const [fuelReceiptImageError, setFuelReceiptImageError] = useState(false);
 
   const calculatedTotalExpense =
     total_expense ||
@@ -31,6 +41,35 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose = () => {} }
       day: "numeric",
     });
   };
+
+  const handleImageError = (type) => {
+    if (type === "odometer") {
+      setOdometerImageError(true);
+      setIsOdometerImageLoading(false);
+    } else if (type === "fuelReceipt") {
+      setFuelReceiptImageError(true);
+      setIsFuelReceiptImageLoading(false);
+    }
+  };
+
+  const handleImageLoad = (type) => {
+    if (type === "odometer") {
+      setIsOdometerImageLoading(false);
+    } else if (type === "fuelReceipt") {
+      setIsFuelReceiptImageLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (odometer_distance_proof) {
+      setIsOdometerImageLoading(true);
+      setOdometerImageError(false);
+    }
+    if (fuel_receipt_proof) {
+      setIsFuelReceiptImageLoading(true);
+      setFuelReceiptImageError(false);
+    }
+  }, [odometer_distance_proof, fuel_receipt_proof]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
@@ -84,11 +123,21 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose = () => {} }
             </div>
             <div className="mb-4">
               <label className="block font-medium">Odometer Proof</label>
-              {odometer_distance_proof ? (
+              {odometerImageError ? (
+                <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center">
+                  Failed to load image
+                </div>
+              ) : isOdometerImageLoading ? (
+                <div className="w-full h-48 flex justify-center items-center border border-gray-300 p-2 rounded bg-gray-100">
+                  <span>Loading...</span>
+                </div>
+              ) : odometer_distance_proof ? (
                 <img
                   src={`${BASE_URL}${odometer_distance_proof}`}
                   alt={`Odometer proof for Bus ${selectedBus}`}
                   className="max-h-48 w-auto border border-gray-300 p-2 rounded"
+                  onError={() => handleImageError("odometer")}
+                  onLoad={() => handleImageLoad("odometer")}
                 />
               ) : (
                 <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center">
@@ -98,11 +147,21 @@ const FuelViewDetailsModal = ({ selectedBus, viewData = {}, onClose = () => {} }
             </div>
             <div className="mb-4">
               <label className="block font-medium">Fuel Receipt Proof</label>
-              {fuel_receipt_proof ? (
+              {fuelReceiptImageError ? (
+                <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center">
+                  Failed to load image
+                </div>
+              ) : isFuelReceiptImageLoading ? (
+                <div className="w-full h-48 flex justify-center items-center border border-gray-300 p-2 rounded bg-gray-100">
+                  <span>Loading...</span>
+                </div>
+              ) : fuel_receipt_proof ? (
                 <img
                   src={`${BASE_URL}${fuel_receipt_proof}`}
                   alt={`Fuel receipt proof for Bus ${selectedBus}`}
                   className="max-h-48 w-auto border border-gray-300 p-2 rounded"
+                  onError={() => handleImageError("fuelReceipt")}
+                  onLoad={() => handleImageLoad("fuelReceipt")}
                 />
               ) : (
                 <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center">

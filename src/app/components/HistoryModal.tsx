@@ -8,14 +8,16 @@ const HistoryModal = ({ isOpen, onClose, history }) => {
   if (!isOpen) return null;
 
   // Function to generate a PDF from the history table
+  // Function to generate a PDF from the history table
   const downloadPDF = () => {
     const doc = new jsPDF();
     const tableColumn = ["Name", "Position", "Date Hired", "Status"];
     const tableRows = [];
 
     history.forEach((record) => {
+      const fullName = `${record.details || "N/A"}`; // Use record.details directly
       const row = [
-        record.name || "N/A",
+        fullName,
         record.position || "N/A",
         record.date_hired || "N/A",
         record.status || "N/A",

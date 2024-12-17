@@ -35,7 +35,18 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: files[0] }));
+    const file = files[0];
+
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, [name]: file };
+
+      // Generate a URL for the selected image
+      if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+        updatedData[`${name}Preview`] = URL.createObjectURL(file);
+      }
+
+      return updatedData;
+    });
   };
 
   const handleSubmit = async () => {
