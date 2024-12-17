@@ -42,8 +42,17 @@ const ViewRecord = () => {
     const fetchLogs = async () => {
       try {
         const logs = await fetchAllFuelLogs();
+<<<<<<< HEAD
         console.log(logs);
         const filteredLogs = logs.filter((log) => log.vehicle_id === selectedBus);
+=======
+        console.log("Fetched Fuel Logs:", logs); // Log to show fetched logs
+
+        const filteredLogs = logs.filter(
+          (log) => log.vehicle_id === selectedBus
+        );
+        console.log(`Filtered Fuel Logs for Bus ${selectedBus}:`, filteredLogs); // Log to show filtered logs for selected bus
+>>>>>>> 04c1ba7dcf2fa7502017dc0b810bd49973df78df
         setFuelLogs(filteredLogs);
       } catch (error) {
         console.error("Failed to fetch fuel logs:", error);
@@ -122,22 +131,35 @@ const ViewRecord = () => {
 
   const handleDeleteFuelLog = async (fuelLogId) => {
     try {
+<<<<<<< HEAD
       await deleteFuelLog(fuelLogId);
       setFuelLogs((prevLogs) => prevLogs.filter((log) => log.fuel_logs_id !== fuelLogId));
       alert("Fuel log deleted successfully");
+=======
+      await deleteFuelLog(fuelLogId); // API call to delete fuel log
+      setFuelLogs((prevLogs) => prevLogs.filter((log) => log.fuel_logs_id !== fuelLogId));
+>>>>>>> 04c1ba7dcf2fa7502017dc0b810bd49973df78df
     } catch (error) {
-      console.error(`Error deleting fuel log with ID ${fuelLogId}:`, error);
-      alert("Failed to delete fuel log. Please try again.");
+      console.error("Failed to delete fuel log", error);
     }
   };
+  
 
   const handleEdit = (record) => {
+<<<<<<< HEAD
     setSelectedBus(record.vehicle_id);
+=======
+    console.log("Edit record:", record); // Log the entire record
+    console.log("Fuel Log ID on Edit:", record.fuel_logs_id); // Log the fuel_logs_id
+    setSelectedFuelLog(record);
+>>>>>>> 04c1ba7dcf2fa7502017dc0b810bd49973df78df
     setEditData(record);
     setIsEditModalOpen(true);
   };
 
   const handleViewDetails = (record) => {
+    console.log("Viewing details for record:", record); // Log the entire record
+    console.log("Fuel Log ID on View Details:", record.fuel_logs_id); // Log the fuel_logs_id
     setViewData(record);
     setIsViewDetailsOpen(true);
   };
@@ -148,8 +170,15 @@ const ViewRecord = () => {
   };
 
   const handleAdd = (updatedRecord) => {
+<<<<<<< HEAD
     setFuelLogs((prevLogs) => [...prevLogs, updatedRecord]);
     setSelectedBus(updatedRecord.vehicle_id);
+=======
+    setFuelLogs((prevLogs) => {
+      const newLogs = [...prevLogs, updatedRecord];
+      return newLogs;
+    });
+>>>>>>> 04c1ba7dcf2fa7502017dc0b810bd49973df78df
   };
 
   const closeAddModal = () => {
@@ -196,7 +225,7 @@ const ViewRecord = () => {
       console.error("Error generating PDF:", err);
     }
   };
-
+  console.log("Selected Fuel Log:", selectedFuelLog);
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
       <Sidebar />
@@ -257,6 +286,7 @@ const ViewRecord = () => {
               </thead>
               <tbody>
                 {displayedRecords
+<<<<<<< HEAD
                   .sort((a, b) => new Date(a.purchase_date) - new Date(b.purchase_date))
                   .map((entry) => (
                     <tr key={entry.fuel_logs_id} className="border-t">
@@ -288,6 +318,50 @@ const ViewRecord = () => {
                       </td>
                     </tr>
                   ))}
+=======
+                  .sort(
+                    (a, b) =>
+                      new Date(a.purchase_date) - new Date(b.purchase_date)
+                  ) // Sort by date ascending
+                  .map((entry) => {
+                    console.log("Rendering Fuel Log Entry: PARENT", entry); // Log the whole entry
+                    console.log("Fuel Log ID: PARENT SIDE", entry.fuel_logs_id); // Log the fuel_logs_id
+                    return (
+                      <tr key={entry.fuel_logs_id} className="border-t">
+                        <td className="py-2 px-4">{entry.purchase_date}</td>
+                        <td className="py-2 px-4">{entry.odometer_km} KM</td>
+                        <td className="py-2 px-4">{entry.fuel_type}</td>
+                        <td className="py-2 px-4">{entry.fuel_price}</td>
+                        <td className="py-2 px-4">
+                          {entry.fuel_liters_quantity} L
+                        </td>
+                        <td className="py-2 px-4">{entry.total_expense} PHP</td>
+                        <td className="py-2 text-right flex items-center space-x-2">
+                          <button
+                            onClick={() => handleViewDetails(entry)}
+                            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleEdit(entry)}
+                            className="px-3 py-1 bg-blue-500 text-white rounded"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDeleteFuelLog(entry.fuel_logs_id)
+                            }
+                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+>>>>>>> 04c1ba7dcf2fa7502017dc0b810bd49973df78df
               </tbody>
             </table>
           </div>
@@ -348,10 +422,10 @@ const ViewRecord = () => {
         />
       )}
 
-      {isEditModalOpen && (
+      {isEditModalOpen && selectedFuelLog && (
         <FuelEditModal
           selectedBus={selectedBus}
-          selectedFuelLog={editData}
+          selectedFuelLog={selectedFuelLog}
           onClose={() => setIsEditModalOpen(false)}
           onUpdate={handleEdit}
         />
