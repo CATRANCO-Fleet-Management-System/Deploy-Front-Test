@@ -93,7 +93,7 @@ export const createFuelLog = async (fuelLogData) => {
 export const updateFuelLog = async (id, fuelLogData) => {
   try {
     console.log("Sending update request for fuel log:", { id, fuelLogData }); // Debug log
-    const response = await api.patch(
+    const response = await api.post(
       `/user/admin/fuel-logs/update/${id}`,
       fuelLogData
     );
