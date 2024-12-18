@@ -58,7 +58,7 @@ export default function Sidebar() {
           <img
             src="/logo.png"
             alt="Image Logo"
-            className="object-contain -mt-14 cursor-pointer mb-"
+            className="object-contain -mt-14 cursor-pointer mb-[-45px]"
           />
         </Link>
       </div>

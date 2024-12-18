@@ -24,22 +24,22 @@ const extractHistoryFromProfiles = (profiles) => {
 };
 
 const ButtonGroup = ({ activeButton, onClick, onViewHistory }) => (
-  <div className="button-type-employee-container flex flex-row space-x-10 m-5 ml-10  mt-10">
+  <div className="button-type-employee-container flex flex-row space-x-10 m-5 ml-14 mt-10 ">
     <button
-      className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${
+      className={`px-4 py-2 border-2 rounded-md transition-colors duration-300 ease-in-out ${
         activeButton === "drivers"
-          ? "border-blue-500 text-blue-500"
-          : "border-transparent text-gray-700"
+          ? "bg-blue-500 text-white"
+          : "bg-gray-200 text-gray-800"
       }`}
       onClick={() => onClick("drivers")}
     >
       Drivers
     </button>
     <button
-      className={`px-4 py-2 border-2 rounded transition-colors duration-300 ease-in-out ${
+      className={`px-4 py-2 border-2 rounded-md transition-colors duration-300 ease-in-out ${
         activeButton === "conductors"
-          ? "border-blue-500 text-blue-500"
-          : "border-transparent text-gray-700"
+          ? "bg-blue-500 text-white "
+          : "bg-gray-200 text-gray-800"
       }`}
       onClick={() => onClick("conductors")}
     >
@@ -196,7 +196,7 @@ const Personnel = () => {
               onClick={setActiveButton}
               onViewHistory={openHistoryModal}
             />
-            <div className="options flex items-center space-x-10 p-4 w-9/12 ml-10">
+            <div className="options flex items-center space-x-3 p-4 w-9/12 ml-10 ">
               <input
                 type="text"
                 placeholder={`Find ${activeButton}`}
@@ -205,7 +205,7 @@ const Personnel = () => {
                 className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
-                className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
+                className="flex items-center px-4 py-2 border-2 mr-[-25] border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 "
                 onClick={() => setIsAddModalOpen(true)}
               >
                 <FaPlus size={22} className="mr-2" />

@@ -176,7 +176,7 @@ const BusRecordDisplay = () => {
   return (
     <Layout>
       <Header title="Bus Profiles" />
-      <div className="options flex items-center space-x-10 p-4 w-9/12 ml-10">
+      <div className="options flex items-center p-4 w-9/12 ml-10">
         <input
           type="text"
           placeholder="Find bus"
@@ -186,7 +186,7 @@ const BusRecordDisplay = () => {
         />
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
+          className="flex items-center px-4 py-2 ml-4 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
         >
           <FaPlus size={22} className="mr-2" />
           Add New
@@ -194,7 +194,7 @@ const BusRecordDisplay = () => {
 
         <button
           onClick={openHistoryModal}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          className="px-4 py-2 bg-gray-500 ml-5 text-white rounded hover:bg-gray-600"
         >
           View History
         </button>
