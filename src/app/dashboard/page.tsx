@@ -46,7 +46,6 @@ const DashboardHeader: React.FC = () => {
         const profiles = await getAllProfiles();
         setCurrentEmployees(profiles.length);
 
-        // Set the first bus as the default selected bus
         if (vehicles.length > 0) {
           const firstBus = vehicles[0];
           setSelectedBusDetails({
@@ -71,7 +70,6 @@ const DashboardHeader: React.FC = () => {
     fetchData();
   }, []);
 
-  // Real-Time Data Integration
   useEffect(() => {
     const echo = new Echo({
       broadcaster: "pusher",
@@ -90,7 +88,6 @@ const DashboardHeader: React.FC = () => {
     });
 
     const channel = echo.channel("flespi-data");
-    console.log("Subscribed to flespi-data channel");
     channel.listen("FlespiDataReceived", (event: any) => {
       const { tracker_ident, location, dispatch_log } = event;
 
@@ -140,74 +137,71 @@ const DashboardHeader: React.FC = () => {
   return (
     <Layout>
       <Header title="Dashboard" />
-      <section className="flex flex-col lg:flex-row p-6 bg-slate-200">
-  <div className="flex-1">
-    {/* Responsive Card Layout */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-      <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
-        <FaBus className="text-blue-500" size={40} />
-        <div>
-          <h1 className="text-2xl font-bold">{busesInOperation}</h1>
-          <p>Buses in Operation</p>
-        </div>
-      </div>
-      <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
-        <FaCog className="text-green-500" size={40} />
-        <div>
-          <h1 className="text-2xl font-bold">{busesInMaintenance}</h1>
-          <p>Buses in Maintenance</p>
-        </div>
-      </div>
-      <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
-        <FaUsers className="text-purple-500" size={40} />
-        <div>
-          <h1 className="text-2xl font-bold">{currentEmployees}</h1>
-          <p>Current Employees</p>
-        </div>
-      </div>
-    </div>
-    {/* Map Component */}
-    <MapProvider>
-      <MapComponent
-        busData={busData}
-        pathData={[]}
-        onBusClick={(busNumber) => {
-          const busDetails = busData.find((bus) => bus.number === busNumber);
-          setSelectedBusDetails(busDetails || null);
-        }}
-        selectedBus={selectedBusDetails?.number || null}
-      />
-    </MapProvider>
-  </div>
+      <section className="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 bg-slate-200">
+        <div className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
+              <FaBus className="text-blue-500" size={40} />
+              <div>
+                <h1 className="text-2xl font-bold">{busesInOperation}</h1>
+                <p>Buses in Operation</p>
+              </div>
+            </div>
+            <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
+              <FaCog className="text-green-500" size={40} />
+              <div>
+                <h1 className="text-2xl font-bold">{busesInMaintenance}</h1>
+                <p>Buses in Maintenance</p>
+              </div>
+            </div>
+            <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
+              <FaUsers className="text-purple-500" size={40} />
+              <div>
+                <h1 className="text-2xl font-bold">{currentEmployees}</h1>
+                <p>Current Employees</p>
+              </div>
+            </div>
+          </div>
 
-  {/* Sidebar */}
-  <div className="w-full lg:w-1/4 bg-white shadow-md rounded-lg p-4 mt-6 lg:mt-0 lg:ml-6">
-    {selectedBusDetails ? (
-      <div>
-        <h1 className="text-red-600 text-2xl font-bold">
-          Bus {selectedBusDetails.number}
-        </h1>
-        <ul className="list-disc list-inside space-y-4 text-base mt-4">
-          <li>
-            <strong>Driver:</strong> {selectedBusDetails.driver}
-          </li>
-          <li>
-            <strong>Conductor:</strong> {selectedBusDetails.conductor}
-          </li>
-          <li>
-            <strong>Plate Number:</strong>{" "}
-            {selectedBusDetails.plateNumber}
-          </li>
-          <li>
-            <strong>Status:</strong> {selectedBusDetails.status}
-          </li>
-        </ul>
-      </div>
-    ) : (
-      <h1 className="text-red-600 text-2xl font-bold">Select a Bus</h1>
-    )}
-  </div>
-</section>
+          <MapProvider>
+            <MapComponent
+              busData={busData}
+              pathData={[]}
+              onBusClick={(busNumber) => {
+                const busDetails = busData.find((bus) => bus.number === busNumber);
+                setSelectedBusDetails(busDetails || null);
+              }}
+              selectedBus={selectedBusDetails?.number || null}
+            />
+          </MapProvider>
+        </div>
+
+        <div className="w-full lg:w-1/4 bg-white shadow-md rounded-lg p-4">
+          {selectedBusDetails ? (
+            <div>
+              <h1 className="text-red-600 text-2xl font-bold">
+                Bus {selectedBusDetails.number}
+              </h1>
+              <ul className="list-disc list-inside space-y-4 text-base mt-4">
+                <li>
+                  <strong>Driver:</strong> {selectedBusDetails.driver}
+                </li>
+                <li>
+                  <strong>Conductor:</strong> {selectedBusDetails.conductor}
+                </li>
+                <li>
+                  <strong>Plate Number:</strong> {selectedBusDetails.plateNumber}
+                </li>
+                <li>
+                  <strong>Status:</strong> {selectedBusDetails.status}
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <h1 className="text-red-600 text-2xl font-bold">Select a Bus</h1>
+          )}
+        </div>
+      </section>
     </Layout>
   );
 };

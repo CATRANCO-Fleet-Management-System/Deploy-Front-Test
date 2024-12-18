@@ -1,86 +1,72 @@
-"use client";
-import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FaUser,
-  FaBus,
-  FaChartBar,
-  FaTruck,
-  FaGasPump,
-  FaCommentDots,
-  FaWrench,
-  FaMicrochip,
+    FaUser,
+    FaBus,
+    FaChartBar,
+    FaTruck,
+    FaGasPump,
+    FaCommentDots,
+    FaWrench,
+    FaMicrochip,
 } from "react-icons/fa";
-import Link from "next/link";
 
 export default function Sidebar() {
-  const pathname = usePathname();
+    const pathname = usePathname();
 
-  // Define menu items
-  const menuItems = [
-    { href: "/dashboard", icon: <FaChartBar size={25} />, label: "Dashboard" },
-    {
-      href: "/personnel",
-      icon: <FaUser size={25} />,
-      label: "Bus Personnel Management",
-    },
-    { href: "/bus-profiles", icon: <FaBus size={25} />, label: "Bus Profiles" },
-    {
-      href: "/devices",
-      icon: <FaMicrochip size={25} />,
-      label: "Device Management",
-    },
-    {
-      href: "/bus-maintenance",
-      icon: <FaWrench size={25} />,
-      label: "Bus Maintenance Management",
-    },
-    {
-      href: "/dispatch-monitoring",
-      icon: <FaTruck size={25} />,
-      label: "Dispatch Monitoring",
-    },
-    {
-      href: "/fuel-monitoring",
-      icon: <FaGasPump size={25} />,
-      label: "Fuel Monitoring",
-    },
-    { href: "/feedback", icon: <FaCommentDots size={25} />, label: "Feedback" },
-  ];
+    const menuItems = [
+        { href: "/dashboard", icon: <FaChartBar />, label: "Dashboard" },
+        { href: "/personnel", icon: <FaUser />, label: "Bus Personnel Management" },
+        { href: "/bus-profiles", icon: <FaBus />, label: "Bus Profiles" },
+        { href: "/devices", icon: <FaMicrochip />, label: "Device Management" },
+        { href: "/bus-maintenance", icon: <FaWrench />, label: "Bus Maintenance Management" },
+        { href: "/dispatch-monitoring", icon: <FaTruck />, label: "Dispatch Monitoring" },
+        { href: "/fuel-monitoring", icon: <FaGasPump />, label: "Fuel Monitoring" },
+        { href: "/feedback", icon: <FaCommentDots />, label: "Feedback" },
+    ];
 
-  // Helper function to check if current path is under the personnel route
-  const isActive = (href) => pathname.startsWith(href);
+    const isActive = (href) => pathname.startsWith(href);
 
-  return (
-    <section className="left w-full sm:w-1/5 flex flex-col h-screen bg-gray-100 ">
-      <div className="header">
-        <Link href="/dashboard">
-          <img
-            src="/logo.png"
+    return (
+        <aside className="h-screen bg-gray-100 md:w-64 w-16 transition-width duration-300" aria-label="Sidebar">
+            <div className="py-4 px-2 md:px-6">
+    <Link href="/dashboard">
+        <img
+            src="/logo1.png"
             alt="Image Logo"
-            className="object-contain -mt-14 cursor-pointer mb-[-45px]"
-          />
-        </Link>
-      </div>
-      <nav className="flex flex-col space-y-4 p-4">
-        <ul className="listOptions flex flex-col space-y-4 text-gray-500">
-          {menuItems.map(({ href, icon, label }) => (
-            <li
-              key={href}
-              className={`menu-item flex items-center space-x-3 p-2 rounded-md transition-colors duration-200 ${
-                isActive(href)
-                  ? "text-violet-700 bg-gray-200"
-                  : "hover:text-violet-700"
-              }`}
-            >
-              {icon}
-              <Link href={href} className="flex-1">
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </section>
-  );
+            className="mx-auto md:mx-0 object-contain h-16 md:mb-0 mb-4 cursor-pointer hidden sm:block"
+        />
+    </Link>
+</div>
+
+            <nav className="flex flex-col space-y-2 md:space-y-4 p-2 md:p-4">
+                <ul className="space-y-3">
+                    {menuItems.map(({ href, icon, label }) => (
+                        <li key={href} className="relative">
+                            <Link
+                                href={href}
+                                className={`flex items-center space-x-2 md:space-x-4 p-2 rounded-md transition-colors duration-200
+                                    ${isActive(href) ? "text-violet-700 bg-gray-200" : "hover:text-violet-700"}`}
+                            >
+                                <span
+                                    className={`text-2xl ${
+                                        isActive(href) ? "text-violet-700" : "text-gray-500 group-hover:text-violet-700"
+                                    }`}
+                                >
+                                    {icon}
+                                </span>
+                                <span
+                                    className={`md:inline hidden text-sm md:text-base ${
+                                        isActive(href) ? "text-violet-700" : "text-gray-500 group-hover:text-violet-700"
+                                    }`}
+                                >
+                                    {label}
+                                </span>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        </aside>
+    );
 }
