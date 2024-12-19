@@ -128,7 +128,7 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6">
+      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 h-[95vh] max-h-screen overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-4">
           <h2 className="text-2xl font-semibold">Edit Bus Record</h2>
           <button

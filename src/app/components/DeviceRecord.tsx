@@ -12,9 +12,9 @@ const DeviceRecord = ({
   onEdit,
 }) => {
   return (
-    <div className="bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative ml-8">
+    <div className="record-box-container -ml-1 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
       {/* Table Content */}
-      <table className="w-full border-collapse mb-16">
+      <table className="w-full overflow-x-auto border-collapse mb-16 ">
         <tbody>
           <tr>
             <td className="border p-2 font-bold">Device Name:</td>

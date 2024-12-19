@@ -32,9 +32,9 @@ const PersonnelRecord: React.FC<RecordBoxProps> = ({
   onView,
 }) => {
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2  flex flex-col p-4 break-words text-sm relative">
+    <div className="record-box-container mr-1 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
       {/* Table Content */}
-      <table className="w-full border-collapse mb-16">
+      <table className="w-full border-collapse mb-16 table-auto">
         {" "}
         {/* Ensure spacing */}
         <tbody>

@@ -114,9 +114,9 @@ const BusRecord: React.FC<BusBoxProps> = ({
   };
 
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
+    <div className="record-box-container mr-1 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
       {/* Table Content */}
-      <table className="w-full border-collapse mb-16">
+      <table className="w-full border-collapse mb-16 table-auto">
         <tbody>
           <tr>
             <td className="border p-2 font-bold">Bus Number:</td>
@@ -162,7 +162,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
       {/* Action Buttons */}
       <div className="absolute bottom-4 left-4 right-4 flex justify-between space-x-2">
         <button
-          className="px-4 py-2 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 h-12"
+          className="px-3 py-1.5 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 sm:px-1 sm:py-2"
           onClick={onDelete}
         >
           Remove
@@ -170,7 +170,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
 
         <div className="relative flex-1 mt-3" ref={dropdownRef}>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full h-12"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full h-full"
             onClick={toggleDropdown}
           >
             Edit
@@ -195,7 +195,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
 
         <button
           onClick={openFullRecordModal}
-          className="px-4 py-2 mt-3 bg-green-500 text-white rounded hover:bg-green-600 flex-1 h-12"
+          className="px-3 py-1.5 mt-3 bg-green-500 text-white rounded hover:bg-green-600 flex-1 sm:px-1 sm:py-2"
         >
           View Full Record
         </button>
