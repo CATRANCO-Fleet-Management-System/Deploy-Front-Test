@@ -156,9 +156,8 @@ const DashboardHeader: React.FC = () => {
   return (
     <Layout>
       <Header title="Dashboard" />
-      <section className="flex flex-col lg:flex-row p-6 bg-slate-200">
+      <section className="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 bg-slate-200">
         <div className="flex-1">
-          {/* Responsive Card Layout */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
               <FaBus className="text-blue-500" size={40} />
@@ -182,7 +181,7 @@ const DashboardHeader: React.FC = () => {
               </div>
             </div>
           </div>
-          {/* Map Component */}
+
           <MapProvider>
             <DispatchMap
               busData={busData}
@@ -196,8 +195,7 @@ const DashboardHeader: React.FC = () => {
           </MapProvider>
         </div>
 
-        {/* Sidebar */}
-        <div className="w-full lg:w-1/4 bg-white shadow-md rounded-lg p-4 mt-6 lg:mt-0 lg:ml-6">
+        <div className="w-full lg:w-1/4 bg-white shadow-md rounded-lg p-4">
           {selectedBusDetails ? (
             <div>
               <h1 className="text-red-600 text-2xl font-bold">
@@ -223,7 +221,7 @@ const DashboardHeader: React.FC = () => {
                   <strong>Time:</strong> {selectedBusDetails.time}
                 </li>
               </ul>
-            </div>
+          </div>
           ) : (
             <h1 className="text-red-600 text-2xl font-bold">Select a Bus</h1>
           )}

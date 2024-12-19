@@ -1,7 +1,7 @@
 import React from "react";
 
 const ViewProofModal = ({ isOpen, onClose, proof }) => {
-  const BASE_URL = "https://catranco.jwisnetwork.com/storage/";
+  const BASE_URL = "https://192.168.154.191/storage/";
 
   /**
    * Renders the image with the provided path.

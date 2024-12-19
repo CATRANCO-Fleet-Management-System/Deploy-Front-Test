@@ -33,46 +33,28 @@ const DispatchMonitoring: React.FC = () => {
   // Function to fetch vehicle assignments and save them to localStorage
   const fetchVehicleAssignments = async () => {
     try {
-      console.log('Fetching vehicle assignments and dispatch data...');
-      
+      console.log("Fetching vehicle assignments...");
+
+      // Fetch all vehicle assignments
       const vehicleAssignments = await getAllVehicleAssignments();
-      
-      // Fetch on-alley and on-road dispatches separately
-      const alleyData = await DispatchService.getAllOnAlley();
-      const roadData = await DispatchService.getAllOnRoad();
 
-      // Combine the dispatch data
-      const allDispatches = [...alleyData, ...roadData];
-
-      // Map vehicle assignments and assign status based on the dispatches
-      const mappedVehicles = vehicleAssignments.map((vehicle: any) => {
-        const dispatch = allDispatches.find(
-          (dispatch: any) => dispatch.vehicle_assignment_id === vehicle.vehicle_assignment_id
-        );
-
-        // Set the status and additional data from the dispatch
-        const status = dispatch ? dispatch.status : 'idle';
-        const route = dispatch ? dispatch.route : '';
-        const dispatch_logs_id = dispatch ? dispatch.dispatch_logs_id : null;
-
-        return {
-          number: vehicle.vehicle_id,
-          status,
-          route,
-          dispatch_logs_id
-        };
-      });
+      // Map vehicle assignments with default status and placeholders
+      const mappedVehicles = vehicleAssignments.map((vehicle: any) => ({
+        number: vehicle.vehicle_id,
+        status: "idle", // Default status if no dispatch data is provided
+        route: "", // Default route
+        dispatch_logs_id: null, // Default dispatch log ID
+      }));
 
       // Save the mapped vehicle data to localStorage
       localStorage.setItem("busData", JSON.stringify(mappedVehicles));
 
+      // Update refs and state
       busDataRef.current = mappedVehicles;
       setBusData(mappedVehicles);
-      localStorage.clear();
       setLoading(false);
-
     } catch (error) {
-      console.error("Error fetching vehicle assignments and dispatch data:", error);
+      console.error("Error fetching vehicle assignments:", error);
     }
   };
 
@@ -127,6 +109,8 @@ const DispatchMonitoring: React.FC = () => {
       })
       .listen("FlespiDataReceived", (event: any) => {
         const { vehicle_id, location, dispatch_log } = event;
+
+        console.log('Real Time Data:', event)
 
         // Reset polyline if dispatch_log is null
         if (!dispatch_log) {
@@ -245,21 +229,29 @@ const DispatchMonitoring: React.FC = () => {
           </div>
 
           <div className="bus-info grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredBusData.map((bus) => (
-              <button
-                key={bus.number}
-                onClick={() => setSelectedBus(bus.number)}
-                className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
-                  bus.status
-                )}`}
-              >
-                <FaBus size={24} />
-                <div className="flex flex-col text-sm sm:text-base">
-                  <span className="font-bold">Vehicle ID: {bus.number}</span>
-                  <span>Status: {bus.status}</span>
-                </div>
-              </button>
-            ))}
+            {filteredBusData
+              .slice() // Create a shallow copy to avoid mutating the original array
+              .sort((a, b) => {
+                // Convert bus.number to a number for comparison
+                const numberA = parseInt(a.number, 10);
+                const numberB = parseInt(b.number, 10);
+                return numberA - numberB;
+              })
+              .map((bus) => (
+                <button
+                  key={bus.number}
+                  onClick={() => setSelectedBus(bus.number)}
+                  className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
+                    bus.status
+                  )}`}
+                >
+                  <FaBus size={24} />
+                  <div className="flex flex-col text-sm sm:text-base">
+                    <span className="font-bold">Vehicle ID: {bus.number}</span>
+                    <span>Status: {bus.status}</span>
+                  </div>
+                </button>
+              ))}
           </div>
         </div>
       </section>

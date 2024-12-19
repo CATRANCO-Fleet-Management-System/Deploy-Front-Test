@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, Marker, Polyline, InfoWindow } from "@react-google-maps/api";
 
@@ -15,43 +13,28 @@ interface BusData {
 
 interface DispatchMapProps {
   busData: BusData[];
-  pathData: { lat: number; lng: number }[];
+  pathData: { [busNumber: string]: { lat: number; lng: number }[] }; // Modify pathData to be a map of bus numbers to path data
   onBusClick: (busNumber: string) => void;
-  selectedBus?: string | null; // Added to track the selected bus for InfoWindow
+  selectedBus?: string | null;
 }
 
 const staticLocations = [
-  {
-    id: 1,
-    title: "Canitoan",
-    coordinate: { lat: 8.4663228, lng: 124.5853069 },
-  },
-  {
-    id: 2,
-    title: "Silver Creek",
-    coordinate: { lat: 8.475946, lng: 124.6120194 },
-  },
-  {
-    id: 3,
-    title: "Cogon",
-    coordinate: { lat: 8.4759094, lng: 124.6514315 },
-  },
+  { id: 1, title: "Canitoan", coordinate: { lat: 8.4663228, lng: 124.5853069 } },
+  { id: 2, title: "Silver Creek", coordinate: { lat: 8.475946, lng: 124.6120194 } },
+  { id: 3, title: "Cogon", coordinate: { lat: 8.4759094, lng: 124.6514315 } },
 ];
 
-// Styling for the map container
 const mapContainerStyle = {
   width: "100%",
   height: "450px",
   borderRadius: "10px",
 };
 
-// Default center coordinates
 const defaultMapCenter = {
   lat: 8.48325558794408,
   lng: 124.5866112118501,
 };
 
-// Map options
 const mapOptions = {
   zoomControl: true,
   streetViewControl: false,
@@ -60,7 +43,6 @@ const mapOptions = {
   mapTypeId: "roadmap",
 };
 
-// Icon URLs based on dispatch status
 const getIconUrl = (status: string) => {
   switch (status) {
     case "on alley":
@@ -78,21 +60,17 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
   onBusClick,
   selectedBus,
 }) => {
-  const [zoomLevel, setZoomLevel] = useState(13); // Default zoom level
-  const mapRef = useRef<google.maps.Map | null>(null); // Store map instance
+  const [zoomLevel, setZoomLevel] = useState(13);
+  const mapRef = useRef<google.maps.Map | null>(null);
 
-  // Capture the map instance when the map is loaded
   const handleMapLoad = (map: google.maps.Map) => {
     mapRef.current = map;
-
-    // Listen to zoom level changes
     map.addListener("zoom_changed", () => {
       const currentZoom = map.getZoom() || 13;
       setZoomLevel(currentZoom);
     });
   };
 
-  // Fit the map bounds after the map is loaded
   const fitMapBounds = () => {
     if (mapRef.current) {
       const bounds = new window.google.maps.LatLngBounds();
@@ -104,7 +82,6 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
   };
 
   useEffect(() => {
-    // Call fitMapBounds once the map is loaded
     fitMapBounds();
   }, [mapRef.current]);
 
@@ -115,48 +92,53 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
         center={defaultMapCenter}
         zoom={zoomLevel}
         options={mapOptions}
-        onLoad={handleMapLoad} // Capture the map instance
+        onLoad={handleMapLoad}
       >
         {/* Render dynamic bus markers and corresponding polyline */}
-        {busData.map((bus) => (
-          <React.Fragment key={bus.number}>
-            {/* Marker for the bus */}
-            <Marker
-              position={{ lat: bus.latitude, lng: bus.longitude }}
-              icon={{
-                url: getIconUrl(bus.status),
-                scaledSize: new window.google.maps.Size(50, 50), // Dynamic size
-              }}
-              onClick={() => onBusClick(bus.number)}
-            >
-              {selectedBus === bus.number && (
-                <InfoWindow position={{ lat: bus.latitude, lng: bus.longitude }}>
-                  <div>
-                    <strong>Bus {bus.number}</strong>
-                    <br />
-                    Speed: {bus.speed} km/h
-                    <br />
-                    Status: {bus.status}
-                    <br />
-                    Latitude: {bus.latitude?.toFixed(6) || "N/A"}, Longitude:{" "}
-                    {bus.longitude?.toFixed(6) || "N/A"}
-                    <br />
-                    Time: {bus.time}
-                  </div>
-                </InfoWindow>
-              )}
-            </Marker>
+        {busData.map((bus) => {
+          const busPath = pathData[bus.number] || []; // Get the path for this specific bus
 
-            {/* Polyline for the bus */}
-            <Polyline
-              path={pathData} // Use the pathData to create the bus's path
-              options={{
-                strokeColor: bus.status === "on road" ? "green" : "blue", // Customize color based on status
-                strokeWeight: 4,
-              }}
-            />
-          </React.Fragment>
-        ))}
+          return (
+            <React.Fragment key={bus.number}>
+              {/* Marker for the bus */}
+              <Marker
+                position={{ lat: bus.latitude, lng: bus.longitude }}
+                icon={{
+                  url: getIconUrl(bus.status),
+                  scaledSize: new window.google.maps.Size(50, 50),
+                }}
+                onClick={() => onBusClick(bus.number)}
+              >
+                {selectedBus === bus.number && (
+                  <InfoWindow position={{ lat: bus.latitude, lng: bus.longitude }}>
+                    <div>
+                      <strong>Bus {bus.number}</strong>
+                      <br />
+                      Speed: {bus.speed} km/h
+                      <br />
+                      Status: {bus.status}
+                      <br />
+                      Latitude: {bus.latitude?.toFixed(6) || "N/A"}, Longitude: {bus.longitude?.toFixed(6) || "N/A"}
+                      <br />
+                      Time: {bus.time}
+                    </div>
+                  </InfoWindow>
+                )}
+              </Marker>
+
+              {/* Polyline for the bus */}
+              {busPath.length > 0 && (
+                <Polyline
+                  path={busPath} // Use the path specific to this bus
+                  options={{
+                    strokeColor: bus.status === "on road" ? "green" : "blue",
+                    strokeWeight: 4,
+                  }}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
 
         {/* Render static location markers */}
         {staticLocations.map((location) => (
@@ -165,7 +147,7 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
             position={location.coordinate}
             icon={{
               url: `/${location.title.toLowerCase().replace(" ", "_")}.png`,
-              scaledSize: new window.google.maps.Size(50, 50), // Dynamic size
+              scaledSize: new window.google.maps.Size(50, 50),
             }}
             title={location.title}
           >
