@@ -80,7 +80,7 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96 h-[95vh] max-h-screen overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Edit Personnel Assignment</h2>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}

@@ -64,20 +64,20 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     }
   };
   return (
-    <div className="header flex flex-row justify-between mt-10">
+    <div className="header flex flex-row justify-between mt-7">
       <div className="title ml-5 text-violet-700">
       <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl">{title}</h1> {/* Responsive title sizes */}
       </div>
       <div className="icon-container">
         <div className="icons flex flex-row">
          {/* Burger menu button with conditional white box */}
-         <div className="md:hidden bg-white p-1 mr-3"> {/* White box only on smaller screens */}
+         <div className="md:hidden bg-white h-6 mt-0.5 mr-3"> {/* White box only on smaller screens */}
             <button onClick={toggleBurgerMenu} className="md:hidden">
               <FaBars size={25} className="text-violet-700 cursor-pointer" />
             </button>
           </div>
           {/* Icons for larger screens */}
-          <div className="md:flex md:flex-row md:border-r-2 md:border-gray-400 md:mr-4 md:text-violet-700 hidden">
+          <div className="md:flex md:flex-row md:border-r-2  md:border-gray-400 md:mr-4 md:text-violet-700 hidden">
             <Link href="/notification">
               <FaBell size={25} className="mr-5 mt-2 cursor-pointer" />
             </Link>

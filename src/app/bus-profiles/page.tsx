@@ -3,12 +3,12 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
-import { FaSearch, FaPlus } from "react-icons/fa";
+import { FaSearch, FaPlus, FaHistory } from "react-icons/fa";
 import BusRecord from "../components/BusRecord";
 import AddBusRecordModal from "../components/AddBusRecordModal";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
 import EditBusRecordModal from "../components/EditBusRecordModal";
-import Pagination from "../components/Pagination"; // Pagination Component
+import Pagination from "../components/Pagination"; 
 import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
 import HistoryModalForBus from "../components/HistoryModalForBus";
@@ -16,7 +16,7 @@ import HistoryModalForBus from "../components/HistoryModalForBus";
 const BusRecordDisplay = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Number of items per page
+  const itemsPerPage = 3; 
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -176,31 +176,36 @@ const BusRecordDisplay = () => {
   return (
     <Layout>
       <Header title="Bus Profiles" />
-      <div className="options flex items-center p-4 w-9/12 ml-10">
-        <input
-          type="text"
-          placeholder="Find bus"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center px-4 py-2 ml-4 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
-        >
-          <FaPlus size={22} className="mr-2" />
-          Add New
-        </button>
+      <div className="options flex flex-col md:flex-row items-center p-4 w-full md:w-9/12 ml-1 space-y-4 md:space-y-0">
+  <input
+    type="text"
+    placeholder="Find bus"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 md:mr-4 w-full md:w-auto"
+  />
 
-        <button
-          onClick={openHistoryModal}
-          className="px-4 py-2 bg-gray-500 ml-5 text-white rounded hover:bg-gray-600"
-        >
-          View History
-        </button>
-      </div>
+<div className="flex flex-col md:flex-row w-full md:w-auto md:space-x-4">
+  <button
+    onClick={() => setIsAddModalOpen(true)}
+    className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 w-full md:w-auto mb-4 md:mb-0"
+  >
+    <FaPlus size={22} className="mr-2" />
+    Add New
+  </button>
+
+  <button
+    onClick={openHistoryModal}
+    className="flex items-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full md:w-auto"
+  >
+    <FaHistory size={22} className="mr-2" />
+    View History
+  </button>
+</div>
+</div>
+
       <div className="records flex flex-col h-full">
-        <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 mx-14">
+        <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5">
           {paginatedRecords.map((record) => {
             const { driver, conductor } = getAssignedProfiles(
               record.vehicle_id
