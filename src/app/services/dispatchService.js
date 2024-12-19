@@ -133,6 +133,34 @@ const DispatchService = {
       throw error.response?.data || error.message;
     }
   },
+
+  /**
+   * Get all on-alley dispatches.
+   * @returns {Promise<Object[]>} List of on-alley dispatch logs.
+   */
+  getAllOnAlley: async () => {
+    try {
+      const response = await api.get('/user/admin/dispatch_logs/alley');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching on-alley dispatches:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  /**
+   * Get all on-road dispatches.
+   * @returns {Promise<Object[]>} List of on-road dispatch logs.
+   */
+  getAllOnRoad: async () => {
+    try {
+      const response = await api.get('/user/admin/dispatch_logs/road');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching on-road dispatches:', error);
+      throw error.response?.data || error.message;
+    }
+  },
 };
 
 export default DispatchService;

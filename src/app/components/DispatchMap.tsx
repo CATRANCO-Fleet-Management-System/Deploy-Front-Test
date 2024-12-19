@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, Marker, Polyline, InfoWindow } from "@react-google-maps/api";
 
 interface BusData {
@@ -11,7 +11,6 @@ interface BusData {
   longitude: number;
   time: string;
   speed: number;
-  dispatchStatus: string; // Either 'idle', 'on alley', or 'on road'
 }
 
 interface DispatchMapProps {
@@ -93,13 +92,21 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
     });
   };
 
-  // Calculate marker size dynamically based on zoom level
-  const calculateMarkerSize = (zoom: number) => {
-    const baseSize = 50; // Minimum size
-    const scaleFactor = 4; // Scaling factor for size increase
-    const size = Math.max(baseSize, zoom * scaleFactor);
-    return new window.google.maps.Size(size, size * 1.5); // Maintain aspect ratio
+  // Fit the map bounds after the map is loaded
+  const fitMapBounds = () => {
+    if (mapRef.current) {
+      const bounds = new window.google.maps.LatLngBounds();
+      staticLocations.forEach((location) => {
+        bounds.extend(location.coordinate);
+      });
+      mapRef.current.fitBounds(bounds);
+    }
   };
+
+  useEffect(() => {
+    // Call fitMapBounds once the map is loaded
+    fitMapBounds();
+  }, [mapRef.current]);
 
   return (
     <div className="relative w-full">
@@ -110,43 +117,45 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
         options={mapOptions}
         onLoad={handleMapLoad} // Capture the map instance
       >
-        {/* Render the bus trail (polyline) */}
-        {pathData.length > 0 && (
-          <Polyline
-            path={pathData}
-            options={{
-              strokeColor: "blue",
-              strokeWeight: 4,
-            }}
-          />
-        )}
-
-        {/* Render dynamic bus markers */}
+        {/* Render dynamic bus markers and corresponding polyline */}
         {busData.map((bus) => (
-          <Marker
-            key={bus.number}
-            position={{ lat: bus.latitude, lng: bus.longitude }}
-            icon={{
-              url: getIconUrl(bus.dispatchStatus),
-              scaledSize: calculateMarkerSize(zoomLevel), // Dynamic size
-            }}
-            onClick={() => onBusClick(bus.number)}
-          >
-            {selectedBus === bus.number && (
-              <InfoWindow position={{ lat: bus.latitude, lng: bus.longitude }}>
-                <div>
-                  <strong>Bus {bus.number}</strong>
-                  <br />
-                  Status: {bus.status}
-                  <br />
-                  Latitude: {bus.latitude.toFixed(6)}, Longitude:{" "}
-                  {bus.longitude.toFixed(6)}
-                  <br />
-                  Time: {bus.time}
-                </div>
-              </InfoWindow>
-            )}
-          </Marker>
+          <React.Fragment key={bus.number}>
+            {/* Marker for the bus */}
+            <Marker
+              position={{ lat: bus.latitude, lng: bus.longitude }}
+              icon={{
+                url: getIconUrl(bus.status),
+                scaledSize: new window.google.maps.Size(50, 50), // Dynamic size
+              }}
+              onClick={() => onBusClick(bus.number)}
+            >
+              {selectedBus === bus.number && (
+                <InfoWindow position={{ lat: bus.latitude, lng: bus.longitude }}>
+                  <div>
+                    <strong>Bus {bus.number}</strong>
+                    <br />
+                    Speed: {bus.speed} km/h
+                    <br />
+                    Status: {bus.status}
+                    <br />
+                    Latitude: {bus.latitude?.toFixed(6) || "N/A"}, Longitude:{" "}
+                    {bus.longitude?.toFixed(6) || "N/A"}
+                    <br />
+                    Time: {bus.time}
+                  </div>
+                </InfoWindow>
+              )}
+            </Marker>
+
+            {/* Polyline for the bus */}
+            <Polyline
+              path={pathData} // Use the pathData to create the bus's path
+              options={{
+                strokeColor: bus.status === "on road" ? "green" : "blue", // Customize color based on status
+                strokeWeight: 4,
+              }}
+            />
+          </React.Fragment>
         ))}
 
         {/* Render static location markers */}
@@ -156,7 +165,7 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
             position={location.coordinate}
             icon={{
               url: `/${location.title.toLowerCase().replace(" ", "_")}.png`,
-              scaledSize: calculateMarkerSize(zoomLevel), // Dynamic size
+              scaledSize: new window.google.maps.Size(50, 50), // Dynamic size
             }}
             title={location.title}
           >

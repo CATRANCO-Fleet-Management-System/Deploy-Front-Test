@@ -10,7 +10,7 @@ import { getAllProfiles } from "@/app/services/userProfile";
 import { MapProvider } from "@/providers/MapProvider";
 import Pusher from "pusher-js";
 import Echo from "laravel-echo";
-import MapComponent from "@/app/components/Map";
+import DispatchMap from "../components/DispatchMap";
 
 interface BusData {
   number: string;
@@ -23,8 +23,9 @@ interface BusData {
   driver: string;
   conductor: string;
   plateNumber: string;
-  dispatchStatus: string; // 'idle', 'on alley', 'on road'
 }
+
+const LOCAL_STORAGE_KEY = "busData";
 
 const DashboardHeader: React.FC = () => {
   const [busesInOperation, setBusesInOperation] = useState(0);
@@ -45,23 +46,6 @@ const DashboardHeader: React.FC = () => {
 
         const profiles = await getAllProfiles();
         setCurrentEmployees(profiles.length);
-
-        if (vehicles.length > 0) {
-          const firstBus = vehicles[0];
-          setSelectedBusDetails({
-            number: firstBus.vehicle_id,
-            name: `Bus ${firstBus.vehicle_id}`,
-            status: "Stationary",
-            latitude: firstBus.latitude || 0,
-            longitude: firstBus.longitude || 0,
-            time: "",
-            speed: 0,
-            driver: firstBus.driver || "Khen Paler",
-            conductor: firstBus.conductor || "Juan Murillo",
-            plateNumber: firstBus.plateNumber || "NOV-1232-123-12",
-            dispatchStatus: "idle",
-          });
-        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -70,6 +54,32 @@ const DashboardHeader: React.FC = () => {
     fetchData();
   }, []);
 
+  const formatTime = (timestamp: number) => {
+    const date = new Date(timestamp * 1000);
+
+    const options = {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+
+    return date.toLocaleString("en-US", options);
+  };
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedData) {
+      setBusData(JSON.parse(savedData));
+    }
+  }, []);
+
+  // Save data to localStorage whenever busData changes
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(busData));
+  }, [busData]);
+
+  // Real-Time Data Integration
   useEffect(() => {
     const echo = new Echo({
       broadcaster: "pusher",
@@ -88,23 +98,33 @@ const DashboardHeader: React.FC = () => {
     });
 
     const channel = echo.channel("flespi-data");
+    console.log("Subscribed to flespi-data channel");
+
     channel.listen("FlespiDataReceived", (event: any) => {
-      const { tracker_ident, location, dispatch_log } = event;
+      const { vehicle_id, plate_number, location, dispatch_log } = event;
+      const status = dispatch_log?.status || "idle";
+      const driver = dispatch_log?.vehicle_assignment?.user_profiles.find(
+        (profile: any) => profile.position === "driver"
+      )?.name;
+      const conductor = dispatch_log?.vehicle_assignment?.user_profiles.find(
+        (profile: any) => profile.position === "passenger_assistant_officer"
+      )?.name;
 
       setBusData((prevData) => {
-        const existingBus = prevData.find((bus) => bus.number === tracker_ident);
+        const existingBus = prevData.find((bus) => bus.number === vehicle_id);
 
         if (existingBus) {
           return prevData.map((bus) =>
-            bus.number === tracker_ident
+            bus.number === vehicle_id
               ? {
                   ...bus,
                   latitude: location.latitude,
                   longitude: location.longitude,
-                  speed: location.speed || 0,
-                  status: `Speed: ${location.speed} km/h`,
-                  time: new Date(event.timestamp * 1000).toISOString(),
-                  dispatchStatus: dispatch_log?.status || "idle",
+                  speed: location.speed,
+                  time: formatTime(event.timestamp),
+                  status,
+                  driver,
+                  conductor,
                 }
               : bus
           );
@@ -112,17 +132,16 @@ const DashboardHeader: React.FC = () => {
           return [
             ...prevData,
             {
-              number: tracker_ident,
-              name: `Bus ${tracker_ident}`,
+              number: vehicle_id,
+              name: `Bus ${vehicle_id}`,
               latitude: location.latitude,
               longitude: location.longitude,
-              speed: location.speed || 0,
-              status: `Speed: ${location.speed} km/h`,
-              time: new Date(event.timestamp * 1000).toISOString(),
-              driver: "Unknown Driver",
-              conductor: "Unknown Conductor",
-              plateNumber: "Unknown Plate",
-              dispatchStatus: dispatch_log?.status || "idle",
+              speed: location.speed,
+              time: formatTime(event.timestamp),
+              driver,
+              conductor,
+              plateNumber: plate_number || "Unknown Plate",
+              status,
             },
           ];
         }
@@ -137,8 +156,9 @@ const DashboardHeader: React.FC = () => {
   return (
     <Layout>
       <Header title="Dashboard" />
-      <section className="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 bg-slate-200">
+      <section className="flex flex-col lg:flex-row p-6 bg-slate-200">
         <div className="flex-1">
+          {/* Responsive Card Layout */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4">
               <FaBus className="text-blue-500" size={40} />
@@ -162,9 +182,9 @@ const DashboardHeader: React.FC = () => {
               </div>
             </div>
           </div>
-
+          {/* Map Component */}
           <MapProvider>
-            <MapComponent
+            <DispatchMap
               busData={busData}
               pathData={[]}
               onBusClick={(busNumber) => {
@@ -176,7 +196,8 @@ const DashboardHeader: React.FC = () => {
           </MapProvider>
         </div>
 
-        <div className="w-full lg:w-1/4 bg-white shadow-md rounded-lg p-4">
+        {/* Sidebar */}
+        <div className="w-full lg:w-1/4 bg-white shadow-md rounded-lg p-4 mt-6 lg:mt-0 lg:ml-6">
           {selectedBusDetails ? (
             <div>
               <h1 className="text-red-600 text-2xl font-bold">
@@ -194,6 +215,12 @@ const DashboardHeader: React.FC = () => {
                 </li>
                 <li>
                   <strong>Status:</strong> {selectedBusDetails.status}
+                </li>
+                <li>
+                  <strong>Speed:</strong> {selectedBusDetails.speed} km/h
+                </li>
+                <li>
+                  <strong>Time:</strong> {selectedBusDetails.time}
                 </li>
               </ul>
             </div>

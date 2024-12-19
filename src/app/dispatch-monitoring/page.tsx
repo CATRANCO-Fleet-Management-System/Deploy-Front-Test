@@ -1,64 +1,106 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import DispatchMap from "../components/DispatchMap";
 import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 import { FaBus } from "react-icons/fa";
-import { getAllVehicles } from "../services/vehicleService";
+import { getAllVehicleAssignments } from "../services/vehicleAssignService";
+import DispatchService from "../services/dispatchService"; // Import the dispatch service
 import { MapProvider } from "@/providers/MapProvider";
 
 interface BusData {
   number: string;
-  name: string;
-  status: string;
   latitude: number;
   longitude: number;
-  time: string;
   speed: number;
-  dispatchStatus: string; // Either 'idle', 'on alley', or 'on road'
+  status: string;
+  time: string;
+  dispatch_logs_id: string | null; // Added dispatch_logs_id to track dispatch state
 }
 
 const DispatchMonitoring: React.FC = () => {
+  const busDataRef = useRef<BusData[]>([]);
+  const pathDataRef = useRef<{ lat: number; lng: number }[]>([]);
   const [busData, setBusData] = useState<BusData[]>([]);
   const [pathData, setPathData] = useState<{ lat: number; lng: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBus, setSelectedBus] = useState<string | null>(null);
-  const [activeButton, setActiveButton] = useState<string>("all"); // Track active button
+  const [activeButton, setActiveButton] = useState<string>("all");
 
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const vehicles = await getAllVehicles();
-        const mappedVehicles = vehicles.map((vehicle: any) => ({
+  // Function to fetch vehicle assignments and save them to localStorage
+  const fetchVehicleAssignments = async () => {
+    try {
+      console.log('Fetching vehicle assignments and dispatch data...');
+      
+      const vehicleAssignments = await getAllVehicleAssignments();
+      
+      // Fetch on-alley and on-road dispatches separately
+      const alleyData = await DispatchService.getAllOnAlley();
+      const roadData = await DispatchService.getAllOnRoad();
+
+      // Combine the dispatch data
+      const allDispatches = [...alleyData, ...roadData];
+
+      // Map vehicle assignments and assign status based on the dispatches
+      const mappedVehicles = vehicleAssignments.map((vehicle: any) => {
+        const dispatch = allDispatches.find(
+          (dispatch: any) => dispatch.vehicle_assignment_id === vehicle.vehicle_assignment_id
+        );
+
+        // Set the status and additional data from the dispatch
+        const status = dispatch ? dispatch.status : 'idle';
+        const route = dispatch ? dispatch.route : '';
+        const dispatch_logs_id = dispatch ? dispatch.dispatch_logs_id : null;
+
+        return {
           number: vehicle.vehicle_id,
-          name: `Vehicle ${vehicle.vehicle_id}`,
-          status: "Stationary",
-          latitude: vehicle.latitude || 8.4663228,
-          longitude: vehicle.longitude || 124.585,
-          time: "",
-          speed: 0,
-          dispatchStatus: "idle", // Default status
-        }));
-        setBusData(mappedVehicles);
+          status,
+          route,
+          dispatch_logs_id
+        };
+      });
 
-        if (mappedVehicles.length > 0 && !selectedBus) {
-          const firstVehicle = mappedVehicles[0];
-          setPathData([
-            { lat: firstVehicle.latitude, lng: firstVehicle.longitude },
-          ]);
-        }
+      // Save the mapped vehicle data to localStorage
+      localStorage.setItem("busData", JSON.stringify(mappedVehicles));
 
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching vehicles:", error);
-      }
+      busDataRef.current = mappedVehicles;
+      setBusData(mappedVehicles);
+      localStorage.clear();
+      setLoading(false);
+
+    } catch (error) {
+      console.error("Error fetching vehicle assignments and dispatch data:", error);
+    }
+  };
+
+  // On initial load, check for offline data in localStorage
+  useEffect(() => {
+    const storedBusData = localStorage.getItem("busData");
+
+    if (storedBusData) {
+      const parsedData = JSON.parse(storedBusData);
+      busDataRef.current = parsedData;
+      setBusData(parsedData);
+      setLoading(false);  // Set loading to false since offline data is available
+    } else {
+      fetchVehicleAssignments(); // If no offline data, fetch it
+    }
+  }, [selectedBus]); // Make sure fetchVehicleAssignments is called again when selectedBus changes
+
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp * 1000);
+
+    const options = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true, // Use 12-hour format with AM/PM
     };
 
-    fetchVehicles();
-  }, [selectedBus]);
+    return date.toLocaleString('en-US', options); // Returns time in format like '10:00 AM'
+  };
 
   useEffect(() => {
     const echo = new Echo({
@@ -84,52 +126,51 @@ const DispatchMonitoring: React.FC = () => {
         console.log("Subscribed to flespi-data channel");
       })
       .listen("FlespiDataReceived", (event: any) => {
-        console.log("Real-time Data Received:", event);
+        const { vehicle_id, location, dispatch_log } = event;
 
-        const { tracker_ident, location, dispatch_log } = event;
-
-        if (selectedBus === tracker_ident) {
-          setPathData((prevPath) => [
-            ...prevPath,
-            { lat: location.latitude, lng: location.longitude },
-          ]);
+        // Reset polyline if dispatch_log is null
+        if (!dispatch_log) {
+          setPathData([]);
+          pathDataRef.current = [];
         }
 
-        setBusData((prevData) => {
-          const existingBus = prevData.find(
-            (bus) => bus.number === tracker_ident
-          );
+        if (selectedBus === vehicle_id) {
+          const newPoint = { lat: location.latitude, lng: location.longitude };
+          pathDataRef.current = [...pathDataRef.current, newPoint];
+          setPathData([...pathDataRef.current]);
+        }
 
-          if (existingBus) {
-            return prevData.map((bus) =>
-              bus.number === tracker_ident
-                ? {
-                    ...bus,
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    speed: location.speed || 0,
-                    status: `Speed: ${location.speed || 0} km/h`,
-                    time: new Date(event.timestamp * 1000).toISOString(),
-                    dispatchStatus: dispatch_log?.status || "idle",
-                  }
-                : bus
-            );
-          } else {
-            return [
-              ...prevData,
-              {
-                number: tracker_ident,
-                name: `Bus ${tracker_ident}`,
-                latitude: location.latitude,
-                longitude: location.longitude,
+        const updatedBusData = busDataRef.current.map((bus) =>
+          bus.number === vehicle_id
+            ? {
+                ...bus,
+                latitude: location.latitude || null,
+                longitude: location.longitude || null,
                 speed: location.speed || 0,
-                status: `Speed: ${location.speed || 0} km/h`,
-                time: new Date(event.timestamp * 1000).toISOString(),
-                dispatchStatus: dispatch_log?.status || "idle",
-              },
-            ];
-          }
-        });
+                time: formatTime(event.timestamp),
+                status: dispatch_log?.status || "idle",
+                dispatch_logs_id: dispatch_log?.dispatch_logs_id || null, // Update dispatch_logs_id
+              }
+            : bus
+        );
+
+        if (!updatedBusData.find((bus) => bus.number === vehicle_id)) {
+          updatedBusData.push({
+            number: vehicle_id,
+            latitude: location.latitude || null,
+            longitude: location.longitude || null,
+            speed: location.speed || 0,
+            time: formatTime(event.timestamp),
+            status: dispatch_log?.status || "idle",
+            dispatch_logs_id: dispatch_log?.dispatch_logs_id || null, // Add new bus data if needed
+          });
+        }
+
+        // Save the updated bus data to localStorage
+        localStorage.setItem("busData", JSON.stringify(updatedBusData));
+
+        busDataRef.current = updatedBusData;
+        setBusData([...busDataRef.current]);
       });
 
     return () => {
@@ -137,8 +178,8 @@ const DispatchMonitoring: React.FC = () => {
     };
   }, [selectedBus]);
 
-  const getButtonColor = (dispatchStatus: string) => {
-    switch (dispatchStatus) {
+  const getButtonColor = (status: string) => {
+    switch (status) {
       case "on road":
         return "bg-green-500 text-white";
       case "on alley":
@@ -151,14 +192,13 @@ const DispatchMonitoring: React.FC = () => {
   const filteredBusData =
     activeButton === "all"
       ? busData
-      : busData.filter((bus) => bus.dispatchStatus === activeButton);
+      : busData.filter((bus) => bus.status === activeButton);
 
   return (
     <Layout>
       <Header title="Dispatch Monitoring" />
       <section className="p-4 flex flex-col items-center">
         <div className="w-full md:w-5/6 flex flex-col h-full">
-          {/* Map Display */}
           <MapProvider>
             {loading ? (
               <div className="text-center mt-8">Loading map...</div>
@@ -173,8 +213,8 @@ const DispatchMonitoring: React.FC = () => {
                       (bus) => bus.number === busNumber
                     );
                     if (clickedBus) {
-                      setPathData([
-                        { lat: clickedBus.latitude, lng: clickedBus.longitude },
+                      setPathData([ 
+                        { lat: clickedBus.latitude, lng: clickedBus.longitude }
                       ]);
                     }
                   }}
@@ -184,7 +224,6 @@ const DispatchMonitoring: React.FC = () => {
             )}
           </MapProvider>
 
-          {/* Segregation Buttons */}
           <div className="flex space-x-4 mb-5 -mt-4">
             {["all", "idle", "on road", "on alley"].map((status) => (
               <button
@@ -205,20 +244,19 @@ const DispatchMonitoring: React.FC = () => {
             ))}
           </div>
 
-          {/* Vehicle Buttons */}
           <div className="bus-info grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredBusData.map((bus) => (
               <button
                 key={bus.number}
                 onClick={() => setSelectedBus(bus.number)}
                 className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
-                  bus.dispatchStatus
+                  bus.status
                 )}`}
               >
                 <FaBus size={24} />
                 <div className="flex flex-col text-sm sm:text-base">
                   <span className="font-bold">Vehicle ID: {bus.number}</span>
-                  <span>Status: {bus.dispatchStatus}</span>
+                  <span>Status: {bus.status}</span>
                 </div>
               </button>
             ))}
