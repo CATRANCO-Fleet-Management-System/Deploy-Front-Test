@@ -25,8 +25,6 @@ interface BusData {
   plateNumber: string;
 }
 
-const LOCAL_STORAGE_KEY = "busData";
-
 const DashboardHeader: React.FC = () => {
   const [busesInOperation, setBusesInOperation] = useState(0);
   const [busesInMaintenance, setBusesInMaintenance] = useState(0);
@@ -65,19 +63,6 @@ const DashboardHeader: React.FC = () => {
 
     return date.toLocaleString("en-US", options);
   };
-
-  // Load data from localStorage on mount
-  useEffect(() => {
-    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (savedData) {
-      setBusData(JSON.parse(savedData));
-    }
-  }, []);
-
-  // Save data to localStorage whenever busData changes
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(busData));
-  }, [busData]);
 
   // Real-Time Data Integration
   useEffect(() => {
