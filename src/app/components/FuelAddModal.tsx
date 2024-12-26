@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaBus } from "react-icons/fa";
-import { createFuelLog } from "@/app/services/fuellogsService"; // Import the API service
+import { createFuelLog } from "@/app/services/fuellogsService";
+
 
 const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
+  const formRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     date: "",
     distanceTraveled: "",
@@ -14,92 +17,74 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
     fuelReceiptProof: null,
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    if (formData.fuelPrice && formData.fuel_liters_quantity) {
+      const price = parseFloat(formData.fuelPrice) || 0;
+      const quantity = parseFloat(formData.fuel_liters_quantity) || 0;
+      setFormData((prevData) => ({
+        ...prevData,
+        total_expense: (price * quantity).toFixed(2),
+      }));
+    }
+  }, [formData.fuelPrice, formData.fuel_liters_quantity]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prevData) => {
-      const updatedData = { ...prevData, [name]: value };
-
-      // Auto compute fuel expense
-      if (name === "fuelPrice" || name === "fuel_liters_quantity") {
-        const price = parseFloat(updatedData.fuelPrice) || 0;
-        const quantity = parseFloat(updatedData.fuel_liters_quantity) || 0;
-        updatedData.total_expense = (price * quantity).toFixed(2);
-      }
-
-      return updatedData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
-
-    setFormData((prevData) => {
-      const updatedData = { ...prevData, [name]: file };
-
-      // Generate a URL for the selected image
-      if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
-        updatedData[`${name}Preview`] = URL.createObjectURL(file);
-      }
-
-      return updatedData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: file,
+    }));
   };
 
   const handleSubmit = async () => {
-    // Validate required fields
-    if (
-      !formData.date ||
-      !formData.distanceTraveled ||
-      !formData.fuelType ||
-      !formData.fuelPrice ||
-      !formData.fuel_liters_quantity ||
-      !formData.total_expense
-    ) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append("purchase_date", formData.date);
-    formDataToSubmit.append("odometer_km", formData.distanceTraveled);
-    formDataToSubmit.append(
-      "fuel_liters_quantity",
-      formData.fuel_liters_quantity
-    ); // Assuming fuel price is in liters
-    formDataToSubmit.append("fuel_price", formData.fuelPrice);
-    formDataToSubmit.append("fuel_type", formData.fuelType);
-    formDataToSubmit.append("vehicle_id", selectedBus);
-
-    // Append optional files
-    if (formData.odometerProof) {
+    if (formRef.current && formRef.current.reportValidity()) {
+      setIsSubmitting(true);
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append("purchase_date", formData.date);
+      formDataToSubmit.append("odometer_km", formData.distanceTraveled);
       formDataToSubmit.append(
-        "odometer_distance_proof",
-        formData.odometerProof
+        "fuel_liters_quantity",
+        formData.fuel_liters_quantity
       );
-    }
-    if (formData.fuelReceiptProof) {
-      formDataToSubmit.append("fuel_receipt_proof", formData.fuelReceiptProof);
-    }
+      formDataToSubmit.append("fuel_price", formData.fuelPrice);
+      formDataToSubmit.append("fuel_type", formData.fuelType);
+      formDataToSubmit.append("vehicle_id", selectedBus);
+      if (formData.odometerProof) {
+        formDataToSubmit.append(
+          "odometer_distance_proof",
+          formData.odometerProof
+        );
+      }
+      if (formData.fuelReceiptProof) {
+        formDataToSubmit.append(
+          "fuel_receipt_proof",
+          formData.fuelReceiptProof
+        );
+      }
 
-    setIsSubmitting(true);
-
-    try {
-      const response = await createFuelLog(formDataToSubmit);
-      console.log("Fuel log created:", response);
-      onAdd(response.fuel_log); // Pass the new log to parent
-      onClose(); // Close modal
-    } catch (error) {
-      console.error("Failed to create fuel log:", error);
-      alert(
-        error?.response?.data?.message ||
-          "An error occurred while creating the fuel log. Please try again."
-      );
-    } finally {
-      setIsSubmitting(false);
+      try {
+        const response = await createFuelLog(formDataToSubmit);
+        console.log("Fuel log created:", response);
+        onAdd(response.fuel_log);
+        onClose();
+      } catch (error) {
+        console.error("Failed to create fuel log:", error);
+        alert(
+          error?.response?.data?.message ||
+            "An error occurred while creating the fuel log. Please try again."
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -110,10 +95,10 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
           <FaBus size={32} className="mr-3" />
           <span className="text-xl font-bold">BUS {selectedBus}</span>
         </div>
-        <div className="flex space-x-6">
-          {/* Left Section */}
-          <div className="w-1/2">
-            <div className="mb-4">
+        <form ref={formRef} className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left Section */}
+            <div>
               <label className="block font-medium">Date</label>
               <input
                 type="date"
@@ -121,10 +106,9 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
                 value={formData.date}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded"
+                required
               />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">
+              <label className="block font-medium mt-4">
                 Distance Traveled (KM)
               </label>
               <input
@@ -133,46 +117,44 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
                 value={formData.distanceTraveled}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded"
+                required
               />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">Fuel Type</label>
+              <label className="block font-medium mt-4">Fuel Type</label>
               <select
                 name="fuelType"
                 value={formData.fuelType}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded"
+                required
               >
                 <option value="">Select Fuel Type</option>
                 <option value="unleaded">Unleaded</option>
                 <option value="premium">Premium</option>
                 <option value="diesel">Diesel</option>
               </select>
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">Fuel Price (PHP)</label>
+              <label className="block font-medium mt-4">Fuel Price (PHP)</label>
               <input
                 type="number"
                 name="fuelPrice"
                 value={formData.fuelPrice}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded"
+                required
               />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">Fuel Quantity (L)</label>
+              <label className="block font-medium mt-4">
+                Fuel Quantity (L)
+              </label>
               <input
                 type="number"
                 name="fuel_liters_quantity"
                 value={formData.fuel_liters_quantity}
                 onChange={handleChange}
                 className="w-full border border-gray-300 p-2 rounded"
+                required
               />
             </div>
-          </div>
-          {/* Right Section */}
-          <div className="w-1/2">
-            <div className="mb-4">
+            {/* Right Section */}
+            <div>
               <label className="block font-medium">Total Expense (PHP)</label>
               <input
                 type="number"
@@ -181,9 +163,7 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
                 disabled
                 className="w-full border border-gray-300 p-2 rounded"
               />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">
+              <label className="block font-medium mt-4">
                 Distance (Odometer) Proof
               </label>
               <input
@@ -193,9 +173,9 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
                 className="w-full border border-gray-300 p-2 rounded"
                 accept="image/*"
               />
-            </div>
-            <div className="mb-4">
-              <label className="block font-medium">Fuel Receipt Proof</label>
+              <label className="block font-medium mt-4">
+                Fuel Receipt Proof
+              </label>
               <input
                 type="file"
                 name="fuelReceiptProof"
@@ -205,24 +185,25 @@ const FuelAddModal = ({ selectedBus, onClose, onAdd }) => {
               />
             </div>
           </div>
-        </div>
-        {/* Action Buttons */}
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-5 py-2 mr-3 bg-gray-500 text-white rounded"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="px-5 py-2 bg-blue-500 text-white rounded"
-          >
-            {isSubmitting ? "Adding..." : "Add"}
-          </button>
-        </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="px-5 py-2 bg-gray-500 text-white rounded"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="px-5 py-2 bg-blue-500 text-white rounded"
+            >
+              {isSubmitting ? "Adding..." : "Add"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

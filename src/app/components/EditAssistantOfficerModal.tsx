@@ -23,7 +23,7 @@ const EditAssistantOfficerModal = ({
     contact_person: "",
     contact_person_number: "",
     address: "",
-    user_profile_image: "",
+
     status: "",
   });
 
@@ -48,7 +48,6 @@ const EditAssistantOfficerModal = ({
           contact_person: userProfileData.contact_person || "",
           contact_person_number: userProfileData.contact_person_number || "",
           address: userProfileData.address || "",
-          user_profile_image: userProfileData.user_profile_image || "",
         });
         setBirthday(userProfileData.date_of_birth || ""); // Set birthday for age calculation
       } catch (error) {
@@ -99,40 +98,63 @@ const EditAssistantOfficerModal = ({
   const handleDateHiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
   };
-  // Handle image changes
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          user_profile_image: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   // Submit updated profile
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Validate required fields
+    const requiredFields = [
+      "last_name",
+      "first_name",
+      "middle_initial",
+      "position",
+      "license_number",
+      "sex",
+      "contact_number",
+      "date_hired",
+      "contact_person",
+      "contact_person_number",
+      "address",
+    ];
+  
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+    if (missingFields.length > 0) {
+      console.error("Error: Missing required fields", missingFields);
+      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      return;
+    }
+  
+    if (!birthday) {
+      console.error("Error: Missing date of birth");
+      alert("Please provide a valid date of birth.");
+      return;
+    }
+  
+    if (!userProfileId) {
+      console.error("Error: Missing userProfileId");
+      alert("Cannot update the profile. User ID is missing.");
+      return;
+    }
+  
     try {
       const updatedProfile = {
         ...formData,
         date_of_birth: birthday,
       };
-      if (!userProfileId) {
-        console.error("Error: Missing userProfileId");
-        return;
-      }
+  
+      // Call the updateProfile API
       await updateProfile(userProfileId, updatedProfile);
-      onSave({ ...updatedProfile, user_profile_id: userProfileId }); // Notify parent with updated profile
+  
+      // Notify parent with updated profile
+      onSave({ ...updatedProfile, user_profile_id: userProfileId });
       onClose(); // Close the modal
     } catch (error) {
       console.error("Error updating profile:", error);
+      alert("An error occurred while updating the profile. Please try again.");
     }
   };
+  
 
   if (!isOpen) return null;
 
@@ -154,27 +176,6 @@ const EditAssistantOfficerModal = ({
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mt-4">
           {/* Left Column */}
           <div>
-            <div className="flex flex-col items-center space-y-4 mb-6">
-              <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                {formData.user_profile_image ? (
-                  <img
-                    src={formData.user_profile_image}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <span className="flex items-center justify-center h-full text-gray-500">
-                    + Add Photo
-                  </span>
-                )}
-              </div>
-            </div>
             <label className="block text-sm font-medium text-gray-700">
               Last Name
             </label>
@@ -242,7 +243,7 @@ const EditAssistantOfficerModal = ({
 
           {/* Right Column */}
           <div>
-          <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-4">
               Date of Birth
             </label>
             <Input
@@ -316,17 +317,6 @@ const EditAssistantOfficerModal = ({
               placeholder="Enter Address"
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
-            />
-            {/* Personnel Status */}
-              <label className="block text-sm font-medium text-gray-700 mt-4">
-              Status
-            </label>
-            <Input
-              name="Status"
-              value={formData.status}
-              type="status"
-              readOnly
-              className="focus:ring-2 focus:ring-blue-500"
             />
           </div>
           {/* Buttons */}

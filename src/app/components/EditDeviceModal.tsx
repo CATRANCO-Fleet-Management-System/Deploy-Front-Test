@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { getTrackerVehicleMappingById, updateTrackerVehicleMapping } from "@/app/services/trackerService"; // Import services
+import {
+  getTrackerVehicleMappingById,
+  updateTrackerVehicleMapping,
+} from "@/app/services/trackerService"; // Import services
 import { getAllVehicles } from "@/app/services/vehicleService"; // Fetch available buses dynamically
 
 const EditDeviceModal = ({ isOpen, onClose, deviceId, onSave }) => {
@@ -43,7 +46,7 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, onSave }) => {
       setError("All fields are required.");
       return;
     }
-  
+
     try {
       const updatedDevice = {
         id: deviceId, // Ensure `id` is included
@@ -52,23 +55,31 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, onSave }) => {
         vehicle_id: busNumber,
         status,
       };
-  
+
+      // Log the updated device data to inspect it
+      console.log("Updated Device Data:", updatedDevice);
+
+      // Update the device mapping in the backend
       await updateTrackerVehicleMapping(deviceId, updatedDevice);
+
+      // Notify parent component and close modal
       onSave(updatedDevice); // Pass updated device to parent
       onClose(); // Close modal
     } catch (err) {
-      console.error("Error updating tracker-to-vehicle mapping:", err);
-      setError("Failed to save changes. Please try again.");
+      // Log the error and show a more detailed error message
+      console.error("Tracker Identifier Already Assigned to Another Bus:", err);
+      setError(`Failed to save changes. Reason: ${err.message || err}`);
     }
   };
-  
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-lg p-6 w-96">
-        <h2 className="text-xl font-semibold mb-4">Edit Tracker-to-Vehicle Mapping</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Edit Tracker-to-Vehicle Mapping
+        </h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
           <label className="block text-gray-700">Device Name</label>

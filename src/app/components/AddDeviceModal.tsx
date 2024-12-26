@@ -30,10 +30,14 @@ const AddDeviceModal = ({ isOpen, onClose, onSave }) => {
   }, []);
 
   const handleSave = async () => {
-    if (!deviceName || !trackerIdent || !vehicleId) {
+    // Check if all required fields are filled
+    if (!deviceName.trim() || !trackerIdent.trim() || !vehicleId.trim()) {
       setError("All fields are required.");
-      return;
+      return; // Prevent form submission if any field is empty
     }
+
+    // Reset the error message before proceeding
+    setError("");
 
     try {
       const mappingData = {
@@ -63,7 +67,9 @@ const AddDeviceModal = ({ isOpen, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-1/3 rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Add Tracker-to-Vehicle Mapping</h2>
+        <h2 className="text-xl font-bold mb-4">
+          Add Tracker-to-Vehicle Mapping
+        </h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">

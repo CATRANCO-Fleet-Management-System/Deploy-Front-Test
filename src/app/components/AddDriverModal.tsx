@@ -1,12 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { createProfile } from "@/app/services/userProfile";
 
 const AddDriverModal = ({ isOpen, onClose, onSave }) => {
-  const [birthday, setBirthday] = useState<string>(""); // State for birthday
-  const [dateHired, setDateHired] = useState<string>(""); // State for date hired
-  const [age, setAge] = useState<number | string>(""); // State for age
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [birthday, setBirthday] = useState<string>("");
+  const [dateHired, setDateHired] = useState<string>("");
+  const [age, setAge] = useState<number | string>("");
+
   const [formData, setFormData] = useState({
     last_name: "",
     first_name: "",
@@ -18,12 +21,10 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
     contact_person: "",
     contact_person_number: "",
     address: "",
-    user_profile_image: "",
     status: "On Duty",
     specific_personnel_status: "",
   });
 
-  // Calculate Age
   useEffect(() => {
     if (birthday) {
       const birthDate = new Date(birthday);
@@ -38,11 +39,10 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
       }
       setAge(calculatedAge);
     } else {
-      setAge(""); // Clear age if birthday is removed
+      setAge("");
     }
   }, [birthday]);
 
-  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -54,7 +54,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
       [name]: value,
     }));
   };
-
   // Handle birthday changes
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
@@ -64,37 +63,22 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
   const handleDateHiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDateHired(e.target.value);
   };
-
-  // Handle Image Upload
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          user_profile_image: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Handle form submission
   const handleSubmit = async () => {
-    try {
-      const newProfile = {
-        ...formData,
-        date_of_birth: birthday,
-        date_hired: dateHired,
-      };
-      const response = await createProfile(newProfile); // Save the new driver profile
-      if (response && response.profile) {
-        onSave(response.profile); // Pass the new profile to the parent
+    if (formRef.current && formRef.current.reportValidity()) {
+      try {
+        const newProfile = {
+          ...formData,
+          date_of_birth: birthday,
+          date_hired: dateHired,
+        };
+        const response = await createProfile(newProfile);
+        if (response && response.profile) {
+          onSave(response.profile);
+        }
+        onClose();
+      } catch (error) {
+        console.error("Error creating profile:", error);
       }
-      onClose(); // Close the modal
-    } catch (error) {
-      console.error("Error creating profile:", error);
     }
   };
 
@@ -113,31 +97,12 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
           </button>
         </div>
 
-        <form className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-          {/* Left Column */}
+        <form
+          ref={formRef}
+          className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
+          noValidate
+        >
           <div>
-            <div className="flex flex-col items-center space-y-4 mb-2">
-              <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                {formData.user_profile_image ? (
-                  <img
-                    src={formData.user_profile_image}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <span className="flex items-center justify-center h-full text-gray-500">
-                    + Add Photo
-                  </span>
-                )}
-              </div>
-            </div>
-
             <label className="block text-sm font-medium text-gray-700">
               Last Name
             </label>
@@ -147,7 +112,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleInputChange}
               placeholder="e.g. Callo"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -159,7 +123,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleInputChange}
               placeholder="e.g. Juan"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -170,8 +133,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               value={formData.middle_initial}
               onChange={handleInputChange}
               placeholder="e.g. V"
-              required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -181,7 +142,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               name="position"
               value="Driver"
               disabled
-              className="focus:outline-none focus-visible:ring-0"
+              className="focus:outline-none"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-4">
@@ -193,7 +154,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleInputChange}
               placeholder="e.g. N03-12-123456"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-4">
@@ -202,10 +162,9 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
             <Input
               name="date_hired"
               value={dateHired}
-              onChange={handleDateHiredChange}
+              onChange={(e) => setDateHired(e.target.value)}
               type="date"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -217,19 +176,14 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
             <Input
               name="birthday"
               value={birthday}
-              onChange={handleBirthdayChange}
+              onChange={(e) => setBirthday(e.target.value)}
               type="date"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-1">
               Age
             </label>
-            <Input
-              value={age}
-              readOnly
-              className="focus:ring-2 focus:ring-blue-500"
-            />
+            <Input value={age} readOnly />
 
             <label className="block text-sm font-medium text-gray-700 mt-3">
               Gender
@@ -238,7 +192,7 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               name="sex"
               value={formData.sex}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
             >
               <option value="Male">Male</option>
               <option value="Female">Female</option>
@@ -252,7 +206,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               value={formData.contact_number}
               onChange={handleInputChange}
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -263,7 +216,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               value={formData.contact_person}
               onChange={handleInputChange}
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -274,7 +226,6 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               value={formData.contact_person_number}
               onChange={handleInputChange}
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
 
             <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -284,40 +235,13 @@ const AddDriverModal = ({ isOpen, onClose, onSave }) => {
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="w-full px-4 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
+              className="w-full px-4 border rounded-md"
             />
-
-            {/* Personnel Status */}
-            <label className="block text-sm font-medium text-gray-700 mt-3">
-              Personnel Status
-            </label>
-            <select
-              name="personnel_status"
-              value={formData.status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="On Duty">On Duty</option>
-              <option value="Terminated">Terminated</option>
-              <option value="On Leave">On Leave</option>
-              <option value="Others">Others</option>
-            </select>
-
-            {/* Additional input for "Others" */}
-            {formData.status === "Others" && (
-              <Input
-                name="specific_personnel_status"
-                value={formData.specific_personnel_status}
-                onChange={handleInputChange}
-                placeholder="Specify personnel status"
-                className="mt-2 focus:ring-2 focus:ring-blue-500"
-              />
-            )}
           </div>
         </form>
-        {/* Buttons */}
-        <div className="col-span-2 flex justify-end space-x-4 mt-4">
+
+        <div className="col-span-2 flex justify-end space-x-4 mt-6">
           <button
             type="button"
             onClick={handleSubmit}

@@ -6,6 +6,7 @@ import { updateProfile, getProfileById } from "@/app/services/userProfile";
 const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
   const [birthday, setBirthday] = useState<string>(""); // State for birthday
   const [age, setAge] = useState<number | string>(""); // State for age
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     last_name: "",
     first_name: "",
@@ -18,7 +19,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
     contact_person: "",
     contact_person_number: "",
     address: "",
-    user_profile_image: "",
+
     status: "",
   });
 
@@ -44,7 +45,6 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
           contact_person: userProfileData.contact_person || "",
           contact_person_number: userProfileData.contact_person_number || "",
           address: userProfileData.address || "",
-          user_profile_image: userProfileData.user_profile_image || "",
         });
         setBirthday(userProfileData.date_of_birth || ""); // Set birthday
       } catch (error) {
@@ -74,38 +74,21 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
     }
   }, [birthday]);
 
-  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value, // Spread previous formData and set new value
     }));
   };
 
   // Handle birthday changes
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
-  };
-
-
-  // Handle image upload
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          user_profile_image: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   // Handle form submission
@@ -146,28 +129,6 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mt-4">
           {/* Left Column */}
           <div>
-            <div className="flex flex-col items-center space-y-4 mb-2">
-              <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                {formData.user_profile_image ? (
-                  <img
-                    src={formData.user_profile_image}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <span className="flex items-center justify-center h-full text-gray-500">
-                    + Add Photo
-                  </span>
-                )}
-              </div>
-            </div>
-
             <label className="block text-sm font-medium text-gray-700">
               Last Name
             </label>
@@ -179,6 +140,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
               required
               className="focus:ring-2 focus:ring-blue-500"
             />
+
             <label className="block text-sm font-medium text-gray-700 mt-4">
               First Name
             </label>
@@ -236,7 +198,7 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
 
           {/* Right Column */}
           <div>
-          <label className="block text-sm font-medium text-gray-700 mt-4">
+            <label className="block text-sm font-medium text-gray-700 mt-4">
               Date of Birth
             </label>
             <Input
@@ -312,33 +274,6 @@ const EditDriverModal = ({ isOpen, onClose, userProfileId, onSave }) => {
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
             />
-
-            {/* Personnel Status */}
-            <label className="block text-sm font-medium text-gray-700 mt-4">
-              Personnel Status
-            </label>
-            <select
-              name="personnel_status"
-              value={formData.status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="On Duty">On Duty</option>
-              <option value="Terminated">Terminated</option>
-              <option value="On Leave">On Leave</option>
-              <option value="Others">Others</option>
-            </select>
-
-            {/* Additional input for "Others" */}
-            {formData.status === "Others" && (
-              <Input
-                name="specific_personnel_status"
-                value={formData.specific_personnel_status}
-                onChange={handleInputChange}
-                placeholder="Specify personnel status"
-                className="mt-2 focus:ring-2 focus:ring-blue-500"
-              />
-            )}
           </div>
           {/* Buttons */}
           <div className="col-span-2 flex justify-end space-x-4 -mt-15 mb-1">

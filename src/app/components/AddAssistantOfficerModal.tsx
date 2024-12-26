@@ -1,12 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { createProfile } from "@/app/services/userProfile";
 
 const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
-  const [birthday, setBirthday] = useState<string>(""); // State to hold birthday
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [birthday, setBirthday] = useState<string>("");
   const [age, setAge] = useState<number | string>("");
-  const [dateHired, setDateHired] = useState<string>(""); // State to hold calculated age
+  const [dateHired, setDateHired] = useState<string>("");
   const [formData, setFormData] = useState({
     last_name: "",
     first_name: "",
@@ -17,10 +19,8 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
     contact_person: "",
     contact_person_number: "",
     address: "",
-    user_profile_image: "",
   });
 
-  // Calculate age based on birthday
   useEffect(() => {
     if (birthday) {
       const birthDate = new Date(birthday);
@@ -35,11 +35,10 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
       }
       setAge(calculatedAge);
     } else {
-      setAge(""); // Clear age if no birthday is provided
+      setAge("");
     }
   }, [birthday]);
 
-  // Handle form field changes
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -52,47 +51,30 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
     }));
   };
 
-  // Handle date of birth change
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthday(e.target.value);
   };
-  // Handle date hired changes
+
   const handleDateHiredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBirthday(e.target.value);
+    setDateHired(e.target.value);
   };
 
-  // Photo upload handler
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          user_profile_image: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const profileData = {
-        ...formData,
-        date_of_birth: birthday, // Include birthday in profile data
-      };
-      const response = await createProfile(profileData); // Call createProfile service
-      if (response && response.profile) {
-        onSave(response.profile); // Pass the newly created profile to the parent component
-        onClose(); // Close the modal
-      } else {
-        console.error("Error: No profile returned in the response.");
+  const handleSubmit = async () => {
+    if (formRef.current && formRef.current.reportValidity()) {
+      try {
+        const profileData = {
+          ...formData,
+          date_of_birth: birthday,
+          date_hired: dateHired,
+        };
+        const response = await createProfile(profileData);
+        if (response && response.profile) {
+          onSave(response.profile);
+          onClose();
+        }
+      } catch (error) {
+        console.error("Error creating profile:", error);
       }
-    } catch (error) {
-      console.error("Error creating profile:", error);
     }
   };
 
@@ -112,35 +94,8 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
             &times;
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 mt-4">
-          {/* Left Column */}
+        <form ref={formRef} className="grid grid-cols-2 gap-4 mt-4" noValidate>
           <div>
-            <div className="flex flex-col items-center space-y-4 mb-2">
-              <div className="relative w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                {formData.user_profile_image ? (
-                  <img
-                    src={formData.user_profile_image}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <span className="flex items-center justify-center h-full text-gray-500">
-                    + Add Photo
-                  </span>
-                )}
-              </div>
-              <span className="text-sm text-gray-500">
-                {formData.user_profile_image
-                  ? "File selected"
-                  : "No file chosen"}
-              </span>
-            </div>
             <label className="block text-sm font-medium text-gray-700">
               Last Name
             </label>
@@ -150,7 +105,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleInputChange}
               placeholder="e.g. Callo"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-4">
               First Name
@@ -161,7 +115,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleInputChange}
               placeholder="e.g. Juan"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-4">
               Middle Initial
@@ -171,8 +124,6 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               value={formData.middle_initial}
               onChange={handleInputChange}
               placeholder="e.g. V"
-              required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-5">
               Position
@@ -181,22 +132,18 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               name="position"
               value="Passenger Assistant Officer"
               disabled
-              className="focus:outline-none"
             />
-
             <label className="block text-sm font-medium text-gray-700 mt-5">
               Date Hired
             </label>
             <Input
               name="date_hired"
               value={dateHired}
+              onChange={handleDateHiredChange}
               type="date"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
-          {/* Right Column */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Date of Birth
@@ -207,16 +154,11 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               onChange={handleBirthdayChange}
               type="date"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-1">
               Age
             </label>
-            <Input
-              value={age}
-              readOnly
-              className="focus:ring-2 focus:ring-blue-500"
-            />
+            <Input value={age} readOnly />
             <label className="block text-sm font-medium text-gray-700 mt-2">
               Gender
             </label>
@@ -224,7 +166,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               name="sex"
               value={formData.sex}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-md"
             >
               <option value="Male">Male</option>
               <option value="Female">Female</option>
@@ -236,9 +178,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               name="contact_number"
               value={formData.contact_number}
               onChange={handleInputChange}
-              placeholder="e.g. 09123456789"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Person
@@ -247,9 +187,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               name="contact_person"
               value={formData.contact_person}
               onChange={handleInputChange}
-              placeholder="Contact Person Name"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-2">
               Contact Person Number
@@ -258,9 +196,7 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               name="contact_person_number"
               value={formData.contact_person_number}
               onChange={handleInputChange}
-              placeholder="e.g. 09123456789"
               required
-              className="focus:ring-2 focus:ring-blue-500"
             />
             <label className="block text-sm font-medium text-gray-700 mt-2">
               Address
@@ -269,55 +205,27 @@ const AddAssistantOfficerModal = ({ isOpen, onClose, onSave }) => {
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              placeholder="Enter Address"
-              className="w-full px-4 py-0 border rounded-md focus:ring-2 focus:ring-blue-500"
               required
+              className="w-full px-4 border rounded-md"
             />
-            {/* Personnel Status */}
-            <label className="block text-sm font-medium text-gray-700 mt-2">
-              Personnel Status
-            </label>
-            <select
-              name="personnel_status"
-              value={formData.personnel_status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="On Duty">On Duty</option>
-              <option value="Terminated">Terminated</option>
-              <option value="On Leave">On Leave</option>
-              <option value="Others">Others</option>
-            </select>
-
-            {/* Additional input for "Others" */}
-            {formData.personnel_status === "Others" && (
-              <Input
-                name="specific_personnel_status"
-                value={formData.specific_personnel_status}
-                onChange={handleInputChange}
-                placeholder="Specify personnel status"
-                className="mt-2 focus:ring-2 focus:ring-blue-500"
-              />
-            )}
-          </div>
-          {/* Buttons */}
-          <div className="col-span-2 flex justify-end space-x-4 mt-2">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
-            >
-              Cancel
-            </button>
           </div>
         </form>
+        <div className="col-span-2 flex justify-end space-x-4 mt-6">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
