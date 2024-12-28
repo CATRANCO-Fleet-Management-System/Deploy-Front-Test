@@ -177,52 +177,61 @@ const MaintenanceManagement = () => {
   return (
     <Layout>
       <Header title="Bus Maintenance Management" />
-      <div className="options flex items-center space-x-10 p-4 w-11/12 ml-5 mt-5">
-        {/* Active/Completed Toggle Buttons */}
-        <button
-          className={`px-4 py-2 rounded-md ${
-            viewType === "active"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
-          }`}
-          onClick={() => setViewType("active")}
-        >
-          Active
-        </button>
-        <button
-          className={`px-4 py-2 rounded-md ${
-            viewType === "completed"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-800"
-          }`}
-          onClick={() => setViewType("completed")}
-        >
-          Completed
-        </button>
+      <div className="options flex flex-col md:flex-row items-center p-4 w-full md:w-9/12 ml-1 space-y-4 md:space-y-0">
+ 
+  {/* Active/Completed Toggle Buttons */}
+  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-2 w-full sm:w-auto">
+    <button
+      className={`px-4 py-2 rounded-md ${
+        viewType === "active"
+          ? "bg-blue-500 text-white"
+          : "bg-gray-200 text-gray-800"
+      }`}
+      onClick={() => setViewType("active")}
+    >
+      Active
+    </button>
+    <button
+      className={`px-4 py-2 rounded-md ${
+        viewType === "completed"
+          ? "bg-blue-500 text-white"
+          : "bg-gray-200 text-gray-800"
+      }`}
+      onClick={() => setViewType("completed")}
+    >
+      Completed
+    </button>
+  </div>
 
-        {/* Search and Add Buttons */}
-        <input
-          type="text"
-          placeholder="Find maintenance records"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50"
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          <FaPlus size={20} className="mr-2" />
-          Add New
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 flex items-center"
-          onClick={handleOpenHistoryModal}
-        >
-          <FaHistory className="mr-2" />
-          View History
-        </button>
-        {/* Render the modal if isHistoryModalOpen is true */}
+  {/* Search Input */}
+  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+  <input
+    type="text"
+    placeholder="Find maintenance records"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+  />
+
+  {/* Add and View History Buttons */}
+  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0 w-full sm:w-auto">
+    <button
+      className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 w-full sm:w-auto"
+      onClick={() => setIsAddModalOpen(true)}
+    >
+      <FaPlus size={20} className="mr-2" />
+      Add New
+    </button>
+    <button
+      className="flex items-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full sm:w-auto"
+      onClick={handleOpenHistoryModal}
+    >
+      <FaHistory className="mr-2" />
+      View History
+    </button>
+  </div>
+  </div>
+        {/* Render the modal if isHistoryModalOpen is true */} 
         {isHistoryModalOpen && (
           <MaintenanceHistoryModal
             isOpen={isHistoryModalOpen} // Correct prop for modal visibility
@@ -233,13 +242,14 @@ const MaintenanceManagement = () => {
       </div>
 
       {/* Display Records */}
-      <div className="records flex flex-wrap gap-4 px-8 mt-4">
+      <div className="records flex flex-col h-full">
+      <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5"> 
         {currentRecords.map((record) => (
           <div
             key={record.maintenance_scheduling_id}
-            className="record-card bg-white p-2 rounded shadow w-full md:w-1/3 lg:w-1/4"
+            className="record-box-container mr-3 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relatives"
           >
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse mb-1 table-auto">
               <tbody>
                 <tr>
                   <td className="border p-2 font-bold">Bus:</td>
@@ -300,10 +310,10 @@ const MaintenanceManagement = () => {
                 </tr>
               </tbody>
             </table>
-            <div className="flex space-x-2 mt-3">
+            <div className="left-4 right-4 flex justify-between space-x-2">
               {record.maintenance_status === "completed" ? (
                 <button
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-3 py-1.5 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 sm:px-1 sm:py-2"
                   onClick={() => handleViewProof(record)}
                 >
                   View Completion Proof
@@ -311,7 +321,7 @@ const MaintenanceManagement = () => {
               ) : (
                 <>
                   <button
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    className="px-3 py-1.5 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 sm:px-1 sm:py-2"
                     onClick={() => {
                       setCurrentRecord(record);
                       setIsEditModalOpen(true);
@@ -320,7 +330,7 @@ const MaintenanceManagement = () => {
                     Edit
                   </button>
                   <button
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    className="px-3 py-1.5 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 sm:px-1 sm:py-2"
                     onClick={() =>
                       handleRemove(record.maintenance_scheduling_id)
                     }
@@ -332,6 +342,7 @@ const MaintenanceManagement = () => {
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Pagination Component */}

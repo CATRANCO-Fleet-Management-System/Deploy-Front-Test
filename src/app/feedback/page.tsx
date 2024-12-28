@@ -7,62 +7,7 @@ import Confirmpopup from "../components/Confirmpopup";
 import { FaSearch } from "react-icons/fa";
 import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
-
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page);
-    }
-  };
-
-  const createPageButtons = () => {
-    const pageButtons = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageButtons.push(
-        <button
-          key={i}
-          className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-            i === currentPage
-              ? "bg-blue-500 text-white border-blue-500"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pageButtons;
-  };
-
-  return (
-    <div className="pagination flex items-center justify-center space-x-2 mt-8">
-      <button
-        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-          currentPage === 1
-            ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-gray-300 text-gray-700 hover:bg-gray-100"
-        }`}
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        &lt;
-      </button>
-      {createPageButtons()}
-      <button
-        className={`px-3 py-1 border-2 rounded transition-colors duration-300 ${
-          currentPage === totalPages
-            ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-gray-300 text-gray-700 hover:bg-gray-100"
-        }`}
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        &gt;
-      </button>
-    </div>
-  );
-};
+import Pagination from "../components/Pagination";
 
 const FeedbackRecordDisplay = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -89,7 +34,6 @@ const FeedbackRecordDisplay = () => {
     };
     fetchFeedbackLogs();
   }, []);
-
 
   const handleDelete = (recordId: string) => {
     setDeleteRecordId(recordId);
@@ -126,18 +70,14 @@ const FeedbackRecordDisplay = () => {
     <Layout>
       <Header title="Feedback Records" />
       <div className="content flex flex-col flex-1">
-        <div className="options flex items-center space-x-10 p-4 w-9/12 ml-8">
+        <div className="options flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3 p-4 w-full sm:w-9/12 ml-1">
           <input
             type="text"
             placeholder="Search by phone number or comment"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
           />
-          <button className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 hover:bg-blue-50">
-            <FaSearch size={22} className="mr-2" />
-            Search
-          </button>
         </div>
         {loading ? (
   <div className="text-center text-blue-500 mt-10">Loading feedback...</div>
@@ -145,7 +85,7 @@ const FeedbackRecordDisplay = () => {
   <div className="text-center text-gray-500 mt-10">No feedback records found.</div>
 ) : (
   <div className="records flex flex-col h-full">
-    <div className="output flex mt-2 items-center ml-8 flex-wrap gap-4">
+    <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5">
       {paginatedRecords.map((record) => (
         <FeedbackRecord
           key={record.feedback_logs_id}

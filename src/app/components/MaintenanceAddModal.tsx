@@ -113,13 +113,13 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
             <div className="col-span-1">
               <label
                 htmlFor="vehicleId"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium  text-gray-700"
               >
                 Vehicle
               </label>
               <select
                 id="vehicleId"
-                className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                className="border border-gray-300 p-3 rounded-md w-full mt-1"
                 value={vehicleId}
                 onChange={(e) => setVehicleId(e.target.value)}
               >
@@ -141,7 +141,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               </label>
               <select
                 id="maintenanceType"
-                className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                className="border border-gray-300 p-3 rounded-md w-full mt-1"
                 value={maintenanceType}
                 onChange={handleMaintenanceTypeChange} // Updated handler
               >
@@ -170,7 +170,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
                   placeholder="Describe the maintenance type"
                   value={otherMaintenanceType} // Use new state
                   onChange={(e) => setOtherMaintenanceType(e.target.value)} // Update new state
-                  className="border border-gray-500 p-3 rounded-md mt-1 w-full"
+                  className="border border-gray-300 p-3 rounded-md mt-1 w-full"
                 />
               </div>
             )}
@@ -189,7 +189,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
                 placeholder="Mechanic Company"
                 value={mechanicCompany}
                 onChange={(e) => setMechanicCompany(e.target.value)}
-                className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                className="border border-gray-300 p-3 rounded-md w-full mt-1"
               />
             </div>
             <div className="col-span-1">
@@ -204,7 +204,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
                 placeholder="Mechanic Company Address"
                 value={mechanicCompanyAddress}
                 onChange={(e) => setMechanicCompanyAddress(e.target.value)}
-                className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                className="border border-gray-300 p-3 rounded-md w-full mt-1"
               />
             </div>
             <div className="col-span-1">
@@ -218,7 +218,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
                 id="maintenanceDate"
                 selected={maintenanceDate}
                 onChange={(date) => setMaintenanceDate(date)}
-                className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                className="border border-gray-300 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
               />
             </div>
@@ -235,7 +235,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
                 placeholder="PHP"
                 value={maintenanceCost}
                 onChange={(e) => setMaintenanceCost(e.target.value)}
-                className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                className="border border-gray-300 p-3 rounded-md w-full mt-1"
               />
             </div>
           </div>

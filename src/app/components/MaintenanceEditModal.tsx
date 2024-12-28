@@ -90,7 +90,7 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               placeholder="Maintenance #"
               value={maintenanceNumber}
               onChange={(e) => setMaintenanceNumber(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
             />
           </div>
           <div className="col-span-1">
@@ -102,7 +102,7 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               placeholder="Mechanic Company"
               value={mechanicCompany}
               onChange={(e) => setMechanicCompany(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
             />
           </div>
           <div className="col-span-1">
@@ -114,7 +114,7 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               placeholder="Mechanic Company Address"
               value={mechanicCompanyAddress}
               onChange={(e) => setMechanicCompanyAddress(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
             />
           </div>
           <div className="col-span-1">
@@ -123,7 +123,7 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             </label>
             <select
               id="maintenanceType"
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
               value={maintenanceType}
               onChange={(e) => setMaintenanceType(e.target.value)}
             >
@@ -141,7 +141,7 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             </label>
             <select
               id="vehicleId"
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
               value={vehicleId}
               onChange={(e) => setVehicleId(e.target.value)}
             >
@@ -162,7 +162,7 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               placeholder="PHP"
               value={maintenanceCost}
               onChange={(e) => setMaintenanceCost(e.target.value)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
             />
           </div>
           <div className="col-span-1">
@@ -173,14 +173,14 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               id="maintenanceDate"
               selected={maintenanceDate}
               onChange={(date) => setMaintenanceDate(date)}
-              className="border border-gray-500 p-3 rounded-md w-full mt-1"
+              className="border border-gray-300 p-3 rounded-md w-full mt-1"
               dateFormat="MM/dd/yyyy"
             />
           </div>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
           <button
-            className="px-6 py-3 border border-gray-500 text-gray-500 rounded-md bg-transparent"
+            className="px-6 py-3 border border-gray-300 text-gray-500 rounded-md bg-transparent"
             onClick={onClose}
           >
             Cancel

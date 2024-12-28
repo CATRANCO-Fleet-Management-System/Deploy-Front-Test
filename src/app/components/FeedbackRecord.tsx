@@ -28,8 +28,8 @@ const FeedbackRecord: React.FC<FeedbackRecordProps> = ({
   };
 
   return (
-    <div className="record-box-container bg-white border-gray-200 rounded-lg border-2 flex flex-col p-4 m-4 shadow-md">
-      <table className="w-full border-collapse text-sm">
+    <div className="record-box-container mr-1 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relative">
+      <table className="w-full border-collapse -mb-1 table-auto">
         <tbody>
           <tr>
             <td className="border p-2 font-bold">Phone Number:</td>
