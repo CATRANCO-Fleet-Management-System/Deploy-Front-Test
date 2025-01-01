@@ -1,4 +1,5 @@
 import axios from "axios";
+import { MaintenanceData } from "@/app/types";
 
 // Define the base API URL
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -65,17 +66,15 @@ export const getAllMaintenanceScheduling = async () => {
  * @param {number} id - The ID of the maintenance schedule.
  * @returns {Promise<Object>} - The maintenance schedule data.
  */
-export const getMaintenanceSchedulingById = async (id) => {
+export const getMaintenanceSchedulingById = async (id: number): Promise<MaintenanceData> => {
   try {
     const maintenanceIdNumber = Number(id); // Convert ID to number
     if (isNaN(maintenanceIdNumber)) {
       throw new Error("Invalid maintenance ID");
     }
 
-    const response = await api.get(
-      `/user/admin/maintenance-scheduling/${maintenanceIdNumber}`
-    );
-    return response.data;
+    const response = await api.get(`/user/admin/maintenance-scheduling/${maintenanceIdNumber}`);
+    return response.data as MaintenanceData; // Explicitly cast to MaintenanceData
   } catch (error) {
     console.error(`Get Maintenance Scheduling by ID error: ${id}`, error);
     throw error.response ? error.response.data : error;

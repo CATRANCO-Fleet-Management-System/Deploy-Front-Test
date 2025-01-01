@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getAllVehicles } from "@/app/services/vehicleService";
+import { getAllVehicles } from "../services/maintenanceService";
 
 const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
   const [vehicles, setVehicles] = useState([]);
@@ -55,10 +55,9 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
   }, [record]);
 
   const handleSubmit = async () => {
-    const formattedDate = `${maintenanceDate.toLocaleDateString("en-CA")} ${new Date().toLocaleTimeString(
-      "en-GB",
-      { hour12: false }
-    )}`;
+    const formattedDate = `${maintenanceDate.toLocaleDateString(
+      "en-CA"
+    )} ${new Date().toLocaleTimeString("en-GB", { hour12: false })}`;
     const updatedRecord = {
       maintenance_number: maintenanceNumber,
       vehicle_id: vehicleId,
@@ -82,7 +81,10 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
         <h2 className="text-lg font-bold mb-4">Edit Maintenance Record</h2>
         <div className="form grid grid-cols-2 gap-6">
           <div className="col-span-1">
-            <label htmlFor="maintenanceNumber" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="maintenanceNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
               Maintenance #
             </label>
             <input
@@ -94,7 +96,10 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="mechanicCompany" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="mechanicCompany"
+              className="block text-sm font-medium text-gray-700"
+            >
               Mechanic Company
             </label>
             <input
@@ -106,7 +111,10 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="mechanicCompanyAddress" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="mechanicCompanyAddress"
+              className="block text-sm font-medium text-gray-700"
+            >
               Mechanic Company Address
             </label>
             <input
@@ -118,7 +126,10 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="maintenanceType" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="maintenanceType"
+              className="block text-sm font-medium text-gray-700"
+            >
               Maintenance Type
             </label>
             <select
@@ -130,13 +141,18 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
               <option value="">Select a maintenance type</option>
               {maintenanceTypes.map((type) => (
                 <option key={type} value={type}>
-                  {type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  {type
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </option>
               ))}
             </select>
           </div>
           <div className="col-span-1">
-            <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="vehicleId"
+              className="block text-sm font-medium text-gray-700"
+            >
               Vehicle
             </label>
             <select
@@ -154,7 +170,10 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             </select>
           </div>
           <div className="col-span-1">
-            <label htmlFor="maintenanceCost" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="maintenanceCost"
+              className="block text-sm font-medium text-gray-700"
+            >
               Maintenance Cost
             </label>
             <input
@@ -166,7 +185,10 @@ const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
             />
           </div>
           <div className="col-span-1">
-            <label htmlFor="maintenanceDate" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="maintenanceDate"
+              className="block text-sm font-medium text-gray-700"
+            >
               Maintenance Date
             </label>
             <DatePicker

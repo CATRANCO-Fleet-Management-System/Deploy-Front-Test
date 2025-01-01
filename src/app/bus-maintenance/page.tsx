@@ -15,7 +15,7 @@ import {
   updateMaintenanceScheduling,
   deleteMaintenanceScheduling,
   toggleMaintenanceSchedulingStatus,
-} from "@/app/services/maintenanceService";
+} from "../services/maintenanceService";
 
 import MaintenanceHistoryModal from "../components/MaintenanceHistoryModal";
 
@@ -144,7 +144,7 @@ const MaintenanceManagement = () => {
       console.error("Error saving record:", error);
     }
   };
-  
+
   const handleProofSubmit = async (id, proofData) => {
     try {
       const updatedRecord = await toggleMaintenanceSchedulingStatus(
@@ -178,60 +178,59 @@ const MaintenanceManagement = () => {
     <Layout>
       <Header title="Bus Maintenance Management" />
       <div className="options flex flex-col md:flex-row items-center p-4 w-full md:w-9/12 ml-1 space-y-4 md:space-y-0">
- 
-  {/* Active/Completed Toggle Buttons */}
-  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-2 w-full sm:w-auto">
-    <button
-      className={`px-4 py-2 rounded-md ${
-        viewType === "active"
-          ? "bg-blue-500 text-white"
-          : "bg-gray-200 text-gray-800"
-      }`}
-      onClick={() => setViewType("active")}
-    >
-      Active
-    </button>
-    <button
-      className={`px-4 py-2 rounded-md ${
-        viewType === "completed"
-          ? "bg-blue-500 text-white"
-          : "bg-gray-200 text-gray-800"
-      }`}
-      onClick={() => setViewType("completed")}
-    >
-      Completed
-    </button>
-  </div>
+        {/* Active/Completed Toggle Buttons */}
+        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-2 w-full sm:w-auto">
+          <button
+            className={`px-4 py-2 rounded-md ${
+              viewType === "active"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-800"
+            }`}
+            onClick={() => setViewType("active")}
+          >
+            Active
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md ${
+              viewType === "completed"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-800"
+            }`}
+            onClick={() => setViewType("completed")}
+          >
+            Completed
+          </button>
+        </div>
 
-  {/* Search Input */}
-  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full">
-  <input
-    type="text"
-    placeholder="Find maintenance records"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
-  />
+        {/* Search Input */}
+        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+          <input
+            type="text"
+            placeholder="Find maintenance records"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+          />
 
-  {/* Add and View History Buttons */}
-  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0 w-full sm:w-auto">
-    <button
-      className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 w-full sm:w-auto"
-      onClick={() => setIsAddModalOpen(true)}
-    >
-      <FaPlus size={20} className="mr-2" />
-      Add New
-    </button>
-    <button
-      className="flex items-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full sm:w-auto"
-      onClick={handleOpenHistoryModal}
-    >
-      <FaHistory className="mr-2" />
-      View History
-    </button>
-  </div>
-  </div>
-        {/* Render the modal if isHistoryModalOpen is true */} 
+          {/* Add and View History Buttons */}
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0 w-full sm:w-auto">
+            <button
+              className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 w-full sm:w-auto"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              <FaPlus size={20} className="mr-2" />
+              Add New
+            </button>
+            <button
+              className="flex items-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full sm:w-auto"
+              onClick={handleOpenHistoryModal}
+            >
+              <FaHistory className="mr-2" />
+              View History
+            </button>
+          </div>
+        </div>
+        {/* Render the modal if isHistoryModalOpen is true */}
         {isHistoryModalOpen && (
           <MaintenanceHistoryModal
             isOpen={isHistoryModalOpen} // Correct prop for modal visibility
@@ -243,105 +242,105 @@ const MaintenanceManagement = () => {
 
       {/* Display Records */}
       <div className="records flex flex-col h-full">
-      <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5"> 
-        {currentRecords.map((record) => (
-          <div
-            key={record.maintenance_scheduling_id}
-            className="record-box-container mr-3 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relatives"
-          >
-            <table className="w-full border-collapse mb-1 table-auto">
-              <tbody>
-                <tr>
-                  <td className="border p-2 font-bold">Bus:</td>
-                  <td className="border p-2">{record.vehicle_id || "N/A"}</td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Status:</td>
-                  <td className="border p-2">
-                    <button
-                      className={`px-2 py-1 rounded text-black ${
-                        record.maintenance_status === "active"
-                          ? "bg-yellow-400"
-                          : "bg-green-400"
-                      }`}
-                      onClick={() => {
-                        if (record.maintenance_status === "active") {
-                          setCurrentRecord(record);
-                          setIsProofModalOpen(true);
-                        }
-                      }}
-                    >
-                      {record.maintenance_status || "N/A"}
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Type:</td>
-                  <td className="border p-2">
-                    {record.maintenance_type || "N/A"}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Cost:</td>
-                  <td className="border p-2">
-                    PHP{" "}
-                    {record.maintenance_cost
-                      ? parseFloat(record.maintenance_cost).toFixed(2)
-                      : "0.00"}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Date:</td>
-                  <td className="border p-2">
-                    {record.maintenance_date || "N/A"}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Company:</td>
-                  <td className="border p-2">
-                    {record.mechanic_company || "N/A"}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border p-2 font-bold">Address:</td>
-                  <td className="border p-2">
-                    {record.mechanic_company_address || "N/A"}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="left-4 right-4 flex justify-between space-x-2">
-              {record.maintenance_status === "completed" ? (
-                <button
-                  className="px-3 py-1.5 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 sm:px-1 sm:py-2"
-                  onClick={() => handleViewProof(record)}
-                >
-                  View Completion Proof
-                </button>
-              ) : (
-                <>
+        <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5">
+          {currentRecords.map((record) => (
+            <div
+              key={record.maintenance_scheduling_id}
+              className="record-box-container mr-3 bg-white  border-gray-200 rounded-lg border-2 flex flex-col p-4 break-words text-sm relatives"
+            >
+              <table className="w-full border-collapse mb-1 table-auto">
+                <tbody>
+                  <tr>
+                    <td className="border p-2 font-bold">Bus:</td>
+                    <td className="border p-2">{record.vehicle_id || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border p-2 font-bold">Status:</td>
+                    <td className="border p-2">
+                      <button
+                        className={`px-2 py-1 rounded text-black ${
+                          record.maintenance_status === "active"
+                            ? "bg-yellow-400"
+                            : "bg-green-400"
+                        }`}
+                        onClick={() => {
+                          if (record.maintenance_status === "active") {
+                            setCurrentRecord(record);
+                            setIsProofModalOpen(true);
+                          }
+                        }}
+                      >
+                        {record.maintenance_status || "N/A"}
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border p-2 font-bold">Type:</td>
+                    <td className="border p-2">
+                      {record.maintenance_type || "N/A"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border p-2 font-bold">Cost:</td>
+                    <td className="border p-2">
+                      PHP{" "}
+                      {record.maintenance_cost
+                        ? parseFloat(record.maintenance_cost).toFixed(2)
+                        : "0.00"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border p-2 font-bold">Date:</td>
+                    <td className="border p-2">
+                      {record.maintenance_date || "N/A"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border p-2 font-bold">Company:</td>
+                    <td className="border p-2">
+                      {record.mechanic_company || "N/A"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border p-2 font-bold">Address:</td>
+                    <td className="border p-2">
+                      {record.mechanic_company_address || "N/A"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className="left-4 right-4 flex justify-between space-x-2">
+                {record.maintenance_status === "completed" ? (
                   <button
                     className="px-3 py-1.5 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 sm:px-1 sm:py-2"
-                    onClick={() => {
-                      setCurrentRecord(record);
-                      setIsEditModalOpen(true);
-                    }}
+                    onClick={() => handleViewProof(record)}
                   >
-                    Edit
+                    View Completion Proof
                   </button>
-                  <button
-                    className="px-3 py-1.5 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 sm:px-1 sm:py-2"
-                    onClick={() =>
-                      handleRemove(record.maintenance_scheduling_id)
-                    }
-                  >
-                    Remove
-                  </button>
-                </>
-              )}
+                ) : (
+                  <>
+                    <button
+                      className="px-3 py-1.5 mt-3 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 sm:px-1 sm:py-2"
+                      onClick={() => {
+                        setCurrentRecord(record);
+                        setIsEditModalOpen(true);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="px-3 py-1.5 mt-3 bg-red-500 text-white rounded hover:bg-red-600 flex-1 sm:px-1 sm:py-2"
+                      onClick={() =>
+                        handleRemove(record.maintenance_scheduling_id)
+                      }
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
 
