@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getAllVehicles } from "../services/maintenanceService";
+import { getAllVehicles } from "@/app/services/vehicleService";
 
 const MaintenanceEditModal = ({ isOpen, onClose, record, onSave }) => {
   const [vehicles, setVehicles] = useState([]);
