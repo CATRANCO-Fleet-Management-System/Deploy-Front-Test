@@ -22,12 +22,17 @@ interface MaintenanceData {
   attending_mechanic: string;
 }
 
+interface Vehicle {
+  vehicle_id: string;
+  plate_number: string;
+}
+
 const EditPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const maintenanceId = searchParams.get("id"); // Get the maintenance ID from query params
 
-  const [vehicles, setVehicles] = useState([]); // State for storing vehicles
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [maintenanceNumber, setMaintenanceNumber] = useState("");
   const [vehicleId, setVehicleId] = useState(""); // Store selected vehicle ID
   const [maintenanceCost, setMaintenanceCost] = useState("");
@@ -44,8 +49,6 @@ const EditPage = () => {
     "engine_check",
     "transmission_service",
   ];
-
-  
 
   // Fetch vehicles and existing maintenance data
   useEffect(() => {
