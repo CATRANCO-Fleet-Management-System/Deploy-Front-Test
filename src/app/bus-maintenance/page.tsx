@@ -194,7 +194,7 @@ const MaintenanceManagement = () => {
     }
   };
 
-  const handleViewProof = (record) => {
+  const handleViewProof = (record: MaintenanceRecord) => {
     setCurrentRecord(record);
     setIsViewProofModalOpen(true); // Open proof modal
   };
