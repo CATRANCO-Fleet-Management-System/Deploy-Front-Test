@@ -19,6 +19,22 @@ import {
 
 import MaintenanceHistoryModal from "../components/MaintenanceHistoryModal";
 
+interface MaintenanceRecord {
+  maintenance_scheduling_id: string | number;
+  vehicle_id?: string;
+  maintenance_status?: string;
+  maintenance_complete_proof?: File | null;
+  maintenance_type?: string;
+  maintenance_cost?: string;
+  maintenance_date?: string;
+  mechanic_company?: string;
+  mechanic_company_address?: string;
+}
+
+const [currentRecord, setCurrentRecord] = useState<MaintenanceRecord | null>(
+  null
+);
+
 const MaintenanceManagement = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
