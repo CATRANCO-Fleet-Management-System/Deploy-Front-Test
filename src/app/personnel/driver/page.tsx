@@ -4,7 +4,7 @@ import Header from "@/app/components/Header";
 import React, { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams } from "next/navigation"; // Use useSearchParams for query params
-import { updateProfile, getUserProfile } from "@/app/services/userProfile";
+import { updateProfile, getProfileById } from "@/app/services/userProfile";
 
 const EditDriver = () => {
   const [birthday, setBirthday] = useState<string>("");
@@ -31,7 +31,7 @@ const EditDriver = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const userProfileData = await getUserProfile(user_profile_id!); // Ensure the ID is not null
+        const userProfileData = await getProfileById(user_profile_id!); // Ensure the ID is not null
         setFormData(userProfileData);
         setBirthday(userProfileData.date_of_birth); // Set the birthday for age calculation
       } catch (error) {
@@ -51,7 +51,10 @@ const EditDriver = () => {
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDifference = today.getMonth() - birthDate.getMonth();
-      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+      ) {
         calculatedAge--;
       }
       setAge(calculatedAge);
@@ -61,7 +64,11 @@ const EditDriver = () => {
   }, [birthday]);
 
   // Handle form changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -119,11 +126,26 @@ const EditDriver = () => {
               <div className="forms flex w-11/12 bg-white h-160 rounded-lg border-1 border-gray-300">
                 <div className="1st-row flex-col m-5 ml-14 w-96 space-y-4">
                   <h1>Last Name</h1>
-                  <Input name="last_name" value={formData.last_name} onChange={handleInputChange} placeholder="ex: Callo" />
+                  <Input
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleInputChange}
+                    placeholder="ex: Callo"
+                  />
                   <h1>First Name</h1>
-                  <Input name="first_name" value={formData.first_name} onChange={handleInputChange} placeholder="ex: Juan" />
+                  <Input
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleInputChange}
+                    placeholder="ex: Juan"
+                  />
                   <h1>Middle Initial</h1>
-                  <Input name="middle_initial" value={formData.middle_initial} onChange={handleInputChange} placeholder="ex: V" />
+                  <Input
+                    name="middle_initial"
+                    value={formData.middle_initial}
+                    onChange={handleInputChange}
+                    placeholder="ex: V"
+                  />
                   <h1>Position</h1>
                   <Input name="position" value="Driver" disabled />
                   <h1>License Number</h1>
@@ -134,28 +156,58 @@ const EditDriver = () => {
                     placeholder="ex: N03-12-123456"
                   />
                   <h1>Date of Birth</h1>
-                  <Input name="birthday" value={birthday} onChange={handleBirthdayChange} type="date" />
+                  <Input
+                    name="birthday"
+                    value={birthday}
+                    onChange={handleBirthdayChange}
+                    type="date"
+                  />
                 </div>
                 <div className="2nd-row flex-col m-5 w-96 space-y-4">
                   <h1>Age</h1>
                   <Input value={age} readOnly />
                   <h1>Gender</h1>
-                  <select name="sex" value={formData.sex} onChange={handleInputChange}>
+                  <select
+                    name="sex"
+                    value={formData.sex}
+                    onChange={handleInputChange}
+                  >
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                   </select>
                   <h1>Contact Number</h1>
-                  <Input name="contact_number" value={formData.contact_number} onChange={handleInputChange} />
+                  <Input
+                    name="contact_number"
+                    value={formData.contact_number}
+                    onChange={handleInputChange}
+                  />
                   <h1>Contact Person</h1>
-                  <Input name="contact_person" value={formData.contact_person} onChange={handleInputChange} />
+                  <Input
+                    name="contact_person"
+                    value={formData.contact_person}
+                    onChange={handleInputChange}
+                  />
                   <h1>Contact Person Number</h1>
-                  <Input name="contact_person_number" value={formData.contact_person_number} onChange={handleInputChange} />
+                  <Input
+                    name="contact_person_number"
+                    value={formData.contact_person_number}
+                    onChange={handleInputChange}
+                  />
                   <h1>Address</h1>
-                  <textarea name="address" value={formData.address} onChange={handleInputChange} />
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className="photo-upload-container flex flex-col items-center space-y-4 mt-10">
                   <div className="relative w-64 h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full">
-                    <input type="file" id="photoUpload" accept="image/*" onChange={handleImageChange} />
+                    <input
+                      type="file"
+                      id="photoUpload"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
                     {formData.user_profile_image && (
                       <img
                         src={formData.user_profile_image}
@@ -165,10 +217,16 @@ const EditDriver = () => {
                     )}
                   </div>
                   <div className="flex space-x-4">
-                    <button onClick={handleSubmit} className="bg-blue-500 text-white rounded px-4 py-2">
+                    <button
+                      onClick={handleSubmit}
+                      className="bg-blue-500 text-white rounded px-4 py-2"
+                    >
                       Save
                     </button>
-                    <button onClick={handleCancelClick} className="bg-red-500 text-white rounded px-4 py-2">
+                    <button
+                      onClick={handleCancelClick}
+                      className="bg-red-500 text-white rounded px-4 py-2"
+                    >
                       Cancel
                     </button>
                   </div>
