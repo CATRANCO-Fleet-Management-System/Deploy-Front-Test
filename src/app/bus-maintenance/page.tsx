@@ -19,6 +19,7 @@ import {
 
 import MaintenanceHistoryModal from "../components/MaintenanceHistoryModal";
 
+// Define interface for MaintenanceRecord
 interface MaintenanceRecord {
   maintenance_scheduling_id: string | number;
   vehicle_id?: string;
@@ -31,20 +32,18 @@ interface MaintenanceRecord {
   mechanic_company_address?: string;
 }
 
-const [currentRecord, setCurrentRecord] = useState<MaintenanceRecord | null>(
-  null
-);
-
 const MaintenanceManagement = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isProofModalOpen, setIsProofModalOpen] = useState(false);
   const [isViewProofModalOpen, setIsViewProofModalOpen] = useState(false); // New state for viewing proof
-  const [currentRecord, setCurrentRecord] = useState(null);
-  const [records, setRecords] = useState([]);
+  const [currentRecord, setCurrentRecord] = useState<MaintenanceRecord | null>(
+    null
+  ); // Fix here
+  const [records, setRecords] = useState<MaintenanceRecord[]>([]); // Specify record type
   const [searchTerm, setSearchTerm] = useState("");
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [historyData, setHistoryData] = useState([]);
+  const [historyData, setHistoryData] = useState([]); // Define the history data type as necessary
   const [viewType, setViewType] = useState("active"); // "active" or "completed"
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 3;
