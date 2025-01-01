@@ -12,6 +12,16 @@ import {
 } from "@/app/services/maintenanceService"; // Import services
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import vehicle service
 
+interface MaintenanceData {
+  maintenance_number: string;
+  vehicle_id: string;
+  maintenance_cost: string;
+  maintenance_date: string;
+  maintenance_address: string;
+  maintenance_type: string;
+  attending_mechanic: string;
+}
+
 const EditPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,6 +45,8 @@ const EditPage = () => {
     "transmission_service",
   ];
 
+  
+
   // Fetch vehicles and existing maintenance data
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -49,9 +61,9 @@ const EditPage = () => {
     const fetchMaintenanceData = async () => {
       try {
         if (maintenanceId) {
-          const maintenanceData = await getMaintenanceSchedulingById(
-            Number(maintenanceId)
-          ); // Convert maintenanceId to a number
+          // Ensure that maintenanceData is typed correctly
+          const maintenanceData: MaintenanceData =
+            await getMaintenanceSchedulingById(Number(maintenanceId)); // Convert maintenanceId to a number
           setMaintenanceNumber(maintenanceData.maintenance_number);
           setVehicleId(maintenanceData.vehicle_id);
           setMaintenanceCost(maintenanceData.maintenance_cost);
