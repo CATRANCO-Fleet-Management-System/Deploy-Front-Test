@@ -141,7 +141,7 @@ const MaintenanceManagement = () => {
     indexOfLastRecord
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
   const handleRemove = async (id) => {
     try {
