@@ -179,7 +179,7 @@ const AddPage = () => {
               <DatePicker
                 id="maintenanceDate"
                 selected={maintenanceDate}
-                onChange={(date) => setMaintenanceDate(date)}
+                onChange={(date) => setMaintenanceDate(date ?? new Date())} 
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
               />
