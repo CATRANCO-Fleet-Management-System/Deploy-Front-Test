@@ -152,7 +152,7 @@ const MaintenanceManagement = () => {
     }
   };
 
-  const handleSave = async (id, data) => {
+  const handleSave = async (id: string | number, data: MaintenanceRecord) => {
     try {
       if (id) {
         await updateMaintenanceScheduling(id, data);
@@ -225,7 +225,7 @@ const MaintenanceManagement = () => {
         </div>
 
         {/* Search Input */}
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full ml-2">
           <input
             type="text"
             placeholder="Find maintenance records"
