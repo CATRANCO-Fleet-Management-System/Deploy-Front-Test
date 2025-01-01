@@ -137,14 +137,14 @@ const MaintenanceManagement = () => {
       } else {
         await createMaintenanceScheduling(data);
       }
-      fetchRecords(); // Refetch records after save
+      fetchRecords();
       setIsAddModalOpen(false);
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Error saving record:", error);
     }
   };
-
+  
   const handleProofSubmit = async (id, proofData) => {
     try {
       const updatedRecord = await toggleMaintenanceSchedulingStatus(

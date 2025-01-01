@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getMaintenanceSchedulingById, updateMaintenanceScheduling } from "@/app/services/maintenanceService"; // Import services
+import {
+  getMaintenanceSchedulingById,
+  updateMaintenanceScheduling,
+} from "@/app/services/maintenanceService"; // Import services
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import vehicle service
 
 const EditPage = () => {
@@ -46,7 +49,9 @@ const EditPage = () => {
     const fetchMaintenanceData = async () => {
       try {
         if (maintenanceId) {
-          const maintenanceData = await getMaintenanceSchedulingById(maintenanceId); // Fetch maintenance data
+          const maintenanceData = await getMaintenanceSchedulingById(
+            Number(maintenanceId)
+          ); // Convert maintenanceId to a number
           setMaintenanceNumber(maintenanceData.maintenance_number);
           setVehicleId(maintenanceData.vehicle_id);
           setMaintenanceCost(maintenanceData.maintenance_cost);
@@ -65,10 +70,9 @@ const EditPage = () => {
   }, [maintenanceId]);
 
   const handleSave = async () => {
-    const formattedDate = `${maintenanceDate.toLocaleDateString("en-CA")} ${new Date().toLocaleTimeString(
-      "en-GB",
-      { hour12: false }
-    )}`; // e.g., 2024-10-14 17:01:31
+    const formattedDate = `${maintenanceDate.toLocaleDateString(
+      "en-CA"
+    )} ${new Date().toLocaleTimeString("en-GB", { hour12: false })}`; // e.g., 2024-10-14 17:01:31
     const data = {
       maintenance_number: maintenanceNumber,
       vehicle_id: vehicleId, // Send selected vehicle ID
@@ -96,7 +100,10 @@ const EditPage = () => {
         <div className="content flex flex-col flex-1 p-10 items-center">
           <div className="form grid grid-cols-2 gap-6 bg-white p-12 rounded-md shadow-md w-[1000px] mr-14">
             <div className="col-span-1">
-              <label htmlFor="maintenanceNumber" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance #
               </label>
               <Input
@@ -108,7 +115,10 @@ const EditPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="attendingMechanic" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="attendingMechanic"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Attending Mechanic
               </label>
               <Input
@@ -120,7 +130,10 @@ const EditPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceType" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceType"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Type
               </label>
               <select
@@ -132,13 +145,19 @@ const EditPage = () => {
                 <option value="">Select a maintenance type</option>
                 {maintenanceTypes.map((type) => (
                   <option key={type} value={type}>
-                    {type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} {/* Format type */}
+                    {type
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}{" "}
+                    {/* Format type */}
                   </option>
                 ))}
               </select>
             </div>
             <div className="col-span-1">
-              <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="vehicleId"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Vehicle
               </label>
               <select
@@ -156,7 +175,10 @@ const EditPage = () => {
               </select>
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceCost" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceCost"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Cost
               </label>
               <Input
@@ -168,7 +190,10 @@ const EditPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceDate" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceDate"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Date
               </label>
               <DatePicker
@@ -180,7 +205,10 @@ const EditPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceAddress" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceAddress"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Address
               </label>
               <Input
