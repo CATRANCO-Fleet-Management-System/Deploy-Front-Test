@@ -165,3 +165,13 @@ export const getAllCompletedMaintenanceScheduling = async () => {
     throw error.response ? error.response.data : error;
   }
 };
+
+export const getNextMaintenanceNumber = async () => {
+  try {
+    const response = await api.get("/maintenance/next-number");
+    return response.data.number;
+  } catch (error) {
+    console.error("Error fetching next maintenance number:", error);
+    throw error;
+  }
+};

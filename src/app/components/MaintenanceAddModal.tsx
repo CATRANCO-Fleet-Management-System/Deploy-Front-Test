@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { getAllVehicles } from "@/app/services/vehicleService";
-import { getNextMaintenanceNumber } from "@/app/services/maintenanceService"; // Add a service to fetch the next number
+import { getNextMaintenanceNumber } from "@/app/services/maintenanceService";
 
 const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
   const [vehicles, setVehicles] = useState([]);
