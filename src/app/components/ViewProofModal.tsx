@@ -1,6 +1,18 @@
 import React from "react";
 
-const ViewProofModal = ({ isOpen, onClose, proof }) => {
+interface ViewProofModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  proof: File | null | undefined;
+  onReturnToActive: () => void; // Add this prop
+}
+
+const ViewProofModal: React.FC<ViewProofModalProps> = ({
+  isOpen,
+  onClose,
+  proof,
+  onReturnToActive,
+}) => {
   const BASE_URL = "https://catranco.jwisnetwork.com/storage/";
 
   /**
@@ -8,7 +20,10 @@ const ViewProofModal = ({ isOpen, onClose, proof }) => {
    * @param {string} imagePath - The relative path to the image.
    * @param {string} altText - The alternative text for the image.
    */
-  const renderImage = (imagePath, altText) => {
+  const renderImage = (
+    imagePath: string | null | undefined,
+    altText: string
+  ) => {
     if (!imagePath) {
       return (
         <div className="w-full border border-gray-300 p-2 rounded bg-gray-100 text-center text-gray-500">
@@ -19,7 +34,6 @@ const ViewProofModal = ({ isOpen, onClose, proof }) => {
 
     const fullUrl = `${BASE_URL}${imagePath.replace(/^\/+/, "")}`; // Removes leading slashes if present
     console.log("Rendering image with URL:", fullUrl);
-
     return (
       <img
         src={fullUrl}
@@ -53,16 +67,20 @@ const ViewProofModal = ({ isOpen, onClose, proof }) => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Proof Image Section */}
           <div className="flex-1">
-            <label className="block font-medium mb-2 text-gray-700">Proof Image</label>
+            <label className="block font-medium mb-2 text-gray-700">
+              Proof Image
+            </label>
             {renderImage(proof, "Completion Proof")}
           </div>
 
           {/* Details Section */}
           <div className="flex-1">
-            <label className="block font-medium mb-2 text-gray-700">Details</label>
+            <label className="block font-medium mb-2 text-gray-700">
+              Details
+            </label>
             <p className="border border-gray-300 p-4 rounded bg-gray-100 text-gray-700">
-              Proof related to the maintenance task is displayed here. Verify the provided
-              image for accuracy.
+              Proof related to the maintenance task is displayed here. Verify
+              the provided image for accuracy.
             </p>
           </div>
         </div>
