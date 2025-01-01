@@ -167,7 +167,10 @@ const MaintenanceManagement = () => {
     }
   };
 
-  const handleProofSubmit = async (id, proofData) => {
+  const handleProofSubmit = async (
+    id: string | number,
+    proofData: FormData
+  ) => {
     try {
       const updatedRecord = await toggleMaintenanceSchedulingStatus(
         id,
