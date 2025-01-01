@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Define the base API URL
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -7,15 +7,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
 // Add request interceptor to include the token in the headers
 api.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem('authToken'); // Use 'auth_token' from localStorage
+    const token = localStorage.getItem("authToken"); // Use 'auth_token' from localStorage
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -35,10 +35,13 @@ api.interceptors.request.use(
  */
 export const createMaintenanceScheduling = async (data) => {
   try {
-    const response = await api.post('/user/admin/maintenance-scheduling/create', data);
+    const response = await api.post(
+      "/user/admin/maintenance-scheduling/create",
+      data
+    );
     return response.data;
   } catch (error) {
-    console.error('Create Maintenance Scheduling error:', error);
+    console.error("Create Maintenance Scheduling error:", error);
     throw error.response ? error.response.data : error;
   }
 };
@@ -49,10 +52,10 @@ export const createMaintenanceScheduling = async (data) => {
  */
 export const getAllMaintenanceScheduling = async () => {
   try {
-    const response = await api.get('/user/admin/maintenance-scheduling/all');
+    const response = await api.get("/user/admin/maintenance-scheduling/all");
     return response.data;
   } catch (error) {
-    console.error('Get All Maintenance Scheduling error:', error);
+    console.error("Get All Maintenance Scheduling error:", error);
     throw error.response ? error.response.data : error;
   }
 };
@@ -80,7 +83,10 @@ export const getMaintenanceSchedulingById = async (id) => {
  */
 export const updateMaintenanceScheduling = async (id, data) => {
   try {
-    const response = await api.patch(`/user/admin/maintenance-scheduling/update/${id}`, data);
+    const response = await api.patch(
+      `/user/admin/maintenance-scheduling/update/${id}`,
+      data
+    );
     return response.data;
   } catch (error) {
     console.error(`Update Maintenance Scheduling error: ${id}`, error);
@@ -95,7 +101,9 @@ export const updateMaintenanceScheduling = async (id, data) => {
  */
 export const deleteMaintenanceScheduling = async (id) => {
   try {
-    const response = await api.delete(`/user/admin/maintenance-scheduling/delete/${id}`);
+    const response = await api.delete(
+      `/user/admin/maintenance-scheduling/delete/${id}`
+    );
     return response.data;
   } catch (error) {
     console.error(`Delete Maintenance Scheduling error: ${id}`, error);
@@ -110,11 +118,15 @@ export const deleteMaintenanceScheduling = async (id) => {
  */
 export const toggleMaintenanceSchedulingStatus = async (id, formData) => {
   try {
-    const response = await api.post(`/user/admin/maintenance-scheduling/toggle-status/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await api.post(
+      `/user/admin/maintenance-scheduling/toggle-status/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error(`Toggle Maintenance Scheduling Status error: ${id}`, error);
@@ -122,18 +134,18 @@ export const toggleMaintenanceSchedulingStatus = async (id, formData) => {
   }
 };
 
-
-
 /**
  * Get all active maintenance scheduling records.
  * @returns {Promise<Object[]>} - An array of active maintenance schedules.
  */
 export const getAllActiveMaintenanceScheduling = async () => {
   try {
-    const response = await api.get('/user/admin/maintenance-scheduling/all/active');
+    const response = await api.get(
+      "/user/admin/maintenance-scheduling/all/active"
+    );
     return response.data;
   } catch (error) {
-    console.error('Get All Active Maintenance Scheduling error:', error);
+    console.error("Get All Active Maintenance Scheduling error:", error);
     throw error.response ? error.response.data : error;
   }
 };
@@ -144,10 +156,28 @@ export const getAllActiveMaintenanceScheduling = async () => {
  */
 export const getAllCompletedMaintenanceScheduling = async () => {
   try {
-    const response = await api.get('/user/admin/maintenance-scheduling/all/completed');
+    const response = await api.get(
+      "/user/admin/maintenance-scheduling/all/completed"
+    );
     return response.data;
   } catch (error) {
-    console.error('Get All Completed Maintenance Scheduling error:', error);
+    console.error("Get All Completed Maintenance Scheduling error:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+/**
+ * Get the next maintenance number.
+ * @returns {Promise<number>} - The next maintenance number.
+ */
+export const getNextMaintenanceNumber = async () => {
+  try {
+    const response = await api.get(
+      "/user/admin/maintenance-scheduling/next-number"
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Get Next Maintenance Number error:", error);
     throw error.response ? error.response.data : error;
   }
 };
