@@ -87,6 +87,11 @@ const EditPage = () => {
   }, [maintenanceId]);
 
   const handleSave = async () => {
+    if (!maintenanceDate) {
+      console.error("Maintenance date is required");
+      return; // Prevents proceeding if maintenanceDate is null
+    }
+
     const formattedDate = `${maintenanceDate.toLocaleDateString(
       "en-CA"
     )} ${new Date().toLocaleTimeString("en-GB", { hour12: false })}`; // e.g., 2024-10-14 17:01:31
