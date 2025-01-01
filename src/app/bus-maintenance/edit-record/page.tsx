@@ -36,7 +36,9 @@ const EditPage = () => {
   const [maintenanceNumber, setMaintenanceNumber] = useState("");
   const [vehicleId, setVehicleId] = useState(""); // Store selected vehicle ID
   const [maintenanceCost, setMaintenanceCost] = useState("");
-  const [maintenanceDate, setMaintenanceDate] = useState(new Date());
+  const [maintenanceDate, setMaintenanceDate] = useState<Date | null>(
+    new Date()
+  );
   const [maintenanceAddress, setMaintenanceAddress] = useState("");
   const [maintenanceType, setMaintenanceType] = useState(""); // For maintenance type dropdown
   const [attendingMechanic, setAttendingMechanic] = useState("");
@@ -214,7 +216,7 @@ const EditPage = () => {
               <DatePicker
                 id="maintenanceDate"
                 selected={maintenanceDate}
-                onChange={(date) => setMaintenanceDate(date)}
+                onChange={(date: Date | null) => setMaintenanceDate(date)}
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
               />
