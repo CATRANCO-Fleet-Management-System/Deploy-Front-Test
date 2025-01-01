@@ -16,6 +16,7 @@ import {
   deleteMaintenanceScheduling,
   toggleMaintenanceSchedulingStatus,
 } from "../services/maintenanceService";
+import { AxiosError } from "axios";
 
 import MaintenanceHistoryModal from "../components/MaintenanceHistoryModal";
 
@@ -106,13 +107,19 @@ const MaintenanceManagement = () => {
       );
 
       setIsViewProofModalOpen(false); // Close the modal after successful update
-    } catch (error) {
-      console.error(
-        "Error returning to active:",
-        error.response?.data || error
-      );
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        // Now you can safely access Axios-specific properties
+        console.error(
+          "Error returning to active:",
+          error.response?.data || error.message || error
+        );
+      } else {
+        console.error("Unexpected error:", error);
+      }
     }
   };
+
   // Function to open the history modal
   const handleOpenHistoryModal = () => {
     console.log("View History button clicked");
