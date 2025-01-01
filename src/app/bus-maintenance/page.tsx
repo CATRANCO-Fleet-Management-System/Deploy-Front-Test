@@ -398,9 +398,13 @@ const MaintenanceManagement = () => {
         isOpen={isViewProofModalOpen}
         onClose={() => setIsViewProofModalOpen(false)}
         proof={currentRecord?.maintenance_complete_proof}
-        onReturnToActive={() =>
-          handleReturnToActive(currentRecord?.maintenance_scheduling_id)
-        }
+        onReturnToActive={() => {
+          if (currentRecord?.maintenance_scheduling_id) {
+            handleReturnToActive(currentRecord.maintenance_scheduling_id);
+          } else {
+            console.error("Maintenance scheduling ID is undefined.");
+          }
+        }}
       />
       <MaintenanceHistoryModal
         isOpen={isHistoryModalOpen}
