@@ -143,7 +143,7 @@ const MaintenanceManagement = () => {
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleRemove = async (id) => {
+  const handleRemove = async (id: string | number) => {
     try {
       await deleteMaintenanceScheduling(id);
       fetchRecords();
