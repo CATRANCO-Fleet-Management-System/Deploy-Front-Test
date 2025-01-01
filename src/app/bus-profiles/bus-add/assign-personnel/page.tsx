@@ -7,35 +7,49 @@ import { getAllProfiles } from "@/app/services/userProfile";
 import { getAllVehicles } from "@/app/services/vehicleService"; // Import your vehicle service
 import { createVehicleAssignment } from "@/app/services/vehicleAssignService";
 
+interface Profile {
+  user_profile_id: string;
+  first_name: string;
+  last_name: string;
+  profile: {
+    position: string;
+  };
+}
+
 const BusAdd = () => {
-  const [drivers, setDrivers] = useState([]);
-  const [paos, setPaos] = useState([]);
-  const [vehicles, setVehicles] = useState([]); // State for vehicles
-  const [selectedDriver, setSelectedDriver] = useState("");
-  const [selectedPAO, setSelectedPAO] = useState("");
-  const [selectedVehicle, setSelectedVehicle] = useState(""); // State for selected vehicle
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(""); // Error state
+  const [drivers, setDrivers] = useState<Profile[]>([]); // Specify the type as Profile[]
+  const [paos, setPaos] = useState<Profile[]>([]); // Specify the type as Profile[]
+  const [vehicles, setVehicles] = useState([]); // Type for vehicles (update if you have a vehicle type)
+  const [selectedDriver, setSelectedDriver] = useState<string>("");
+  const [selectedPAO, setSelectedPAO] = useState<string>("");
+  const [selectedVehicle, setSelectedVehicle] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   // Fetch drivers, PAOs, and vehicles on component mount
   useEffect(() => {
     const fetchProfilesAndVehicles = async () => {
-      setLoading(true); // Set loading to true
+      setLoading(true);
       try {
-        const profiles = await getAllProfiles();
-        const driverProfiles = profiles.filter(profile => profile.profile.position === 'driver');
-        const paoProfiles = profiles.filter(profile => profile.profile.position === 'passenger_assistant_officer');
+        const profiles: Profile[] = await getAllProfiles(); // Specify the type of profiles
+        const driverProfiles = profiles.filter(
+          (profile) => profile.profile.position === "driver"
+        );
+        const paoProfiles = profiles.filter(
+          (profile) =>
+            profile.profile.position === "passenger_assistant_officer"
+        );
         const vehicleData = await getAllVehicles(); // Fetch vehicles
 
         setDrivers(driverProfiles);
         setPaos(paoProfiles);
-        setVehicles(vehicleData); // Set vehicles state
+        setVehicles(vehicleData);
       } catch (error) {
-        setError("Error fetching profiles or vehicles."); // Set error message
+        setError("Error fetching profiles or vehicles.");
         console.error("Error fetching profiles or vehicles:", error);
       } finally {
-        setLoading(false); // Set loading to false
+        setLoading(false);
       }
     };
 
@@ -93,14 +107,18 @@ const BusAdd = () => {
                 >
                   <option value="">Select a Driver</option>
                   {drivers.map((driver) => (
-                    <option key={driver.profile.user_profile_id} value={driver.profile.user_profile_id}>
+                    <option
+                      key={driver.profile.user_profile_id}
+                      value={driver.profile.user_profile_id}
+                    >
                       {`${driver.profile.first_name} ${driver.profile.last_name}`}
                     </option>
                   ))}
                 </select>
               )}
-
-              <h1 className="text-xl mt-4">Passenger Officer Assistant Assignment</h1>
+              <h1 className="text-xl mt-4">
+                Passenger Officer Assistant Assignment
+              </h1>
               {loading ? (
                 <p>Loading PAOs...</p>
               ) : (
@@ -111,13 +129,15 @@ const BusAdd = () => {
                 >
                   <option value="">Select a PAO</option>
                   {paos.map((pao) => (
-                    <option key={pao.profile.user_profile_id} value={pao.profile.user_profile_id}>
+                    <option
+                      key={pao.profile.user_profile_id}
+                      value={pao.profile.user_profile_id}
+                    >
                       {`${pao.profile.first_name} ${pao.profile.last_name}`}
                     </option>
                   ))}
                 </select>
               )}
-
               <h1 className="text-xl mt-4">Select Vehicle</h1>
               {loading ? (
                 <p>Loading vehicles...</p>
@@ -130,14 +150,14 @@ const BusAdd = () => {
                   <option value="">Select a Vehicle</option>
                   {vehicles.map((vehicle) => (
                     <option key={vehicle.vehicle_id} value={vehicle.vehicle_id}>
-                      {`${vehicle.vehicle_id}`} {/* Adjust according to your vehicle object structure */}
+                      {`${vehicle.vehicle_id}`}{" "}
+                      {/* Adjust according to your vehicle object structure */}
                     </option>
                   ))}
                 </select>
               )}
-
-              {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
-
+              {error && <p className="text-red-500">{error}</p>}{" "}
+              {/* Display error message */}
               <div className="buttons mt-6">
                 <div className="buttons flex justify-center space-x-4 w-full mt-6">
                   <button
