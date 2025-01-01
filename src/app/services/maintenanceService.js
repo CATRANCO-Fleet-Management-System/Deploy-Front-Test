@@ -67,7 +67,14 @@ export const getAllMaintenanceScheduling = async () => {
  */
 export const getMaintenanceSchedulingById = async (id) => {
   try {
-    const response = await api.get(`/user/admin/maintenance-scheduling/${id}`);
+    const maintenanceIdNumber = Number(id); // Convert ID to number
+    if (isNaN(maintenanceIdNumber)) {
+      throw new Error("Invalid maintenance ID");
+    }
+
+    const response = await api.get(
+      `/user/admin/maintenance-scheduling/${maintenanceIdNumber}`
+    );
     return response.data;
   } catch (error) {
     console.error(`Get Maintenance Scheduling by ID error: ${id}`, error);
