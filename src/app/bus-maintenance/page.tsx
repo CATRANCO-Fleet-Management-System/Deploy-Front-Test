@@ -62,7 +62,7 @@ const MaintenanceManagement = () => {
       )
     : [];
 
-  const handleReturnToActive = async (id) => {
+  const handleReturnToActive = async (id: string | number) => {
     try {
       const formData = new FormData();
 
