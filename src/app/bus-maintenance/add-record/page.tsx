@@ -12,7 +12,7 @@ import { createMaintenanceScheduling } from "@/app/services/maintenanceService";
 const AddPage = () => {
   const router = useRouter();
 
-  const [vehicles, setVehicles] = useState([]); // State for storing vehicles
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [maintenanceNumber, setMaintenanceNumber] = useState("");
   const [vehicleId, setVehicleId] = useState(""); // Store selected vehicle ID
   const [maintenanceCost, setMaintenanceCost] = useState("");
@@ -30,6 +30,11 @@ const AddPage = () => {
     "transmission_service",
   ];
 
+  interface Vehicle {
+    vehicle_id: string;
+    plate_number: string;
+  }
+
   // Fetch all vehicles on component mount
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -45,10 +50,9 @@ const AddPage = () => {
   }, []);
 
   const handleSave = async () => {
-    const formattedDate = `${maintenanceDate.toLocaleDateString("en-CA")} ${new Date().toLocaleTimeString(
-      "en-GB",
-      { hour12: false }
-    )}`; // e.g., 2024-10-14 17:01:31
+    const formattedDate = `${maintenanceDate.toLocaleDateString(
+      "en-CA"
+    )} ${new Date().toLocaleTimeString("en-GB", { hour12: false })}`; // e.g., 2024-10-14 17:01:31
     const data = {
       maintenance_number: maintenanceNumber,
       vehicle_id: vehicleId, // Send selected vehicle ID
@@ -76,7 +80,10 @@ const AddPage = () => {
         <div className="content flex flex-col flex-1 p-10 items-center">
           <div className="form grid grid-cols-2 gap-6 bg-white p-12 rounded-md shadow-md w-[1000px] mr-14">
             <div className="col-span-1">
-              <label htmlFor="maintenanceNumber" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance #
               </label>
               <Input
@@ -88,7 +95,10 @@ const AddPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="attendingMechanic" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="attendingMechanic"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Attending Mechanic
               </label>
               <Input
@@ -100,7 +110,10 @@ const AddPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceType" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceType"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Type
               </label>
               <select
@@ -112,13 +125,19 @@ const AddPage = () => {
                 <option value="">Select a maintenance type</option>
                 {maintenanceTypes.map((type) => (
                   <option key={type} value={type}>
-                    {type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} {/* Format type */}
+                    {type
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}{" "}
+                    {/* Format type */}
                   </option>
                 ))}
               </select>
             </div>
             <div className="col-span-1">
-              <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="vehicleId"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Vehicle
               </label>
               <select
@@ -136,7 +155,10 @@ const AddPage = () => {
               </select>
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceCost" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceCost"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Cost
               </label>
               <Input
@@ -148,7 +170,10 @@ const AddPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceDate" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceDate"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Date
               </label>
               <DatePicker
@@ -160,7 +185,10 @@ const AddPage = () => {
               />
             </div>
             <div className="col-span-1">
-              <label htmlFor="maintenanceAddress" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="maintenanceAddress"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Maintenance Address
               </label>
               <Input
