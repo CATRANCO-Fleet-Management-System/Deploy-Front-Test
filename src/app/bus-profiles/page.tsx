@@ -8,7 +8,7 @@ import BusRecord from "../components/BusRecord";
 import AddBusRecordModal from "../components/AddBusRecordModal";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
 import EditBusRecordModal from "../components/EditBusRecordModal";
-import Pagination from "../components/Pagination"; 
+import Pagination from "../components/Pagination";
 import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
 import HistoryModalForBus from "../components/HistoryModalForBus";
@@ -16,20 +16,30 @@ import HistoryModalForBus from "../components/HistoryModalForBus";
 const BusRecordDisplay = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; 
+  const itemsPerPage = 3;
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAssignPersonnelModalOpen, setIsAssignPersonnelModalOpen] =
     useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [busRecords, setBusRecords] = useState([]);
   const [vehicleAssignments, setVehicleAssignments] = useState([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [busHistory, setBusHistory] = useState([]);
 
-  // Fetch data from the backend
+  interface BusRecordType {
+    vehicle_id: string;
+    plate_number: string;
+    or_id: string;
+    cr_id: string;
+    third_pli: string;
+    ci: string | null;
+    route: string | null;
+  }
+
+  const [busRecords, setBusRecords] = useState<BusRecordType[]>([]);
+
   const fetchData = async () => {
     try {
       const vehicles = await getAllVehicles();
@@ -41,7 +51,6 @@ const BusRecordDisplay = () => {
     }
   };
 
-  // Fetch data on component mount
   useEffect(() => {
     fetchData();
   }, []);
@@ -63,8 +72,6 @@ const BusRecordDisplay = () => {
     setIsHistoryModalOpen(true);
   };
 
-  // Handle deleting a vehicle
-  // Handle deleting a vehicle
   const handleDelete = (recordId) => {
     setDeleteRecordId(recordId);
     setIsDeletePopupOpen(true); // Open the confirmation popup
@@ -108,6 +115,7 @@ const BusRecordDisplay = () => {
     setBusRecords((prevRecords) => [...prevRecords, newBus]);
     setSelectedVehicleId(newBus.vehicle_id);
     setIsAssignPersonnelModalOpen(true);
+    fetchData();
   };
 
   const handleEditBus = (updatedBus) => {
@@ -116,19 +124,27 @@ const BusRecordDisplay = () => {
         record.vehicle_id === updatedBus.vehicle_id ? updatedBus : record
       )
     );
-
-    // Handle additional steps like opening personnel modal if needed
-    setSelectedVehicleId(updatedBus.vehicle_id);
-    setIsAssignPersonnelModalOpen(false); // Optional: Manage modal states
-    setIsEditModalOpen(false); // Close the edit modal
+    setIsEditModalOpen(false);
+    fetchData();
   };
 
   // Callback for updating vehicle assignments
   const handleAddVehicleAssignment = (newAssignment) => {
-    setVehicleAssignments((prevAssignments) => [
-      ...prevAssignments,
-      newAssignment,
-    ]);
+    // Log the current assignments before adding a new one
+    console.log("Previous Assignments:", prevAssignments);
+
+    // Log the new assignment being added
+    console.log("New Assignment:", newAssignment);
+
+    // Update the state with the new assignment
+    setVehicleAssignments((prevAssignments) => {
+      const updatedAssignments = [...prevAssignments, newAssignment];
+
+      // Log the updated list after adding the new assignment
+      console.log("Updated Assignments:", updatedAssignments);
+
+      return updatedAssignments;
+    });
   };
 
   // Filter bus records by search term
@@ -177,32 +193,32 @@ const BusRecordDisplay = () => {
     <Layout>
       <Header title="Bus Profiles" />
       <div className="options flex flex-col md:flex-row items-center p-4 w-full md:w-9/12 ml-1 space-y-4 md:space-y-0">
-  <input
-    type="text"
-    placeholder="Find bus"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 md:mr-4 w-full md:w-auto"
-  />
+        <input
+          type="text"
+          placeholder="Find bus"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 px-4 py-2 border border-gray-500 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 md:mr-4 w-full md:w-auto"
+        />
 
-<div className="flex flex-col md:flex-row w-full md:w-auto md:space-x-4">
-  <button
-    onClick={() => setIsAddModalOpen(true)}
-    className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 w-full md:w-auto mb-4 md:mb-0"
-  >
-    <FaPlus size={22} className="mr-2" />
-    Add New
-  </button>
+        <div className="flex flex-col md:flex-row w-full md:w-auto md:space-x-4">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center px-4 py-2 border-2 border-blue-500 rounded-md text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-50 w-full md:w-auto mb-4 md:mb-0"
+          >
+            <FaPlus size={22} className="mr-2" />
+            Add New
+          </button>
 
-  <button
-    onClick={openHistoryModal}
-    className="flex items-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full md:w-auto"
-  >
-    <FaHistory size={22} className="mr-2" />
-    View History
-  </button>
-</div>
-</div>
+          <button
+            onClick={openHistoryModal}
+            className="flex items-center px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full md:w-auto"
+          >
+            <FaHistory size={22} className="mr-2" />
+            View History
+          </button>
+        </div>
+      </div>
 
       <div className="records flex flex-col h-full">
         <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5">
@@ -225,14 +241,7 @@ const BusRecordDisplay = () => {
                 assignedPAO={conductor}
                 route={record.route || "Not Assigned"}
                 onDelete={() => handleDelete(record.vehicle_id)} // Update this line
-                onEdit={() => {
-                  setSelectedVehicleId(record.vehicle_id);
-                  setIsEditModalOpen(true);
-                  console.log(
-                    "BusRecordDisplay vehicle_id:",
-                    record.vehicle_id
-                  );
-                }}
+                onUpdate={handleEditBus}
               />
             );
           })}

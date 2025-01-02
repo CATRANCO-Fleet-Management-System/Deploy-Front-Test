@@ -104,13 +104,9 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
     try {
       const updatedVehicle = await updateVehicle(vehicle_id, updatedData);
 
-      // Trigger refreshData if provided
-      if (refreshData) {
-        await refreshData();
-      }
-
+      // Call onSubmit to update parent component state
       if (onSubmit) {
-        onSubmit(updatedVehicle); // Pass updated record back to parent
+        onSubmit(updatedVehicle);
       }
 
       onClose(); // Close the modal

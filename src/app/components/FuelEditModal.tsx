@@ -100,8 +100,6 @@ const FuelEditModal = ({
         console.log("Fuel log updated:", response);
         onUpdate(response.fuel_log);
         onClose();
-        // Refresh page after successful update
-        window.location.reload(); // This will reload the page
       } catch (error) {
         console.error("Failed to update fuel log:", error);
         alert(

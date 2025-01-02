@@ -64,7 +64,12 @@ const AssignBusPersonnelModal = ({
         user_profile_ids: [selectedDriver, selectedPAO],
       };
 
-      console.log("Submitting assignment data:", assignmentData);
+      // Log the data that will be saved
+      console.log("Saving the following assignment data:");
+      console.log("Selected Driver ID:", selectedDriver);
+      console.log("Selected PAO ID:", selectedPAO);
+      console.log("Selected Vehicle ID:", selectedVehicle);
+      console.log("Assignment Data:", assignmentData);
 
       const response = await createVehicleAssignment(assignmentData);
 

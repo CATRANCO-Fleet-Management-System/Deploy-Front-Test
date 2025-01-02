@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  getVehicleAssignmentById,
   createVehicleAssignment,
+  getAllVehicleAssignments,
 } from "@/app/services/vehicleAssignService";
 import EditBusRecordModal from "@/app/components/EditBusRecordModal";
 import EditPersonnelModal from "@/app/components/EditPersonnelModal";
@@ -72,31 +72,39 @@ const BusRecord: React.FC<BusBoxProps> = ({
   }, []);
 
   useEffect(() => {
-    const fetchOrCreateAssignment = async () => {
-      if (!assignmentId) {
-        setLoading(true);
-        try {
-          const response = await getVehicleAssignmentById(vehicle_id);
-          if (response?.vehicle_assignment_id) {
-            setAssignmentId(response.vehicle_assignment_id);
-          } else {
-            const newAssignment = await createVehicleAssignment({
-              vehicle_id,
-              user_profile_ids: [assignedDriver, assignedPAO].filter(Boolean),
-            });
-            setAssignmentId(newAssignment.vehicle_assignment_id);
-          }
-        } catch (error) {
-          console.error("Error fetching or creating assignment ID:", error);
-          setAssignmentId(null);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
+    setAssignmentId(initialAssignmentId);
+  }, [initialAssignmentId]);
 
+  const fetchOrCreateAssignment = async () => {
+    if (!assignmentId) {
+      setLoading(true);
+      try {
+        const response = await getAllVehicleAssignments();
+        const foundAssignment = response.find(
+          (assignment) => assignment.vehicle.vehicle_id === vehicle_id
+        );
+
+        if (foundAssignment) {
+          setAssignmentId(foundAssignment.vehicle_assignment_id);
+        } else {
+          const newAssignment = await createVehicleAssignment({
+            vehicle_id,
+            user_profile_ids: [assignedDriver, assignedPAO].filter(Boolean),
+          });
+          setAssignmentId(newAssignment.vehicle_assignment_id);
+        }
+      } catch (error) {
+        console.error("Error fetching or creating assignment ID:", error);
+        setAssignmentId(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
     fetchOrCreateAssignment();
-  }, [assignmentId, vehicle_id, assignedDriver, assignedPAO]);
+  }, [vehicle_id, assignedDriver, assignedPAO, assignmentId]); // Re-run fetch if vehicle_id, assignedDriver, or assignedPAO change
 
   const handleEditBus = () => {
     setIsEditBusModalOpen(true);
@@ -111,6 +119,16 @@ const BusRecord: React.FC<BusBoxProps> = ({
   const handleModalClose = () => {
     setIsEditBusModalOpen(false);
     setIsEditPersonnelModalOpen(false);
+  };
+
+  const handleUpdate = (updatedBus: any) => {
+    onUpdate(updatedBus); // Trigger parent update
+
+    // Optionally update the assignmentId directly if needed
+    setAssignmentId(updatedBus.assignmentId);
+
+    // Re-fetch assignment after update to reflect changes
+    fetchOrCreateAssignment();
   };
 
   return (
@@ -222,14 +240,24 @@ const BusRecord: React.FC<BusBoxProps> = ({
         <EditBusRecordModal
           vehicle_id={vehicle_id}
           onClose={handleModalClose}
-          onSubmit={(updatedBus) => onUpdate(updatedBus)}
+          onSubmit={(updatedBus) => handleUpdate(updatedBus)} // Pass the handleUpdate function here
         />
       )}
+
       {isEditPersonnelModalOpen && (
         <EditPersonnelModal
-          vehicle_id={vehicle_id}
+          assignmentId={assignmentId}
+          vehicleId={vehicle_id}
+          initialDriver={assignedDriver}
+          initialPAO={assignedPAO}
           onClose={handleModalClose}
-          onSubmit={(updatedPersonnel) => onUpdate(updatedPersonnel)}
+          onUpdate={(updatedDriver, updatedPAO) => {
+            handleUpdate({
+              updatedDriver,
+              updatedPAO,
+              vehicle_id,
+            });
+          }}
         />
       )}
     </div>
