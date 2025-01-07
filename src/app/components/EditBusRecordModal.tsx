@@ -279,6 +279,7 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
             <label className="block text-sm font-medium text-gray-700">
               Comprehensive Insurance Validity
             </label>
+          
             <DatePicker
               id="ciValidity"
               selected={ci_validity}
