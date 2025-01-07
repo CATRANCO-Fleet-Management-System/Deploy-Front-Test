@@ -157,7 +157,9 @@ const FuelMonitoring = () => {
   };
 
   const handlePrint = async () => {
-    const chartElement = document.querySelector(".chart-container");
+    const chartElement = document.querySelector(
+      ".chart-container"
+    ) as HTMLElement; // Cast to HTMLElement
 
     if (!chartElement) return;
 
@@ -180,105 +182,103 @@ const FuelMonitoring = () => {
   }
 
   return (
-   <Layout>
-  <Header title="Fuel Monitoring" />
-  <section className="p-4">
-    <div className="flex justify-center items-center w-full">
-      <div className="relative w-full sm:w-[80%] lg:w-[70%] xl:w-[95%]">
-        <div className="relative chart-container w-full h-[500px] bg-white p-4 rounded-lg shadow-lg">
-          <div className="absolute inset-0 flex justify-center items-center opacity-10 z-0">
-            <span className="text-6xl font-bold text-gray-500">
-              {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
-            </span>
+    <Layout>
+      <Header title="Fuel Monitoring" />
+      <section className="p-4">
+        <div className="flex justify-center items-center w-full">
+          <div className="relative w-full sm:w-[80%] lg:w-[70%] xl:w-[95%]">
+            <div className="relative chart-container w-full h-[500px] bg-white p-4 rounded-lg shadow-lg">
+              <div className="absolute inset-0 flex justify-center items-center opacity-10 z-0">
+                <span className="text-6xl font-bold text-gray-500">
+                  {selectedBus ? `Bus ${selectedBus}` : "Loading..."}
+                </span>
+              </div>
+              <Line
+                data={data}
+                options={options}
+                className="relative z-10"
+                height={500}
+              />
+            </div>
           </div>
-          <Line
-            data={data}
-            options={options}
-            className="relative z-10"
-            height={500}
+        </div>
+
+        <div className="chart-options w-full sm:w-5/6 mx-auto flex flex-col sm:flex-row justify-between items-center mt-3">
+          <div className="time-intervals flex flex-col sm:flex-row space-y-3 sm:space-x-3 sm:space-y-0 mb-3 sm:mb-0 w-full sm:w-auto">
+            {["daily", "weekly", "monthly", "yearly"].map((interval) => (
+              <button
+                key={interval}
+                className={`px-2 py-1 rounded w-full sm:w-auto ${
+                  timeInterval === interval
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-500 text-white"
+                }`}
+                onClick={() => setTimeInterval(interval)}
+              >
+                {interval.charAt(0).toUpperCase() + interval.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          <div className="right-btns flex flex-col sm:flex-row space-y-3 sm:space-x-4 sm:space-y-0 mt-3 sm:mt-0 w-full sm:w-auto ml-auto">
+            <button
+              onClick={navigateToViewRecord}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full sm:w-auto"
+              disabled={!selectedBus}
+            >
+              View Record
+            </button>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
+            >
+              Print Chart as PDF
+            </button>
+          </div>
+        </div>
+
+        <div className="buses mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full sm:w-5/6 mx-auto">
+          {displayedBuses.map((bus) => {
+            const maintenance = maintenanceSchedules.find(
+              (schedule) =>
+                schedule.vehicle_id === bus.vehicle_id &&
+                schedule.maintenance_status === "active"
+            );
+
+            const bgColor = maintenance ? "bg-yellow-400" : "bg-green-400";
+            const textColor = maintenance ? "text-black" : "text-white";
+
+            return (
+              <div
+                key={bus.vehicle_id}
+                className={`flex flex-col p-4 rounded-lg shadow cursor-pointer ${bgColor} ${
+                  selectedBus === bus.vehicle_id ? "ring-2 ring-blue-500" : ""
+                }`}
+                onClick={() => handleBusClick(bus.vehicle_id)}
+              >
+                <FaBus size={24} className="mb-2" />
+                <span className={`font-bold ${textColor}`}>
+                  Bus {bus.vehicle_id} - {bus.plate_number}
+                </span>
+                <span className={`${textColor}`}>
+                  {maintenance
+                    ? `${maintenance.maintenance_type} Scheduled`
+                    : "On Operation"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
         </div>
-      </div>
-    </div>
-
-    <div className="chart-options w-full sm:w-5/6 mx-auto flex flex-col sm:flex-row justify-between items-center mt-3">
-      <div className="time-intervals flex flex-col sm:flex-row space-y-3 sm:space-x-3 sm:space-y-0 mb-3 sm:mb-0 w-full sm:w-auto">
-        {["daily", "weekly", "monthly", "yearly"].map((interval) => (
-          <button
-            key={interval}
-            className={`px-2 py-1 rounded w-full sm:w-auto ${
-              timeInterval === interval
-                ? "bg-blue-500 text-white"
-                : "bg-gray-500 text-white"
-            }`}
-            onClick={() => setTimeInterval(interval)}
-          >
-            {interval.charAt(0).toUpperCase() + interval.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      <div className="right-btns flex flex-col sm:flex-row space-y-3 sm:space-x-4 sm:space-y-0 mt-3 sm:mt-0 w-full sm:w-auto ml-auto">
-        <button
-          onClick={navigateToViewRecord}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full sm:w-auto"
-          disabled={!selectedBus}
-        >
-          View Record
-        </button>
-        <button
-          onClick={handlePrint}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
-        >
-          Print Chart as PDF
-        </button>
-      </div>
-    </div>
-
-    <div className="buses mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full sm:w-5/6 mx-auto">
-      {displayedBuses.map((bus) => {
-        const maintenance = maintenanceSchedules.find(
-          (schedule) =>
-            schedule.vehicle_id === bus.vehicle_id &&
-            schedule.maintenance_status === "active"
-        );
-
-        const bgColor = maintenance ? "bg-yellow-400" : "bg-green-400";
-        const textColor = maintenance ? "text-black" : "text-white";
-
-        return (
-          <div
-            key={bus.vehicle_id}
-            className={`flex flex-col p-4 rounded-lg shadow cursor-pointer ${bgColor} ${
-              selectedBus === bus.vehicle_id ? "ring-2 ring-blue-500" : ""
-            }`}
-            onClick={() => handleBusClick(bus.vehicle_id)}
-          >
-            <FaBus size={24} className="mb-2" />
-            <span className={`font-bold ${textColor}`}>
-              Bus {bus.vehicle_id} - {bus.plate_number}
-            </span>
-            <span className={`${textColor}`}>
-              {maintenance
-                ? `${maintenance.maintenance_type} Scheduled`
-                : "On Operation"}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-
-    <div className="mt-6 flex justify-center">
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
-    </div>
-  </section>
-</Layout>
-  
-
+      </section>
+    </Layout>
   );
 };
 
