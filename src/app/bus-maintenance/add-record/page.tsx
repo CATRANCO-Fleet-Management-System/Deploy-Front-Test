@@ -178,14 +178,12 @@ const AddPage = () => {
               </label>
               <DatePicker
                 id="maintenanceDate"
-                selected={maintenanceDate}
-                onChange={(date: Date | null) =>
+                selected={maintenanceDate} // Single date object
+                onChange={(date: Date) =>
                   setMaintenanceDate(date ?? new Date())
-                }
+                } // Single date handler
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
-                selectsRange={false} // Disable range selection
-                isClearable
               />
             </div>
             <div className="col-span-1">
