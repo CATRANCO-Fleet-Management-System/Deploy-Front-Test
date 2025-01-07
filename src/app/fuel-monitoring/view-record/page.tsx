@@ -99,48 +99,37 @@ const ViewRecord = () => {
     scales: {
       x: {
         ticks: {
-          maxRotation: 45,
+          maxRotation: 45, // Adjust the rotation
           minRotation: 0,
         },
       },
     },
     plugins: {
       tooltip: {
-        enabled: true,
-        mode: "nearest", // Make sure this is a valid mode from the InteractionModeMap
-        intersect: true,
+        enabled: true, // Enable tooltips
+        mode: "index" as const, // Change 'index' to 'index' as a constant type
+        intersect: false, // Show tooltip when hovering over any point in the dataset
         callbacks: {
-          title: (tooltipItem) => tooltipItem[0].label,
+          title: (tooltipItem) => {
+            // Display the label (date, day, or period) as the title of the tooltip
+            return tooltipItem[0].label;
+          },
           label: (tooltipItem) => {
+            // Get the dataset label and value for the tooltip (Distance and Liters)
             const datasetIndex = tooltipItem.datasetIndex;
             const data = tooltipItem.raw;
-            const distance =
-              tooltipItem.chart.data.datasets[0].data[tooltipItem.dataIndex];
-            const liters =
-              tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex];
-
-            let tooltipText = "";
             if (datasetIndex === 0) {
-              tooltipText = `Distance: ${distance} KM`;
+              // Distance (KM) dataset
+              return `Distance: ${data} KM`;
+            } else if (datasetIndex === 1) {
+              // Liters Used (L) dataset
+              return `Liters: ${data} L`;
             }
-            if (datasetIndex === 1) {
-              tooltipText = `Liters: ${liters} L`;
-            }
-
-            if (
-              datasetIndex === 0 &&
-              tooltipItem.chart.data.datasets[1].data[tooltipItem.dataIndex] !==
-                undefined
-            ) {
-              tooltipText = `Distance: ${distance} KM\nLiters: ${liters} L`;
-            }
-            return tooltipText;
           },
         },
       },
     },
   };
-
   const handleDeleteFuelLog = async (fuelLogId) => {
     try {
       await deleteFuelLog(fuelLogId); // API call to delete fuel log
