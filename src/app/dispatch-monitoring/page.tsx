@@ -19,14 +19,16 @@ interface BusData {
   status: string;
   time: string;
   dispatch_logs_id: string | null;
-  name: string; 
+  name: string;
 }
 
 const DispatchMonitoring: React.FC = () => {
   const busDataRef = useRef<BusData[]>([]);
   const pathDataRef = useRef<{ lat: number; lng: number }[]>([]);
   const [busData, setBusData] = useState<BusData[]>([]);
-  const [pathData, setPathData] = useState<{ lat: number; lng: number }[]>([]);
+  const [pathData, setPathData] = useState<{
+    [busNumber: string]: { lat: number; lng: number }[];
+  }>({});
   const [loading, setLoading] = useState(true);
   const [selectedBus, setSelectedBus] = useState<string | null>(null);
   const [activeButton, setActiveButton] = useState<string>("all");
@@ -114,16 +116,19 @@ const DispatchMonitoring: React.FC = () => {
 
         console.log("Real Time Data:", event);
 
-        // Reset polyline if dispatch_log is null
         if (!dispatch_log) {
-          setPathData([]);
-          pathDataRef.current = [];
+          setPathData((prev) => ({
+            ...prev,
+            [vehicle_id]: [],
+          }));
         }
 
         if (selectedBus === vehicle_id) {
           const newPoint = { lat: location.latitude, lng: location.longitude };
-          pathDataRef.current = [...pathDataRef.current, newPoint];
-          setPathData([...pathDataRef.current]);
+          setPathData((prev) => ({
+            ...prev,
+            [vehicle_id]: [...(prev[vehicle_id] || []), newPoint],
+          }));
         }
 
         const updatedBusData = busDataRef.current.map((bus) =>
@@ -135,7 +140,7 @@ const DispatchMonitoring: React.FC = () => {
                 speed: location.speed || 0,
                 time: formatTime(event.timestamp),
                 status: dispatch_log?.status || "idle",
-                dispatch_logs_id: dispatch_log?.dispatch_logs_id || null, // Update dispatch_logs_id
+                dispatch_logs_id: dispatch_log?.dispatch_logs_id || null,
               }
             : bus
         );
@@ -148,11 +153,11 @@ const DispatchMonitoring: React.FC = () => {
             speed: location.speed || 0,
             time: formatTime(event.timestamp),
             status: dispatch_log?.status || "idle",
-            dispatch_logs_id: dispatch_log?.dispatch_logs_id || null, // Add new bus data if needed
+            dispatch_logs_id: dispatch_log?.dispatch_logs_id || null,
+            name: "Unnamed",
           });
         }
 
-        // Save the updated bus data to localStorage
         localStorage.setItem("busData", JSON.stringify(updatedBusData));
 
         busDataRef.current = updatedBusData;
@@ -192,16 +197,22 @@ const DispatchMonitoring: React.FC = () => {
               <div className="w-full h-64 sm:h-96 lg:h-[500px]">
                 <DispatchMap
                   busData={busData}
-                  pathData={pathData}
+                  pathData={pathData} // Now pathData is an object with bus numbers as keys
                   onBusClick={(busNumber) => {
                     setSelectedBus(busNumber);
                     const clickedBus = busData.find(
                       (bus) => bus.number === busNumber
                     );
                     if (clickedBus) {
-                      setPathData([
-                        { lat: clickedBus.latitude, lng: clickedBus.longitude },
-                      ]);
+                      setPathData((prev) => ({
+                        ...prev,
+                        [busNumber]: [
+                          {
+                            lat: clickedBus.latitude,
+                            lng: clickedBus.longitude,
+                          },
+                        ],
+                      }));
                     }
                   }}
                   selectedBus={selectedBus}
