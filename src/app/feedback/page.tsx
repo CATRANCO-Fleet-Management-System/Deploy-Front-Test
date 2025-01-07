@@ -4,10 +4,24 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
-import { FaSearch } from "react-icons/fa";
 import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
 import Pagination from "../components/Pagination";
+
+// Define the FeedbackLog interface for typing the data
+interface FeedbackLog {
+  feedback_logs_id: string;
+  phone_number: string | null;
+  rating: number;
+  comments: string;
+  vehicle_id: string;
+  created_at: string;
+}
+
+// Define the response type for fetchAllFuelLogs
+interface FeedbackLogsResponse {
+  data: FeedbackLog[];
+}
 
 const FeedbackRecordDisplay = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,16 +29,17 @@ const FeedbackRecordDisplay = () => {
   const [itemsPerPage] = useState(4);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
-  const [feedbackRecords, setFeedbackRecords] = useState([]);
+  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackLog[]>([]); // Set initial state to FeedbackLog[]
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const logs = await fetchAllFuelLogs(); // Use the correct service
-        console.log("Fetched Feedback Logs:", logs); // Debug response
-        setFeedbackRecords(logs.data || []); // Set feedback records
+        // Ensure the response is typed correctly
+        const response: FeedbackLogsResponse = await fetchAllFuelLogs(); // Assuming fetchAllFuelLogs returns an object with a data property
+        console.log("Fetched Feedback Logs:", response); // Debug response
+        setFeedbackRecords(response.data || []); // Set feedback records correctly
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
