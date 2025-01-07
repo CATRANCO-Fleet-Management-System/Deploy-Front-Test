@@ -5,10 +5,22 @@ import Header from "../components/Header";
 import { FaCarCrash, FaCog, FaOilCan, FaTools, FaTruck } from "react-icons/fa";
 import { getAllActiveMaintenanceScheduling } from "@/app/services/maintenanceService"; // Assuming this service exists
 
+interface MaintenanceRecord {
+  maintenance_scheduling_id: number;
+  maintenance_type: string;
+  maintenance_date: string;
+}
+
+interface MaintenanceResponse {
+  data: MaintenanceRecord[];
+}
+
 const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [maintenanceRecords, setMaintenanceRecords] = useState([]); // State to store maintenance records
+  const [maintenanceRecords, setMaintenanceRecords] = useState<
+    MaintenanceRecord[]
+  >([]); // State to store maintenance records
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -32,7 +44,8 @@ const DashboardHeader = () => {
   useEffect(() => {
     const fetchActiveMaintenance = async () => {
       try {
-        const response = await getAllActiveMaintenanceScheduling();
+        const response: MaintenanceResponse =
+          await getAllActiveMaintenanceScheduling();
         setMaintenanceRecords(response.data || []); // Ensure data exists
       } catch (error) {
         console.error("Error fetching active maintenance records:", error);
@@ -81,20 +94,26 @@ const DashboardHeader = () => {
                           Bus {record.maintenance_scheduling_id} Maintenance
                         </h1>
                         <p className="description-notif text-gray-700">
-                          {record.maintenance_type.replace(/_/g, " ").toUpperCase()}
+                          {record.maintenance_type
+                            .replace(/_/g, " ")
+                            .toUpperCase()}
                         </p>
                       </div>
                       <div className="date-notif ml-auto mr-10">
                         <div className="date-description">
                           <h1 className="title font-semibold">Date</h1>
-                          <p className="date">{record.maintenance_date || "N/A"}</p>
+                          <p className="date">
+                            {record.maintenance_date || "N/A"}
+                          </p>
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
                   <div className="flex justify-center items-center h-full">
-                    <p className="text-gray-500">No active maintenance records found.</p>
+                    <p className="text-gray-500">
+                      No active maintenance records found.
+                    </p>
                   </div>
                 )}
               </div>
