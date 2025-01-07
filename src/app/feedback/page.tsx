@@ -24,17 +24,24 @@ const FeedbackRecordDisplay = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
 
+  interface FuelLogsResponse {
+    data: FeedbackRecord[];
+  }
+
+  const fetchAllFuelLogs = async (): Promise<FuelLogsResponse> => {
+    const response = await fetch("/api/fuel-logs");
+    if (!response.ok) {
+      throw new Error("Failed to fetch fuel logs");
+    }
+    return response.json();
+  };
   useEffect(() => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const response = await fetchAllFuelLogs();
+        const response: FuelLogsResponse = await fetchAllFuelLogs();
         console.log("Fetched Feedback Logs:", response); // Debug the response
-        if (Array.isArray(response)) {
-          setFeedbackRecords(response); // Directly use the array
-        } else {
-          throw new Error("Invalid response format: expected an array");
-        }
+        setFeedbackRecords(response.data); // Use the `data` property
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
