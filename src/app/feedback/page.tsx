@@ -30,10 +30,10 @@ const FeedbackRecordDisplay = () => {
         setLoading(true);
         const response = await fetchAllFuelLogs();
         console.log("Fetched Feedback Logs:", response); // Debug the response
-        if (Array.isArray(response.data)) {
-          setFeedbackRecords(response.data); // Use only the `data` array
+        if (Array.isArray(response)) {
+          setFeedbackRecords(response); // Directly use the array
         } else {
-          throw new Error("Invalid response format: data is not an array");
+          throw new Error("Invalid response format: expected an array");
         }
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
