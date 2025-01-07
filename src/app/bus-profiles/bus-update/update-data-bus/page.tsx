@@ -27,10 +27,10 @@ const BusUpdate = () => {
     supplier: "",
   });
 
-  // State for validity dates
-  const [third_pli_validity, setTPLValidity] = useState(null);
-  const [ci_validity, setCIValidity] = useState(null);
-  const [date_purchased, setDatePurchased] = useState(null);
+  // State for validity dates (initialized to empty strings)
+  const [third_pli_validity, setTPLValidity] = useState("");
+  const [ci_validity, setCIValidity] = useState("");
+  const [date_purchased, setDatePurchased] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,9 +58,9 @@ const BusUpdate = () => {
           ci: data.ci || "",
           supplier: data.supplier || "",
         });
-        setTPLValidity(data.third_pli_validity ? new Date(data.third_pli_validity) : null);
-        setCIValidity(data.ci_validity ? new Date(data.ci_validity) : null);
-        setDatePurchased(data.date_purchased ? new Date(data.date_purchased) : null);
+        setTPLValidity(data.third_pli_validity ? data.third_pli_validity : "");
+        setCIValidity(data.ci_validity ? data.ci_validity : "");
+        setDatePurchased(data.date_purchased ? data.date_purchased : "");
       } catch (err) {
         console.error("Error fetching vehicle details:", err);
         setError("Failed to fetch vehicle details.");
@@ -75,7 +75,7 @@ const BusUpdate = () => {
   // Update handler
   const handleUpdate = async () => {
     try {
-      // Prepare the updated data (avoid updating vehicle_id and plate_number if they aren't changed)
+      // Prepare the updated data
       const updatedData = {
         or_id: busDetails.or_id,
         cr_id: busDetails.cr_id,
@@ -85,9 +85,9 @@ const BusUpdate = () => {
         third_pli_policy_no: busDetails.third_pli_policy_no,
         ci: busDetails.ci,
         supplier: busDetails.supplier,
-        third_pli_validity: third_pli_validity ? third_pli_validity.toISOString().split("T")[0] : null,
-        ci_validity: ci_validity ? ci_validity.toISOString().split("T")[0] : null,
-        date_purchased: date_purchased ? date_purchased.toISOString().split("T")[0] : null,
+        third_pli_validity: third_pli_validity || null,
+        ci_validity: ci_validity || null,
+        date_purchased: date_purchased || null,
       };
 
       // Update the vehicle record
@@ -98,7 +98,6 @@ const BusUpdate = () => {
       console.error("Error updating vehicle:", err);
 
       if (err.response?.data?.errors) {
-        // Handle specific validation errors (e.g., duplicate vehicle_id or plate_number)
         const validationErrors = err.response.data.errors;
         const errorMessages = Object.values(validationErrors).flat().join("\n");
         alert(`Update failed:\n${errorMessages}`);
@@ -140,9 +139,12 @@ const BusUpdate = () => {
                     placeholder="Vehicle ID"
                     value={busDetails.vehicle_id}
                     onChange={(e) =>
-                      setBusDetails({ ...busDetails, vehicle_id: e.target.value })
+                      setBusDetails({
+                        ...busDetails,
+                        vehicle_id: e.target.value,
+                      })
                     }
-                    disabled // Disable vehicle_id since it should not be updated
+                    disabled
                   />
                   <h1>OR Number</h1>
                   <Input
@@ -171,9 +173,12 @@ const BusUpdate = () => {
                     placeholder="Plate Number"
                     value={busDetails.plate_number}
                     onChange={(e) =>
-                      setBusDetails({ ...busDetails, plate_number: e.target.value })
+                      setBusDetails({
+                        ...busDetails,
+                        plate_number: e.target.value,
+                      })
                     }
-                    disabled // Disable plate_number since it should not be updated
+                    disabled
                   />
                 </div>
                 <div className="2nd-row flex-col m-5 w-96 space-y-4 mt-10">
@@ -184,7 +189,10 @@ const BusUpdate = () => {
                     placeholder="Third Party Insurance"
                     value={busDetails.third_pli}
                     onChange={(e) =>
-                      setBusDetails({ ...busDetails, third_pli: e.target.value })
+                      setBusDetails({
+                        ...busDetails,
+                        third_pli: e.target.value,
+                      })
                     }
                   />
                   <h1>Third Party Liability Policy Number</h1>
@@ -202,7 +210,9 @@ const BusUpdate = () => {
                   />
                   <h1>Third Party Liability Validity</h1>
                   <DatePicker
-                    selected={third_pli_validity}
+                    selected={
+                      third_pli_validity ? new Date(third_pli_validity) : ""
+                    }
                     onChange={(date) => setTPLValidity(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
@@ -219,7 +229,7 @@ const BusUpdate = () => {
                   />
                   <h1>Comprehensive Insurance Validity</h1>
                   <DatePicker
-                    selected={ci_validity}
+                    selected={ci_validity ? new Date(ci_validity) : ""}
                     onChange={(date) => setCIValidity(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
@@ -228,7 +238,7 @@ const BusUpdate = () => {
                 <div className="3rd-row ml-14 mt-10">
                   <h1>Date Purchased</h1>
                   <DatePicker
-                    selected={date_purchased}
+                    selected={date_purchased ? new Date(date_purchased) : ""}
                     onChange={(date) => setDatePurchased(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"

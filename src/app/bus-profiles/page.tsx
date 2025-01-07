@@ -36,6 +36,7 @@ const BusRecordDisplay = () => {
     third_pli: string;
     ci: string | null;
     route: string | null;
+    date_purchased: Date | string | null;
   }
 
   const [busRecords, setBusRecords] = useState<BusRecordType[]>([]);
