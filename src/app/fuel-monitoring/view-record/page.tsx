@@ -19,6 +19,17 @@ import { groupByTimeInterval } from "@/app/helper/fuel-helper";
 import FuelHistoryModal from "@/app/components/FuelHistoryModal";
 import Layout from "@/app/components/Layout";
 
+interface FuelLog {
+  fuel_logs_id: string;
+  vehicle_id: string;
+  purchase_date: string;
+  odometer_km: number;
+  fuel_type: string;
+  fuel_price: number;
+  fuel_liters_quantity: number;
+  total_expense: number;
+}
+
 const ViewRecord = () => {
   const searchParams = useSearchParams();
   const busNumber = searchParams.get("bus") || "001";
@@ -28,7 +39,7 @@ const ViewRecord = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedFuelLog, setSelectedFuelLog] = useState(null);
   const [selectedBus, setSelectedBus] = useState(busNumber);
-  const [fuelLogs, setFuelLogs] = useState([]);
+  const [fuelLogs, setFuelLogs] = useState<FuelLog[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [timeInterval, setTimeInterval] = useState("daily");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -297,7 +308,8 @@ const ViewRecord = () => {
                   {displayedRecords
                     .sort(
                       (a, b) =>
-                        new Date(a.purchase_date) - new Date(b.purchase_date)
+                        new Date(a.purchase_date).getTime() -
+                        new Date(b.purchase_date).getTime()
                     )
                     .map((entry) => (
                       <tr key={entry.fuel_logs_id} className="border-t">
