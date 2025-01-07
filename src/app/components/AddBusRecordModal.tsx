@@ -231,8 +231,8 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
             </label>
             <input
               type="date"
-              value={thirdPartyValidity}
-              onChange={(e) => setThirdPartyValidity(e.target.value)}
+              value={datePurchased.toISOString().slice(0, 10)} // Format as YYYY-MM-DD
+              onChange={(e) => setDatePurchased(new Date(e.target.value))}
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -259,8 +259,10 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
             </label>
             <input
               type="date"
-              value={comprehensiveValidity}
-              onChange={(e) => setComprehensiveValidity(e.target.value)}
+              value={comprehensiveValidity.toISOString().slice(0, 10)} // Format as YYYY-MM-DD
+              onChange={(e) =>
+                setComprehensiveValidity(new Date(e.target.value))
+              }
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -272,8 +274,8 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
             </label>
             <input
               type="date"
-              value={datePurchased}
-              onChange={(e) => setDatePurchased(e.target.value)}
+              value={thirdPartyValidity.toISOString().slice(0, 10)} // Format as YYYY-MM-DD
+              onChange={(e) => setThirdPartyValidity(new Date(e.target.value))}
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
           </div>
