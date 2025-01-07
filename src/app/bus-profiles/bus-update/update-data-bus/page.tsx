@@ -212,8 +212,8 @@ const BusUpdate = () => {
                   <DatePicker
                     selected={
                       third_pli_validity ? new Date(third_pli_validity) : null
-                    } // Use null instead of an empty string
-                    onChange={(date) => setTPLValidity(date)}
+                    }
+                    onChange={(date: Date | null) => setTPLValidity(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />
@@ -230,8 +230,8 @@ const BusUpdate = () => {
                   />
                   <h1>Comprehensive Insurance Validity</h1>
                   <DatePicker
-                    selected={ci_validity ? new Date(ci_validity) : null} // Use null instead of an empty string
-                    onChange={(date) => setCIValidity(date)}
+                    selected={ci_validity ? new Date(ci_validity) : null}
+                    onChange={(date: Date | null) => setCIValidity(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />
@@ -239,8 +239,8 @@ const BusUpdate = () => {
                 <div className="3rd-row ml-14 mt-10">
                   <h1>Date Purchased</h1>
                   <DatePicker
-                    selected={date_purchased ? new Date(date_purchased) : null} // Use null instead of an empty string
-                    onChange={(date) => setDatePurchased(date)}
+                    selected={date_purchased ? new Date(date_purchased) : null}
+                    onChange={(date: Date | null) => setDatePurchased(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />

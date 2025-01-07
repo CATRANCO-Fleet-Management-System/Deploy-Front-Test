@@ -185,7 +185,7 @@ const BusAdd = () => {
                     id="TPLValidity"
                     selected={TPLValidity}
                     onChange={(date: Date) => setTPLValidity(date)} // Ensure only a single date is passed
-                    className="your-class-name"
+                    className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />
 
