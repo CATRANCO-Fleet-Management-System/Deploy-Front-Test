@@ -36,11 +36,6 @@ const FuelViewDetailsModal = ({
     });
   };
 
-  /**
-   * Renders an image or a fallback.
-   * @param {string | null} imagePath - The path to the image.
-   * @param {string} altText - The alt text for the image.
-   */
   const renderImage = (imagePath, altText) => {
     if (!imagePath) {
       return (
@@ -50,15 +45,15 @@ const FuelViewDetailsModal = ({
       );
     }
 
-    const fullUrl = ${BASE_URL}${imagePath.replace(/^\/+/, "")};
-    console.log("Rendering image from URL:", fullUrl); // Debugging log
+    const fullUrl = `${BASE_URL}${imagePath.replace(/^\/+/, "")}`;
+    console.log("Rendering image from URL:", fullUrl);
     return (
       <img
         src={fullUrl}
         alt={altText}
         className="w-full h-auto max-h-48 border border-gray-300 p-2 rounded object-contain"
         onError={(e) => {
-          console.error(Failed to load image from URL: ${fullUrl});
+          console.error(`Failed to load image from URL: ${fullUrl}`);
           e.target.src = "/placeholder-image.png"; // Fallback image
           e.target.alt = "Placeholder image";
         }}
@@ -96,14 +91,14 @@ const FuelViewDetailsModal = ({
               <label className="block font-medium">Odometer Proof</label>
               {renderImage(
                 odometer_distance_proof,
-                Odometer proof for Bus ${selectedBus}
+                `Odometer proof for Bus ${selectedBus}`
               )}
             </div>
             <div className="mb-4">
               <label className="block font-medium">Fuel Receipt Proof</label>
               {renderImage(
                 fuel_receipt_proof,
-                Fuel receipt proof for Bus ${selectedBus}
+                `Fuel receipt proof for Bus ${selectedBus}`
               )}
             </div>
           </div>
@@ -124,11 +119,6 @@ const FuelViewDetailsModal = ({
   );
 };
 
-/**
- * Displays a label and value pair.
- * @param {string} label - The label to display.
- * @param {string} value - The value to display.
- */
 const InfoItem = ({ label, value }) => (
   <div className="mb-4">
     <label className="block font-medium">{label}</label>
