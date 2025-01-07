@@ -138,12 +138,21 @@ export const toggleMaintenanceSchedulingStatus = async (id, formData) => {
  * Get all active maintenance scheduling records.
  * @returns {Promise<Object[]>} - An array of active maintenance schedules.
  */
-export const getAllActiveMaintenanceScheduling = async () => {
+interface MaintenanceRecord {
+  maintenance_scheduling_id: number;
+  maintenance_type: string;
+  maintenance_date: string;
+  // Add any other relevant fields
+}
+
+export const getAllActiveMaintenanceScheduling = async (): Promise<
+  MaintenanceRecord[]
+> => {
   try {
     const response = await api.get(
       "/user/admin/maintenance-scheduling/all/active"
     );
-    return response.data;
+    return response.data || [];
   } catch (error) {
     console.error("Get All Active Maintenance Scheduling error:", error);
     throw error.response ? error.response.data : error;

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Sidebar2 from "../components/Sidebar2";
 import Header from "../components/Header";
 import { FaCarCrash, FaCog, FaOilCan, FaTools, FaTruck } from "react-icons/fa";
-import { getAllActiveMaintenanceScheduling } from "@/app/services/maintenanceService"; // Assuming this service exists
+import { getAllActiveMaintenanceScheduling } from "../services/maintenanceService";
 
 const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -29,11 +29,22 @@ const DashboardHeader = () => {
   }, []);
 
   // Fetch active maintenance records
+  interface MaintenanceRecord {
+    maintenance_scheduling_id: string;
+    maintenance_type: string;
+    maintenance_date: string;
+  }
+
+  interface MaintenanceResponse {
+    data: MaintenanceRecord[];
+  }
+
   useEffect(() => {
     const fetchActiveMaintenance = async () => {
       try {
-        const response = await getAllActiveMaintenanceScheduling();
-        setMaintenanceRecords(response.data || []); // Ensure data exists
+        const response: MaintenanceResponse =
+          await getAllActiveMaintenanceScheduling();
+        setMaintenanceRecords(response.data || []);
       } catch (error) {
         console.error("Error fetching active maintenance records:", error);
       }
