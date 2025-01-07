@@ -4,7 +4,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
 import { createVehicle } from "../services/vehicleService"; // Import the service
 
-const AddBusRecordModal = ({ onClose, refreshData }) => {
+interface AddBusRecordModalProps {
+  onClose: () => void;
+  refreshData: () => void;
+  onSubmit: (newBus: any) => void;
+}
+
+const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
+  onClose,
+  refreshData,
+  onSubmit, // Destructure the onSubmit prop
+}) => {
   const [busNumber, setBusNumber] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [officialReceipt, setOfficialReceipt] = useState("");

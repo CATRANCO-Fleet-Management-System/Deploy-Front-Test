@@ -112,7 +112,7 @@ const BusRecordDisplay = () => {
   };
 
   // Handle adding a new bus record
-  const handleAddNewBus = (newBus) => {
+  const handleAddNewBus = (newBus: any) => {
     setBusRecords((prevRecords) => [...prevRecords, newBus]);
     setSelectedVehicleId(newBus.vehicle_id);
     setIsAssignPersonnelModalOpen(true);
