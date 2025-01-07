@@ -5,22 +5,10 @@ import Header from "../components/Header";
 import { FaCarCrash, FaCog, FaOilCan, FaTools, FaTruck } from "react-icons/fa";
 import { getAllActiveMaintenanceScheduling } from "@/app/services/maintenanceService"; // Assuming this service exists
 
-interface MaintenanceRecord {
-  maintenance_scheduling_id: number;
-  maintenance_type: string;
-  maintenance_date: string;
-}
-
-interface MaintenanceResponse {
-  data: MaintenanceRecord[];
-}
-
 const DashboardHeader = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [maintenanceRecords, setMaintenanceRecords] = useState<
-    MaintenanceRecord[]
-  >([]); // State to store maintenance records
+  const [maintenanceRecords, setMaintenanceRecords] = useState([]); // State to store maintenance records
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -45,16 +33,9 @@ const DashboardHeader = () => {
     const fetchActiveMaintenance = async () => {
       try {
         const response = await getAllActiveMaintenanceScheduling();
-
-        // If response is already an array
-        if (Array.isArray(response)) {
-          setMaintenanceRecords(response);
-        } else {
-          setMaintenanceRecords([]); // If it's not an array, fall back to empty array
-        }
+        setMaintenanceRecords(response.data || []); // Ensure data exists
       } catch (error) {
         console.error("Error fetching active maintenance records:", error);
-        setMaintenanceRecords([]); // Set to an empty array on error as well
       }
     };
 
