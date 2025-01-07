@@ -3,31 +3,35 @@ import React from "react";
 
 interface ConfirmpopupProps {
   isOpen: boolean;
-  onClose: () => void; // Close handler passed as onClose
-  onConfirm: () => void; // Confirm handler passed as onConfirm
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;  
+  message: string;  
 }
 
 const Confirmpopup: React.FC<ConfirmpopupProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  title,
+  message, 
 }) => {
-  if (!isOpen) return null; // Don't render if modal isn't open
+  if (!isOpen) return null; 
 
   const handleCancel = () => {
     console.log("Cancel button clicked");
-    onClose(); // Call onClose when cancel is clicked
-  };
+    onClose(); 
 
   const handleConfirm = () => {
     console.log("Confirm button clicked");
-    onConfirm(); // Call onConfirm when confirm is clicked
+    onConfirm(); 
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
+        <h2 className="text-lg font-semibold mb-4">{title}</h2> {/* Use title prop */}
+        <p className="mb-4">{message}</p> {/* Display the message prop */}
         <div className="flex justify-end space-x-4">
           <button
             onClick={handleCancel}

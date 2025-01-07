@@ -260,9 +260,9 @@ const BusRecordDisplay = () => {
       {isDeletePopupOpen && (
         <Confirmpopup
           isOpen={isDeletePopupOpen}
-          onClose={cancelDelete} // Ensure this is set correctly
-          onConfirm={confirmDelete} // Ensure this is set correctly
-          title="Delete Profile"
+          onClose={cancelDelete}
+          onConfirm={confirmDelete}
+          title="Delete Profile" // Pass title here
           message="Are you sure you want to delete this profile?"
         />
       )}
