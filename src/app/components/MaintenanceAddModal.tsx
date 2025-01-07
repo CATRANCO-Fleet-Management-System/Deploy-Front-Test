@@ -217,7 +217,7 @@ const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
               <DatePicker
                 id="maintenanceDate"
                 selected={maintenanceDate}
-                onChange={(date) => setMaintenanceDate(date)}
+                onChange={(date: Date) => setMaintenanceDate(date)}
                 className="border border-gray-300 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
               />
