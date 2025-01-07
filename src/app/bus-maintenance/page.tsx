@@ -176,13 +176,19 @@ const MaintenanceManagement = () => {
     proofData: FormData
   ) => {
     try {
+      const maintenanceId = Number(id); // Convert to number here
+      if (isNaN(maintenanceId)) {
+        throw new Error("Invalid ID");
+      }
+
       const updatedRecord = await toggleMaintenanceSchedulingStatus(
-        id,
+        maintenanceId, // Use maintenanceId instead of id
         proofData
       );
+
       setRecords((prev) =>
         prev.map((record) =>
-          record.maintenance_scheduling_id === id
+          record.maintenance_scheduling_id === maintenanceId // Compare with maintenanceId
             ? {
                 ...record,
                 maintenance_status: updatedRecord.schedule.maintenance_status,
@@ -192,6 +198,7 @@ const MaintenanceManagement = () => {
             : record
         )
       );
+
       setIsProofModalOpen(false);
     } catch (error) {
       console.error("Error submitting proof:", error);
