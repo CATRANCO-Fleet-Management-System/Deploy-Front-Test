@@ -30,7 +30,9 @@ const DashboardHeader: React.FC = () => {
   const [busesInMaintenance, setBusesInMaintenance] = useState(0);
   const [currentEmployees, setCurrentEmployees] = useState(0);
   const [busData, setBusData] = useState<BusData[]>([]);
-  const [selectedBusDetails, setSelectedBusDetails] = useState<BusData | null>(null);
+  const [selectedBusDetails, setSelectedBusDetails] = useState<BusData | null>(
+    null
+  );
 
   // Fetch Static Data
   useEffect(() => {
@@ -55,10 +57,10 @@ const DashboardHeader: React.FC = () => {
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
 
-    const options = {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
+    const options: Intl.DateTimeFormatOptions = {
+      hour: "2-digit", // Corrected type
+      minute: "2-digit", // Corrected type
+      hour12: true, // Remains as boolean
     };
 
     return date.toLocaleString("en-US", options);
@@ -172,7 +174,9 @@ const DashboardHeader: React.FC = () => {
               busData={busData}
               pathData={[]}
               onBusClick={(busNumber) => {
-                const busDetails = busData.find((bus) => bus.number === busNumber);
+                const busDetails = busData.find(
+                  (bus) => bus.number === busNumber
+                );
                 setSelectedBusDetails(busDetails || null);
               }}
               selectedBus={selectedBusDetails?.number || null}
@@ -194,7 +198,8 @@ const DashboardHeader: React.FC = () => {
                   <strong>Conductor:</strong> {selectedBusDetails.conductor}
                 </li>
                 <li>
-                  <strong>Plate Number:</strong> {selectedBusDetails.plateNumber}
+                  <strong>Plate Number:</strong>{" "}
+                  {selectedBusDetails.plateNumber}
                 </li>
                 <li>
                   <strong>Status:</strong> {selectedBusDetails.status}
@@ -206,7 +211,7 @@ const DashboardHeader: React.FC = () => {
                   <strong>Time:</strong> {selectedBusDetails.time}
                 </li>
               </ul>
-          </div>
+            </div>
           ) : (
             <h1 className="text-red-600 text-2xl font-bold">Select a Bus</h1>
           )}
