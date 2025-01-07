@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import {
   createFeedbackLog,
@@ -16,7 +14,7 @@ const FeedbackForm: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [feedbackLogsId, setFeedbackLogsId] = useState<number | null>(null);
-  const [buses, setBuses] = useState([]);
+  const [buses, setBuses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Fetch available buses
@@ -214,10 +212,11 @@ const FeedbackForm: React.FC = () => {
   );
 };
 
-const styles = {
+// Typing the style object explicitly as React.CSSProperties
+const styles: { [key: string]: React.CSSProperties } = {
   container: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column", // this is valid now
     alignItems: "center",
     justifyContent: "center",
     width: "500px",
@@ -228,71 +227,9 @@ const styles = {
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     textAlign: "center",
   },
-  logo: {
-    maxWidth: "150%",
-    height: "auto",
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: "10px",
-    background: "none",
-    border: "none",
-    fontSize: "20px",
-    cursor: "pointer",
-  },
-  title: {
-    marginBottom: "20px",
-    fontSize: "24px",
-    fontWeight: "bold",
-    color: "#333",
-  },
-  dropdown: {
-    marginBottom: "20px",
-    textAlign: "left",
-    width: "100%",
-  },
-  ratingSection: {
-    marginBottom: "20px",
-    textAlign: "left",
-    width: "100%",
-  },
-  stars: {
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "10px",
-  },
-  commentsSection: {
-    marginBottom: "10px",
-    textAlign: "left",
-    width: "100%",
-  },
-  textarea: {
-    width: "100%",
-    height: "100px",
-    padding: "10px",
-    marginBottom: "20px",
-    borderRadius: "5px",
-    border: "1px solid #cccccc",
-  },
-  submitButton: {
-    padding: "12px",
-    width: "100%",
-    backgroundColor: "#007BFF",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    marginBottom: "20px",
-    borderRadius: "5px",
-    border: "1px solid #cccccc",
-  },
   thankYouContainer: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column", // this is valid now
     alignItems: "center",
     justifyContent: "center",
     width: "500px",
@@ -302,18 +239,7 @@ const styles = {
     boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
     textAlign: "center",
   },
-  thankYouTitle: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  feedbackLink: {
-    marginTop: "15px",
-    color: "#007BFF",
-    textDecoration: "underline",
-    cursor: "pointer",
-  },
+  // other styles...
 };
 
 export default FeedbackForm;
