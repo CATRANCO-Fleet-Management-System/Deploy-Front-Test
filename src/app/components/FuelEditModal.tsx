@@ -85,13 +85,13 @@ const FuelEditModal = ({
       formDataToSubmit.append("vehicle_id", selectedBus);
 
       // Append the files only if they exist and are valid
-      if (formData.odometerProof) {
+      if (formData.odometerProof instanceof File) {
         formDataToSubmit.append(
           "odometer_distance_proof",
           formData.odometerProof
         );
       }
-      if (formData.fuelReceiptProof) {
+      if (formData.fuelReceiptProof instanceof File) {
         formDataToSubmit.append(
           "fuel_receipt_proof",
           formData.fuelReceiptProof

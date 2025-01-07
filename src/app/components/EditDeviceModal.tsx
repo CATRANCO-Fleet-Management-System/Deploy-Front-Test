@@ -46,31 +46,33 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, onSave }) => {
       setError("All fields are required.");
       return;
     }
-
+  
     try {
       const updatedDevice = {
-        id: deviceId, // Ensure `id` is included
+        id: deviceId,
         device_name: deviceName,
         tracker_ident: trackerIdent,
         vehicle_id: busNumber,
         status,
       };
-
-      // Log the updated device data to inspect it
-      console.log("Updated Device Data:", updatedDevice);
-
-      // Update the device mapping in the backend
+  
+      // Attempt to update the device
       await updateTrackerVehicleMapping(deviceId, updatedDevice);
-
-      // Notify parent component and close modal
       onSave(updatedDevice); // Pass updated device to parent
       onClose(); // Close modal
     } catch (err) {
-      // Log the error and show a more detailed error message
-      console.error("Tracker Identifier Already Assigned to Another Bus:", err);
-      setError(`Failed to save changes. Reason: ${err.message || err}`);
+      // If the error is related to a duplicate tracker ident, show a warning message
+      if (err.message.includes("The tracker ident has already been taken")) {
+        setError(
+          `Warning: The tracker ident is already in use. Do you still want to proceed with this?`
+        );
+      } else {
+        setError(`Failed to save changes. Reason: ${err.message || err}`);
+      }
     }
   };
+  
+  
 
   if (!isOpen) return null;
 
