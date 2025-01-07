@@ -68,21 +68,21 @@ const FuelHistoryModal = ({ isOpen, onClose, history }) => {
     doc.setFontSize(16);
     doc.text("Fuel Record History", 14, 15);
     doc.setFont("helvetica", "normal");
-    doc.autoTable({
+    (doc as any).autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 25,
       styles: {
         fontSize: 10,
-        halign: "center", // Center content in each column
+        halign: "center",
       },
       columnStyles: {
-        0: { halign: "center" }, // Date column centered
-        1: { halign: "center" }, // Distance column centered
-        2: { halign: "center" }, // Fuel Type column centered
-        3: { halign: "center" }, // Fuel Price column centered
-        4: { halign: "center" }, // Fuel Quantity column centered
-        5: { halign: "center" }, // Total Amount column centered
+        0: { halign: "center" },
+        1: { halign: "center" },
+        2: { halign: "center" },
+        3: { halign: "center" },
+        4: { halign: "center" },
+        5: { halign: "center" },
       },
     });
 
