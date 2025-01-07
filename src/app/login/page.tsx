@@ -24,6 +24,7 @@ export default function AuthPage() {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for show/hide password
+  const [loginSuccess, setLoginSuccess] = useState(false); // State for successful login notification
   const router = useRouter();
 
   // Handle form field changes
@@ -63,7 +64,13 @@ export default function AuthPage() {
         // Fetch and store updated user profile data after login
         const userProfile = await getProfile();
         localStorage.setItem("userProfile", JSON.stringify(userProfile));
-        router.push("/dashboard"); // Redirect to dashboard
+
+        // Set login success to true
+        setLoginSuccess(true);
+
+        setTimeout(() => {
+          router.push("/dashboard"); // Redirect to dashboard
+        }, 1000); // Wait for notification to show before redirecting
       } else {
         setFormErrors({
           global: "Login failed. Please check your credentials.",
@@ -147,6 +154,13 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Notification (only shown on login page) */}
+      {loginSuccess && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <p className="text-sm font-medium">Successfully Logged In</p>
+        </div>
+      )}
     </section>
   );
 }
