@@ -2,8 +2,8 @@
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
+    "skipLibCheck": true, // Skip type-checking in node_modules
+    "strict": false, // Disable strict type checking
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -12,6 +12,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "suppressImplicitAnyIndexErrors": true, // Suppress errors for implicit "any" in index signatures
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "forceConsistentCasingInFileNames": true, // Enforce consistent casing for file names
+    "strictNullChecks": false, // Allow null and undefined types
+    "noImplicitAny": false, // Allow variables with implicit "any" type
+    "noImplicitThis": false, // Allow usage of "this" without strict type-checking
     "plugins": [
       {
         "name": "next"
