@@ -398,7 +398,7 @@ const ViewRecord = () => {
         {isHistoryModalOpen && (
           <FuelHistoryModal
             onClose={handleCloseHistoryModal}
-            historyData={fuelLogs}
+            history={fuelLogs} // Use 'history' instead of 'historyData'
             selectedBus={selectedBus}
           />
         )}
