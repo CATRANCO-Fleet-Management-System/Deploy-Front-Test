@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
-import { FaSearch } from "react-icons/fa";
 import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
 import Pagination from "../components/Pagination";
@@ -17,7 +16,7 @@ interface FeedbackRecord {
 }
 
 const FeedbackRecordDisplay = () => {
-  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]);
+  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]); // Use FeedbackRecord[] instead of FuelLogsResponse["data"]
   const [loading, setLoading] = useState(true);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
@@ -30,9 +29,9 @@ const FeedbackRecordDisplay = () => {
       try {
         setLoading(true);
         const response = await fetchAllFuelLogs();
-        console.log("Fetched Feedback Logs:", response); // Log response structure
+        console.log("Fetched Feedback Logs:", response); // Debug the response
         if (Array.isArray(response.data)) {
-          setFeedbackRecords(response.data); // Ensure data is an array
+          setFeedbackRecords(response.data); // Use only the `data` array
         } else {
           throw new Error("Invalid response format: data is not an array");
         }
@@ -43,6 +42,7 @@ const FeedbackRecordDisplay = () => {
         setLoading(false);
       }
     };
+
     fetchFeedbackLogs();
   }, []);
 
