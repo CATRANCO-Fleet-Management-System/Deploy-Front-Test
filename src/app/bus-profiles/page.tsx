@@ -280,9 +280,10 @@ const BusRecordDisplay = () => {
           onClose={() => setIsAssignPersonnelModalOpen(false)}
           refreshData={fetchData}
           onAssign={handleAddVehicleAssignment}
-          vehicleId={selectedVehicleId} // Pass the selected vehicle_id to the modal
+          vehicleId={selectedVehicleId} 
         />
       )}
+
       {isEditModalOpen && (
         <EditBusRecordModal
           vehicle_id={selectedVehicleId}

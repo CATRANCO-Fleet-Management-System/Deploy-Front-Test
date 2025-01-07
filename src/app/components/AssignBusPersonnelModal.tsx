@@ -7,16 +7,14 @@ const AssignBusPersonnelModal = ({
   onClose,
   refreshData,
   onAssign,
-  preSelectedVehicle,
+  vehicleId, // Change preSelectedVehicle to vehicleId
 }) => {
+  const [selectedVehicle, setSelectedVehicle] = useState(vehicleId || "");
   const [drivers, setDrivers] = useState([]);
   const [paos, setPaos] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState("");
   const [selectedPAO, setSelectedPAO] = useState("");
-  const [selectedVehicle, setSelectedVehicle] = useState(
-    preSelectedVehicle || ""
-  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
