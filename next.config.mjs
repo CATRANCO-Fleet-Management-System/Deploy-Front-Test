@@ -9,6 +9,21 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  // Correctly define output
+  output: "export",
+
+  // Configure image handling
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.com",
+        port: "", // Leave empty if no specific port is needed
+        pathname: "/**/*", // Correct wildcard pattern
+      },
+    ],
+  },
 };
 
 export default nextConfig;
