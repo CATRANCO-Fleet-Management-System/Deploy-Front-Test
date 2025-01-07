@@ -184,11 +184,12 @@ const BusAdd = () => {
                   <DatePicker
                     id="TPLValidity"
                     selected={TPLValidity}
-                    onChange={(date) => setTPLValidity(date)} // Handle date change
+                    onChange={(date: Date) => setTPLValidity(date)} // Ensure only a single date is passed
                     className="your-class-name"
                     dateFormat="MM/dd/yyyy"
-                    selectsMultiple={false} // Add this line to fix the error
+                    selectsMultiple={false} // Only one date is allowed
                   />
+
                   <h1>Comprehensive Insurance</h1>
                   <Input
                     className="h-10 text-lg"
@@ -201,7 +202,7 @@ const BusAdd = () => {
                   <DatePicker
                     id="CIValidity"
                     selected={CIValidity}
-                    onChange={(date) => setCIValidity(date)} // Handle date change
+                    onChange={(date: Date) => setCIValidity(date)} // Ensure only a single date is passed
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />
@@ -211,7 +212,7 @@ const BusAdd = () => {
                   <DatePicker
                     id="DatePurchased"
                     selected={DatePurchased}
-                    onChange={(date) => setDatePurchased(date)} // Handle date change
+                    onChange={(date: Date) => setDatePurchased(date)} // Ensure only a single date is passed
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />
