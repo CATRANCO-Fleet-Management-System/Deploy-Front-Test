@@ -74,9 +74,9 @@ const DeviceManagement = () => {
   };
 
   const confirmDelete = async () => {
-    if (deleteRecordId) {
+    if (deleteRecordId !== null) {
       try {
-        // Convert deleteRecordId to string before passing it to the delete function
+        // Convert deleteRecordId to string before passing it to deleteTrackerVehicleMapping
         await deleteTrackerVehicleMapping(deleteRecordId.toString());
         setDevices((prevDevices) =>
           prevDevices.filter((device) => device.id !== deleteRecordId)
