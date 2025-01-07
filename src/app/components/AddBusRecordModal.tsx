@@ -77,7 +77,6 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
     }
   };
 
-  // Show the AssignBusPersonnelModal after submission
   if (isSubmitted) {
     return (
       <AssignBusPersonnelModal
@@ -86,7 +85,8 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
         onAssign={(newAssignment) => {
           refreshData(); // Refresh or dynamically update assignments
         }}
-        vehicleId={busNumber} // Change to vehicleId
+        vehicleId={busNumber} // Assuming `busNumber` is correct here
+        preSelectedVehicle={busNumber} // Pass the `busNumber` as `preSelectedVehicle`
       />
     );
   }
