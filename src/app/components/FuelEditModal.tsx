@@ -60,14 +60,12 @@ const FuelEditModal = ({
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    const file = files[0];
+    const file = files[0]; // Get the first file from the input
 
-    // Remove the file type validation check
-    // If file exists, update the state
     if (file) {
       setFormData((prev) => ({
         ...prev,
-        [name]: file,
+        [name]: file, // Update state with the selected file
       }));
     }
   };
@@ -86,7 +84,7 @@ const FuelEditModal = ({
       formDataToSubmit.append("fuel_type", formData.fuelType);
       formDataToSubmit.append("vehicle_id", selectedBus);
 
-      // Add files only if they exist
+      // Append the files only if they exist and are valid
       if (formData.odometerProof) {
         formDataToSubmit.append(
           "odometer_distance_proof",
@@ -106,8 +104,8 @@ const FuelEditModal = ({
           formDataToSubmit
         );
         console.log("Fuel log updated:", response);
-        onUpdate();
-        onClose();
+        onUpdate(); // Refresh parent component after update
+        onClose(); // Close the modal
       } catch (error) {
         console.error("Failed to update fuel log:", error);
         alert(
