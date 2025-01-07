@@ -4,8 +4,8 @@ interface ConfirmpopupProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;  
-  message: string;  
+  title: string;
+  message: string;
 }
 
 const Confirmpopup: React.FC<ConfirmpopupProps> = ({
@@ -13,23 +13,25 @@ const Confirmpopup: React.FC<ConfirmpopupProps> = ({
   onClose,
   onConfirm,
   title,
-  message, 
+  message,
 }) => {
-  if (!isOpen) return null; 
+  if (!isOpen) return null;
 
   const handleCancel = () => {
     console.log("Cancel button clicked");
-    onClose(); 
+    onClose();
+  };
 
   const handleConfirm = () => {
     console.log("Confirm button clicked");
-    onConfirm(); 
+    onConfirm();
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">{title}</h2> {/* Use title prop */}
+        <h2 className="text-lg font-semibold mb-4">{title}</h2>{" "}
+        {/* Use title prop */}
         <p className="mb-4">{message}</p> {/* Display the message prop */}
         <div className="flex justify-end space-x-4">
           <button
