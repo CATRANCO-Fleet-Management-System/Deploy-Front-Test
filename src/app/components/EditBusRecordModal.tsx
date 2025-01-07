@@ -252,9 +252,11 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               3rd Party Insurance Validity
             </label>
             <DatePicker
-              selected={third_pli_validity}
-              onChange={(date) => setTPLValidity(date)}
+              id="thirdPliValidity"
+              selected={third_pli_validity} // Single date object
+              onChange={(date: Date) => setTPLValidity(date ?? new Date())}
               className="w-full px-4 py-2 border rounded-md"
+              dateFormat="MM/dd/yyyy"
             />
           </div>
 
@@ -278,9 +280,11 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               Comprehensive Insurance Validity
             </label>
             <DatePicker
+              id="ciValidity"
               selected={ci_validity}
-              onChange={(date) => setCIValidity(date)}
+              onChange={(date: Date) => setCIValidity(date ?? new Date())}
               className="w-full px-4 py-2 border rounded-md"
+              dateFormat="MM/dd/yyyy"
             />
           </div>
 
@@ -290,9 +294,11 @@ const EditBusRecordModal = ({ vehicle_id, onClose, onSubmit, refreshData }) => {
               Date Purchased
             </label>
             <DatePicker
+              id="datePurchased"
               selected={date_purchased}
-              onChange={(date) => setDatePurchased(date)}
+              onChange={(date: Date) => setDatePurchased(date ?? new Date())}
               className="w-full px-4 py-2 border rounded-md"
+              dateFormat="MM/dd/yyyy"
             />
           </div>
 
