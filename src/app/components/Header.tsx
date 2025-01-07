@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.removeItem("authToken");
 
       // If there's no token, log the user out immediately (or redirect them to login)
       if (!token) {

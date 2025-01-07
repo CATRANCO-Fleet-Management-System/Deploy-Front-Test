@@ -6,6 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { login, getProfile } from "../services/authService";
 
+// Simple Loading Spinner Component
+const Spinner = () => (
+  <div className="loader-border border-t-4 border-blue-500 border-solid w-8 h-8 rounded-full animate-spin"></div>
+);
+
 export default function AuthPage() {
   const [formData, setFormData] = useState({
     username: "",
@@ -132,9 +137,8 @@ export default function AuthPage() {
               onClick={handleLogin}
               disabled={loading}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? <Spinner /> : "Login"}
             </Button>
-
           </div>
         </div>
       </div>

@@ -19,11 +19,13 @@ interface FuelLogsResponse {
 }
 
 const FeedbackRecordDisplay = () => {
-  const [feedbackRecords, setFeedbackRecords] = useState<any[]>([]); // You may want to change this to a proper type later
+  const [feedbackRecords, setFeedbackRecords] = useState<
+    FuelLogsResponse["data"]
+  >([]); // Use the correct type for feedback records
   const [loading, setLoading] = useState(true);
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false); // Add this line
-  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null); // Add this line
-  const [searchTerm, setSearchTerm] = useState(""); // Add searchTerm if missing
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
 
@@ -31,9 +33,9 @@ const FeedbackRecordDisplay = () => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const logs = await fetchAllFuelLogs(); // Now, logs has a 'data' property
+        const logs: FuelLogsResponse = await fetchAllFuelLogs(); // Explicitly typing the response
         console.log("Fetched Feedback Logs:", logs); // Debug response
-        setFeedbackRecords(logs.data || []); // This should now work
+        setFeedbackRecords(logs.data || []); 
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
