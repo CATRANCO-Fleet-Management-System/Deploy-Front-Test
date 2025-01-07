@@ -45,11 +45,12 @@ const DashboardHeader = () => {
     const fetchActiveMaintenance = async () => {
       try {
         const response = await getAllActiveMaintenanceScheduling();
-        // Check if the response contains a 'data' property before trying to access it
-        if (response && Array.isArray(response.data)) {
-          setMaintenanceRecords(response.data);
+
+        // If response is already an array
+        if (Array.isArray(response)) {
+          setMaintenanceRecords(response);
         } else {
-          setMaintenanceRecords([]); // If no valid data, set to an empty array
+          setMaintenanceRecords([]); // If it's not an array, fall back to empty array
         }
       } catch (error) {
         console.error("Error fetching active maintenance records:", error);
