@@ -131,9 +131,6 @@ const BusRecordDisplay = () => {
 
   // Callback for updating vehicle assignments
   const handleAddVehicleAssignment = (newAssignment) => {
-    // Log the current assignments before adding a new one
-    console.log("Previous Assignments:", prevAssignments);
-
     // Log the new assignment being added
     console.log("New Assignment:", newAssignment);
 
