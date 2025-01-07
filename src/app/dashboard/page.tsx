@@ -25,6 +25,15 @@ interface BusData {
   plateNumber: string;
 }
 
+interface MaintenanceRecord {
+  id: string;
+  busNumber: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+}
+
 const DashboardHeader: React.FC = () => {
   const [busesInOperation, setBusesInOperation] = useState(0);
   const [busesInMaintenance, setBusesInMaintenance] = useState(0);
