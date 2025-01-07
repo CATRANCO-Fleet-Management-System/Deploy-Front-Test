@@ -30,11 +30,10 @@ const DashboardHeader = () => {
 
   // Fetch active maintenance records
   interface MaintenanceRecord {
-    maintenance_scheduling_id: string;
+    maintenance_scheduling_id: string; // Change to string
     maintenance_type: string;
     maintenance_date: string;
   }
-
   interface MaintenanceResponse {
     data: MaintenanceRecord[];
   }
@@ -44,6 +43,7 @@ const DashboardHeader = () => {
       try {
         const response: MaintenanceResponse =
           await getAllActiveMaintenanceScheduling();
+        // Ensure we access the 'data' field correctly
         setMaintenanceRecords(response.data || []);
       } catch (error) {
         console.error("Error fetching active maintenance records:", error);

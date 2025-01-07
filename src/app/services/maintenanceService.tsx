@@ -139,25 +139,32 @@ export const toggleMaintenanceSchedulingStatus = async (id, formData) => {
  * @returns {Promise<Object[]>} - An array of active maintenance schedules.
  */
 interface MaintenanceRecord {
-  maintenance_scheduling_id: number;
+  maintenance_scheduling_id: string; // Change to string
   maintenance_type: string;
   maintenance_date: string;
-  // Add any other relevant fields
 }
 
-export const getAllActiveMaintenanceScheduling = async (): Promise<
-  MaintenanceRecord[]
-> => {
-  try {
-    const response = await api.get(
-      "/user/admin/maintenance-scheduling/all/active"
-    );
-    return response.data || [];
-  } catch (error) {
-    console.error("Get All Active Maintenance Scheduling error:", error);
-    throw error.response ? error.response.data : error;
-  }
-};
+// Adjust the type of the response to match the API structure
+interface MaintenanceResponse {
+  data: MaintenanceRecord[];
+}
+
+export const getAllActiveMaintenanceScheduling =
+  async (): Promise<MaintenanceResponse> => {
+    try {
+      const response = await api.get(
+        "/user/admin/maintenance-scheduling/all/active"
+      );
+      // Ensure the response contains 'data' and matches the expected structure
+      if (!response.data) {
+        throw new Error("Response does not contain data.");
+      }
+      return response.data; // Ensure this returns an object with 'data' field
+    } catch (error) {
+      console.error("Get All Active Maintenance Scheduling error:", error);
+      throw error.response ? error.response.data : error;
+    }
+  };
 
 /**
  * Get all completed maintenance scheduling records.
