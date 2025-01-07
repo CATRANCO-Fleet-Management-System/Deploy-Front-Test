@@ -185,8 +185,9 @@ const BusAdd = () => {
                     id="TPLValidity"
                     selected={TPLValidity}
                     onChange={(date) => setTPLValidity(date)} // Handle date change
-                    className="border border-gray-500 p-3 rounded-md w-full mt-1"
+                    className="your-class-name"
                     dateFormat="MM/dd/yyyy"
+                    selectsMultiple={false} // Add this line to fix the error
                   />
                   <h1>Comprehensive Insurance</h1>
                   <Input
