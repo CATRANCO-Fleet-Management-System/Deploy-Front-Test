@@ -17,7 +17,7 @@ interface FeedbackRecord {
 }
 
 const FeedbackRecordDisplay = () => {
-  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]); // Use FeedbackRecord[] instead of FuelLogsResponse["data"]
+  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
@@ -29,9 +29,13 @@ const FeedbackRecordDisplay = () => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const logs: FeedbackRecord[] = await fetchAllFuelLogs(); // Explicitly typing as FeedbackRecord[]
-        console.log("Fetched Feedback Logs:", logs); // Debug response
-        setFeedbackRecords(logs); // Directly set the logs
+        const response = await fetchAllFuelLogs();
+        console.log("Fetched Feedback Logs:", response); // Log response structure
+        if (Array.isArray(response.data)) {
+          setFeedbackRecords(response.data); // Ensure data is an array
+        } else {
+          throw new Error("Invalid response format: data is not an array");
+        }
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
@@ -64,7 +68,7 @@ const FeedbackRecordDisplay = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const filteredRecords = feedbackRecords.filter(
+  const filteredRecords = (feedbackRecords || []).filter(
     (record) =>
       record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.phone_number?.includes(searchTerm)
