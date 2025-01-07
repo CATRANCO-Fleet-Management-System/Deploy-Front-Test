@@ -21,7 +21,7 @@ const ViewProofModal: React.FC<ViewProofModalProps> = ({
    * @param {string} altText - The alternative text for the image.
    */
   const renderImage = (
-    imagePath: string | null | undefined,
+    imagePath: File | string | null | undefined,
     altText: string
   ) => {
     if (!imagePath) {
@@ -32,7 +32,16 @@ const ViewProofModal: React.FC<ViewProofModalProps> = ({
       );
     }
 
-    const fullUrl = `${BASE_URL}${imagePath.replace(/^\/+/, "")}`; // Removes leading slashes if present
+    let fullUrl: string;
+
+    if (imagePath instanceof File) {
+      // Handle File object
+      fullUrl = URL.createObjectURL(imagePath);
+    } else {
+      // Handle string or undefined
+      fullUrl = `${BASE_URL}${imagePath.replace(/^\/+/, "")}`; // Removes leading slashes if present
+    }
+
     console.log("Rendering image with URL:", fullUrl);
     return (
       <img
@@ -40,8 +49,9 @@ const ViewProofModal: React.FC<ViewProofModalProps> = ({
         alt={altText}
         className="w-full h-auto max-h-80 border border-gray-300 p-2 rounded object-contain"
         onError={(e) => {
-          e.target.src = "/placeholder-image.png"; // Fallback image
-          e.target.alt = "Placeholder image"; // Updated alt for the fallback
+          const target = e.target as HTMLImageElement; // Explicitly cast to HTMLImageElement
+          target.src = "/placeholder-image.png"; // Fallback image
+          target.alt = "Placeholder image"; // Updated alt for the fallback
         }}
       />
     );
