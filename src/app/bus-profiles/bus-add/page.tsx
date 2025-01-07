@@ -187,7 +187,6 @@ const BusAdd = () => {
                     onChange={(date: Date) => setTPLValidity(date)} // Ensure only a single date is passed
                     className="your-class-name"
                     dateFormat="MM/dd/yyyy"
-                    selectsMultiple={false} // Only one date is allowed
                   />
 
                   <h1>Comprehensive Insurance</h1>
