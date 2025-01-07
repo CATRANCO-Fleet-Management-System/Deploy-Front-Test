@@ -35,10 +35,10 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
 
   const [isSubmitted, setIsSubmitted] = useState(false); // Track submission state
 
-  const formatDate = (date) => {
+  const formatDate = (date: Date | string) => {
     if (!date) return null;
     const parsedDate = new Date(date); // Convert string to Date object
-    if (isNaN(parsedDate)) return null; // Handle invalid dates
+    if (isNaN(parsedDate.getTime())) return null; // Check if the timestamp is NaN
     return parsedDate.toISOString().slice(0, 19).replace("T", " "); // Convert to 'YYYY-MM-DD HH:MM:SS'
   };
 
