@@ -29,6 +29,12 @@ interface FuelLog {
   fuel_liters_quantity: number;
   total_expense: number;
 }
+interface FuelHistoryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  history: FuelLog[];
+  selectedBus: string; // Add selectedBus to the props
+}
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
