@@ -7,7 +7,6 @@ import { FaSearch, FaPlus, FaHistory } from "react-icons/fa";
 import BusRecord from "../components/BusRecord";
 import AddBusRecordModal from "../components/AddBusRecordModal";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
-import EditBusRecordModal from "../components/EditBusRecordModal";
 import Pagination from "../components/Pagination";
 import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
@@ -280,50 +279,7 @@ const BusRecordDisplay = () => {
           onClose={() => setIsAssignPersonnelModalOpen(false)}
           refreshData={fetchData}
           onAssign={handleAddVehicleAssignment}
-          vehicleId={selectedVehicleId} 
-        />
-      )}
-
-      {isEditModalOpen && (
-        <EditBusRecordModal
-          vehicle_id={selectedVehicleId}
-          onClose={() => setIsEditModalOpen(false)}
-          refreshData={fetchData} // Refresh parent data after edit
-          onSubmit={(updatedBus) => {
-            handleEditBus(updatedBus); // Update the current state
-          }}
-        />
-      )}
-
-      {isAssignPersonnelModalOpen && (
-        <EditPersonnelModal
-          assignmentId={
-            vehicleAssignments.find(
-              (assignment) => assignment.vehicle_id === selectedVehicleId
-            )?.vehicle_assignment_id || ""
-          }
-          vehicleId={selectedVehicleId || ""}
-          initialDriver={getAssignedProfiles(selectedVehicleId).driver}
-          initialPAO={getAssignedProfiles(selectedVehicleId).conductor}
-          onClose={() => setIsAssignPersonnelModalOpen(false)}
-          onUpdate={(updatedDriver, updatedPAO) => {
-            const updatedAssignments = vehicleAssignments.map((assignment) =>
-              assignment.vehicle_id === selectedVehicleId
-                ? {
-                    ...assignment,
-                    user_profiles: [
-                      { position: "driver", user_profile_id: updatedDriver },
-                      {
-                        position: "passenger_assistant_officer",
-                        user_profile_id: updatedPAO,
-                      },
-                    ],
-                  }
-                : assignment
-            );
-            setVehicleAssignments(updatedAssignments);
-            fetchData(); // Ensure UI reflects backend updates
-          }}
+          vehicleId={selectedVehicleId}
         />
       )}
 
