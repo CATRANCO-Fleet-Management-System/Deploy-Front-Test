@@ -12,6 +12,7 @@ interface FuelViewData {
   fuel_receipt_proof?: string | null;
 }
 
+
 const FuelViewDetailsModal = ({
   selectedBus,
   viewData = {}, // Default value is an empty object
