@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
@@ -9,22 +7,32 @@ import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
 import Pagination from "../components/Pagination";
 
+interface FuelLogsResponse {
+  data: Array<{
+    feedback_logs_id: string;
+    phone_number: string;
+    rating: number;
+    comments: string;
+    created_at: string;
+  }>;
+}
+
 const FeedbackRecordDisplay = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [feedbackRecords, setFeedbackRecords] = useState<any[]>([]); // You may want to change this to a proper type later
+  const [loading, setLoading] = useState(true);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false); // Add this line
+  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null); // Add this line
+  const [searchTerm, setSearchTerm] = useState(""); // Add searchTerm if missing
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
-  const [feedbackRecords, setFeedbackRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const logs = await fetchAllFuelLogs(); // Use the correct service
+        const logs = await fetchAllFuelLogs(); // Now, logs has a 'data' property
         console.log("Fetched Feedback Logs:", logs); // Debug response
-        setFeedbackRecords(logs.data || []); // Set feedback records
+        setFeedbackRecords(logs.data || []); // This should now work
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
@@ -43,7 +51,9 @@ const FeedbackRecordDisplay = () => {
   const confirmDelete = () => {
     if (deleteRecordId) {
       setFeedbackRecords((prevRecords) =>
-        prevRecords.filter((record) => record.feedback_logs_id !== deleteRecordId)
+        prevRecords.filter(
+          (record) => record.feedback_logs_id !== deleteRecordId
+        )
       );
       setDeleteRecordId(null);
       setIsDeletePopupOpen(false);
@@ -55,9 +65,10 @@ const FeedbackRecordDisplay = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const filteredRecords = feedbackRecords.filter((record) =>
-    record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.phone_number?.includes(searchTerm)
+  const filteredRecords = feedbackRecords.filter(
+    (record) =>
+      record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.phone_number?.includes(searchTerm)
   );
 
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
@@ -80,30 +91,34 @@ const FeedbackRecordDisplay = () => {
           />
         </div>
         {loading ? (
-  <div className="text-center text-blue-500 mt-10">Loading feedback...</div>
-) : feedbackRecords.length === 0 ? (
-  <div className="text-center text-gray-500 mt-10">No feedback records found.</div>
-) : (
-  <div className="records flex flex-col h-full">
-    <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5">
-      {paginatedRecords.map((record) => (
-        <FeedbackRecord
-          key={record.feedback_logs_id}
-          phoneNumber={record.phone_number || "N/A"}
-          rating={record.rating || 0}
-          comment={record.comments || "No comments available"}
-          date={new Date(record.created_at).toLocaleString()}
-          onDelete={() => handleDelete(record.feedback_logs_id)}
-        />
-      ))}
-    </div>
-    <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      onPageChange={setCurrentPage}
-    />
-  </div>
-)}
+          <div className="text-center text-blue-500 mt-10">
+            Loading feedback...
+          </div>
+        ) : feedbackRecords.length === 0 ? (
+          <div className="text-center text-gray-500 mt-10">
+            No feedback records found.
+          </div>
+        ) : (
+          <div className="records flex flex-col h-full">
+            <div className="output grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3 ml-5">
+              {paginatedRecords.map((record) => (
+                <FeedbackRecord
+                  key={record.feedback_logs_id}
+                  phoneNumber={record.phone_number || "N/A"}
+                  rating={record.rating || 0}
+                  comment={record.comments || "No comments available"}
+                  date={new Date(record.created_at).toLocaleString()}
+                  onDelete={() => handleDelete(record.feedback_logs_id)}
+                />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
       <Confirmpopup
         isOpen={isDeletePopupOpen}
