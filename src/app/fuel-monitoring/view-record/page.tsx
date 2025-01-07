@@ -107,7 +107,7 @@ const ViewRecord = () => {
     plugins: {
       tooltip: {
         enabled: true,
-        mode: "nearest",
+        mode: "nearest", // Make sure this is a valid mode from the InteractionModeMap
         intersect: true,
         callbacks: {
           title: (tooltipItem) => tooltipItem[0].label,
