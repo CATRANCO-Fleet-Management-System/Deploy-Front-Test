@@ -30,7 +30,7 @@ const HistoryModal = ({ isOpen, onClose, history }) => {
     doc.setFontSize(16);
     doc.text("Personnel Record History", 14, 15);
     doc.setFont("helvetica", "normal");
-    doc.autoTable({
+    (doc as any).autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 25,
