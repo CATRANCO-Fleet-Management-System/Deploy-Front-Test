@@ -149,7 +149,12 @@ const MaintenanceManagement = () => {
 
   const handleRemove = async (id: string | number) => {
     try {
-      await deleteMaintenanceScheduling(id);
+      const maintenanceId = Number(id); // Convert to number here
+      if (isNaN(maintenanceId)) {
+        throw new Error("Invalid ID");
+      }
+
+      await deleteMaintenanceScheduling(maintenanceId); // Use maintenanceId instead of id
       fetchRecords();
     } catch (error) {
       console.error("Error deleting record:", error);
@@ -158,11 +163,20 @@ const MaintenanceManagement = () => {
 
   const handleSave = async (id: string | number, data: MaintenanceRecord) => {
     try {
-      if (id) {
-        await updateMaintenanceScheduling(id, data);
+      // Convert id to number if it's a string
+      const maintenanceId = typeof id === "string" ? Number(id) : id;
+
+      // Check if the converted ID is valid
+      if (isNaN(maintenanceId)) {
+        throw new Error("Invalid ID");
+      }
+
+      if (maintenanceId) {
+        await updateMaintenanceScheduling(maintenanceId, data); // Use the valid maintenanceId
       } else {
         await createMaintenanceScheduling(data);
       }
+
       fetchRecords();
       setIsAddModalOpen(false);
       setIsEditModalOpen(false);
