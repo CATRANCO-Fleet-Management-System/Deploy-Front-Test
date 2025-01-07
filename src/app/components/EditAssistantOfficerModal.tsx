@@ -16,7 +16,6 @@ const EditAssistantOfficerModal = ({
     first_name: "",
     middle_initial: "",
     position: "passenger_assistant_officer",
-    license_number: "",
     sex: "Male",
     contact_number: "",
     date_hired: "",
@@ -40,7 +39,6 @@ const EditAssistantOfficerModal = ({
           first_name: userProfileData.first_name || "",
           middle_initial: userProfileData.middle_initial || "",
           position: userProfileData.position || "passenger_assistant_officer",
-          license_number: userProfileData.license_number || "",
           sex: userProfileData.sex || "Male",
           date_hired: userProfileData.date_hired || "",
           status: userProfileData.status || "",
@@ -102,14 +100,13 @@ const EditAssistantOfficerModal = ({
   // Submit updated profile
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate required fields
     const requiredFields = [
       "last_name",
       "first_name",
       "middle_initial",
       "position",
-      "license_number",
       "sex",
       "contact_number",
       "date_hired",
@@ -117,35 +114,35 @@ const EditAssistantOfficerModal = ({
       "contact_person_number",
       "address",
     ];
-  
+
     const missingFields = requiredFields.filter((field) => !formData[field]);
     if (missingFields.length > 0) {
       console.error("Error: Missing required fields", missingFields);
       alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
     }
-  
+
     if (!birthday) {
       console.error("Error: Missing date of birth");
       alert("Please provide a valid date of birth.");
       return;
     }
-  
+
     if (!userProfileId) {
       console.error("Error: Missing userProfileId");
       alert("Cannot update the profile. User ID is missing.");
       return;
     }
-  
+
     try {
       const updatedProfile = {
         ...formData,
         date_of_birth: birthday,
       };
-  
+
       // Call the updateProfile API
       await updateProfile(userProfileId, updatedProfile);
-  
+
       // Notify parent with updated profile
       onSave({ ...updatedProfile, user_profile_id: userProfileId });
       onClose(); // Close the modal
@@ -154,7 +151,6 @@ const EditAssistantOfficerModal = ({
       alert("An error occurred while updating the profile. Please try again.");
     }
   };
-  
 
   if (!isOpen) return null;
 
