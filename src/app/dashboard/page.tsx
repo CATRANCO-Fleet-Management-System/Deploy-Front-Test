@@ -42,8 +42,9 @@ const DashboardHeader: React.FC = () => {
         const vehicles = await getAllVehicles();
         setBusesInOperation(vehicles.length);
 
+        // Assuming the response is an array, directly use its length
         const maintenance = await getAllActiveMaintenanceScheduling();
-        setBusesInMaintenance(maintenance.data.length);
+        setBusesInMaintenance(maintenance.length); // No `.data`, just `maintenance.length`
 
         const profiles = await getAllProfiles();
         setCurrentEmployees(profiles.length);
