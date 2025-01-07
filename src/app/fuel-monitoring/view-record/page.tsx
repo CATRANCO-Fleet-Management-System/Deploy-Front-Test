@@ -29,12 +29,6 @@ interface FuelLog {
   fuel_liters_quantity: number;
   total_expense: number;
 }
-interface FuelHistoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  history: FuelLog[];
-  selectedBus: string; // Add selectedBus to the props
-}
 
 const ViewRecord = () => {
   const searchParams = useSearchParams();
@@ -403,9 +397,9 @@ const ViewRecord = () => {
 
         {isHistoryModalOpen && (
           <FuelHistoryModal
+            isOpen={isHistoryModalOpen} // Add the 'isOpen' prop here
             onClose={handleCloseHistoryModal}
-            history={fuelLogs} // Use 'history' instead of 'historyData'
-            selectedBus={selectedBus}
+            history={historyData}
           />
         )}
         {isAddModalOpen && (
@@ -421,7 +415,7 @@ const ViewRecord = () => {
             selectedBus={selectedBus}
             selectedFuelLog={selectedFuelLog}
             onClose={() => setIsEditModalOpen(false)}
-            onUpdate={handleEdit}
+            onUpdate={() => handleEdit(selectedFuelLog)}
           />
         )}
 

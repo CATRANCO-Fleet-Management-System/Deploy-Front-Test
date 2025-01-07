@@ -4,7 +4,6 @@ import { FaTimes } from "react-icons/fa";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-
 const FuelHistoryModal = ({ isOpen, onClose, history }) => {
   useEffect(() => {
     if (history && history.length > 0) {
