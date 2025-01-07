@@ -19,7 +19,7 @@ const FuelViewDetailsModal = ({
 
   const BASE_URL =
     process.env.NEXT_PUBLIC_STORAGE_URL ||
-    "http://192.168.68.147:8000/storage/";
+    "http://catranco.jwisnetwork.com/storage/";
 
   const calculatedTotalExpense =
     total_expense ||
