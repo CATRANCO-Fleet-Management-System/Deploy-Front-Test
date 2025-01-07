@@ -28,9 +28,9 @@ const BusUpdate = () => {
   });
 
   // State for validity dates (initialized to empty strings)
-  const [third_pli_validity, setTPLValidity] = useState("");
-  const [ci_validity, setCIValidity] = useState("");
-  const [date_purchased, setDatePurchased] = useState("");
+  const [third_pli_validity, setTPLValidity] = useState<Date | null>(null);
+  const [ci_validity, setCIValidity] = useState<Date | null>(null);
+  const [date_purchased, setDatePurchased] = useState<Date | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -211,12 +211,13 @@ const BusUpdate = () => {
                   <h1>Third Party Liability Validity</h1>
                   <DatePicker
                     selected={
-                      third_pli_validity ? new Date(third_pli_validity) : ""
-                    }
+                      third_pli_validity ? new Date(third_pli_validity) : null
+                    } // Use null instead of an empty string
                     onChange={(date) => setTPLValidity(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
                   />
+
                   <h1>Comprehensive Insurance</h1>
                   <Input
                     className="h-10 text-lg"
@@ -229,7 +230,7 @@ const BusUpdate = () => {
                   />
                   <h1>Comprehensive Insurance Validity</h1>
                   <DatePicker
-                    selected={ci_validity ? new Date(ci_validity) : ""}
+                    selected={ci_validity ? new Date(ci_validity) : null} // Use null instead of an empty string
                     onChange={(date) => setCIValidity(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
@@ -238,7 +239,7 @@ const BusUpdate = () => {
                 <div className="3rd-row ml-14 mt-10">
                   <h1>Date Purchased</h1>
                   <DatePicker
-                    selected={date_purchased ? new Date(date_purchased) : ""}
+                    selected={date_purchased ? new Date(date_purchased) : null} // Use null instead of an empty string
                     onChange={(date) => setDatePurchased(date)}
                     className="border border-gray-500 p-3 rounded-md w-full mt-1"
                     dateFormat="MM/dd/yyyy"
