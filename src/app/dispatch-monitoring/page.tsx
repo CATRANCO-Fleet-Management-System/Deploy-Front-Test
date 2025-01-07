@@ -66,22 +66,22 @@ const DispatchMonitoring: React.FC = () => {
       const parsedData = JSON.parse(storedBusData);
       busDataRef.current = parsedData;
       setBusData(parsedData);
-      setLoading(false);  // Set loading to false since offline data is available
+      setLoading(false); // Set loading to false since offline data is available
     } else {
       fetchVehicleAssignments(); // If no offline data, fetch it
     }
   }, [selectedBus]); // Make sure fetchVehicleAssignments is called again when selectedBus changes
 
-  const formatTime = (timestamp) => {
+  const formatTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
 
-    const options = {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true, // Use 12-hour format with AM/PM
+    const options: Intl.DateTimeFormatOptions = {
+      hour: "2-digit", // Correct type
+      minute: "2-digit", // Correct type
+      hour12: true, // Remains as a boolean
     };
 
-    return date.toLocaleString('en-US', options); // Returns time in format like '10:00 AM'
+    return date.toLocaleString("en-US", options); // Returns time in format like '10:00 AM'
   };
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const DispatchMonitoring: React.FC = () => {
       .listen("FlespiDataReceived", (event: any) => {
         const { vehicle_id, location, dispatch_log } = event;
 
-        console.log('Real Time Data:', event)
+        console.log("Real Time Data:", event);
 
         // Reset polyline if dispatch_log is null
         if (!dispatch_log) {
@@ -197,8 +197,8 @@ const DispatchMonitoring: React.FC = () => {
                       (bus) => bus.number === busNumber
                     );
                     if (clickedBus) {
-                      setPathData([ 
-                        { lat: clickedBus.latitude, lng: clickedBus.longitude }
+                      setPathData([
+                        { lat: clickedBus.latitude, lng: clickedBus.longitude },
                       ]);
                     }
                   }}
