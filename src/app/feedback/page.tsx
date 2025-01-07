@@ -8,20 +8,16 @@ import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
 import Pagination from "../components/Pagination";
 
-interface FuelLogsResponse {
-  data: Array<{
-    feedback_logs_id: string;
-    phone_number: string;
-    rating: number;
-    comments: string;
-    created_at: string;
-  }>;
+interface FeedbackRecord {
+  feedback_logs_id: string;
+  phone_number: string;
+  rating: number;
+  comments: string;
+  created_at: string;
 }
 
 const FeedbackRecordDisplay = () => {
-  const [feedbackRecords, setFeedbackRecords] = useState<
-    FuelLogsResponse["data"]
-  >([]); // Use the correct type for feedback records
+  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]); // Use FeedbackRecord[] instead of FuelLogsResponse["data"]
   const [loading, setLoading] = useState(true);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
@@ -33,9 +29,9 @@ const FeedbackRecordDisplay = () => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const logs: FuelLogsResponse = await fetchAllFuelLogs(); // Explicitly typing the response
+        const logs: FeedbackRecord[] = await fetchAllFuelLogs(); // Explicitly typing as FeedbackRecord[]
         console.log("Fetched Feedback Logs:", logs); // Debug response
-        setFeedbackRecords(logs.data || []); 
+        setFeedbackRecords(logs); // Directly set the logs
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");

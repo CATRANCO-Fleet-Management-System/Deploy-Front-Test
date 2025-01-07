@@ -45,29 +45,29 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
+  try {
+    const token = localStorage.getItem("authToken");
 
-      // If there's no token, log the user out immediately (or redirect them to login)
-      if (!token) {
-        console.error("No token found, cannot log out.");
-        router.push("/login");
-        return;
-      }
-
-      // Proceed with logout from the server (if applicable)
-      await logout(); // Call the logout function from authService
-
-      // Clear the token from localStorage
-      localStorage.removeItem("authToken");
-
-      // Redirect to the login page after logout
+    // If there's no token, log the user out immediately (or redirect them to login)
+    if (!token) {
+      console.error("No token found, cannot log out.");
       router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Optionally, show a notification or error message to the user
+      return;
     }
-  };
+
+    // Proceed with logout from the server (if applicable)
+    await logout(); // Call the logout function from authService
+
+    // Clear the token from localStorage
+    localStorage.removeItem("authToken");
+
+    // Redirect to the login page after logout
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    // Optionally, show a notification or error message to the user
+  }
+};
   return (
     <div className="header flex flex-row justify-between mt-7">
       <div className="title ml-5 text-violet-700">
