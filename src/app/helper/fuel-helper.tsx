@@ -1,11 +1,16 @@
 import { format, startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
+interface GroupedData {
+  distance: number;
+  liters: number;
+}
+
 export const groupByTimeInterval = (logs, interval) => {
-  const groupedData = {};
+  const groupedData: { [key: string]: GroupedData } = {};
 
   logs.forEach((log) => {
     const date = new Date(log.purchase_date);
-    let key;
+    let key: string;
 
     switch (interval) {
       case "daily":
@@ -43,6 +48,6 @@ export const groupByTimeInterval = (logs, interval) => {
   // Return the grouped data with the formatted key and values
   return Object.entries(groupedData).map(([key, value]) => ({
     label: key,
-    ...value,
+    ...value, // No TypeScript error now because value is typed as an object
   }));
 };

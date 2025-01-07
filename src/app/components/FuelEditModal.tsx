@@ -61,6 +61,13 @@ const FuelEditModal = ({
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     const file = files[0];
+
+    // Validate file type (optional)
+    if (file && !file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: file,
@@ -80,6 +87,8 @@ const FuelEditModal = ({
       formDataToSubmit.append("fuel_price", formData.fuelPrice);
       formDataToSubmit.append("fuel_type", formData.fuelType);
       formDataToSubmit.append("vehicle_id", selectedBus);
+
+      // Add files only if they exist
       if (formData.odometerProof) {
         formDataToSubmit.append(
           "odometer_distance_proof",
@@ -133,7 +142,9 @@ const FuelEditModal = ({
                 className="w-full border border-gray-300 p-2 rounded"
                 required
               />
-              <label className="block font-medium mt-4">Distance Traveled (KM)</label>
+              <label className="block font-medium mt-4">
+                Distance Traveled (KM)
+              </label>
               <input
                 type="number"
                 name="distanceTraveled"
@@ -164,7 +175,9 @@ const FuelEditModal = ({
                 className="w-full border border-gray-300 p-2 rounded"
                 required
               />
-              <label className="block font-medium mt-4">Fuel Quantity (L)</label>
+              <label className="block font-medium mt-4">
+                Fuel Quantity (L)
+              </label>
               <input
                 type="number"
                 name="fuel_liters_quantity"
@@ -184,7 +197,9 @@ const FuelEditModal = ({
                 disabled
                 className="w-full border border-gray-300 p-2 rounded"
               />
-              <label className="block font-medium mt-4">Distance (Odometer) Proof</label>
+              <label className="block font-medium mt-4">
+                Distance (Odometer) Proof
+              </label>
               <input
                 type="file"
                 name="odometerProof"
@@ -192,7 +207,9 @@ const FuelEditModal = ({
                 className="w-full border border-gray-300 p-2 rounded"
                 accept="image/*"
               />
-              <label className="block font-medium mt-4">Fuel Receipt Proof</label>
+              <label className="block font-medium mt-4">
+                Fuel Receipt Proof
+              </label>
               <input
                 type="file"
                 name="fuelReceiptProof"
@@ -227,4 +244,3 @@ const FuelEditModal = ({
 };
 
 export default FuelEditModal;
-
