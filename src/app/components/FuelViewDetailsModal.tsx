@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { FaBus } from "react-icons/fa";
 
+// Define the type for the fuel view data
+interface FuelViewData {
+  purchase_date?: string;
+  odometer_km?: string;
+  fuel_price?: string;
+  fuel_type?: string;
+  fuel_liters_quantity?: string;
+  total_expense?: string;
+  odometer_distance_proof?: string | null;
+  fuel_receipt_proof?: string | null;
+}
+
 const FuelViewDetailsModal = ({
   selectedBus,
-  viewData = {},
+  viewData = {}, // Default value is an empty object
   onClose = () => {},
+}: {
+  selectedBus: string;
+  viewData: FuelViewData;
+  onClose: () => void;
 }) => {
   const {
     purchase_date = "N/A",
@@ -25,7 +41,7 @@ const FuelViewDetailsModal = ({
 
   const calculatedTotalExpense =
     total_expense ||
-    (!isNaN(fuel_price) && !isNaN(fuel_liters_quantity)
+    (!isNaN(parseFloat(fuel_price)) && !isNaN(parseFloat(fuel_liters_quantity))
       ? (parseFloat(fuel_price) * parseFloat(fuel_liters_quantity)).toFixed(2)
       : "N/A");
 
