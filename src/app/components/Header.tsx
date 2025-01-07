@@ -1,6 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { FaUser, FaEnvelope, FaBell, FaCaretDown ,FaBars} from "react-icons/fa";
+import {
+  FaUser,
+  FaEnvelope,
+  FaBell,
+  FaCaretDown,
+  FaBars,
+} from "react-icons/fa";
 import Link from "next/link";
 import { logout } from "../services/authService"; // Import the logout function
 import { useRouter } from "next/navigation"; // Import Next.js router for redirection
@@ -14,7 +20,6 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter(); // Initialize the router for redirection
   const [burgerMenuVisible, setBurgerMenuVisible] = useState(false); // Correctly initialize
-
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -41,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.removeItem("authToken");
+      const token = localStorage.getItem("authToken");
 
       // If there's no token, log the user out immediately (or redirect them to login)
       if (!token) {
@@ -66,12 +71,17 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   return (
     <div className="header flex flex-row justify-between mt-7">
       <div className="title ml-5 text-violet-700">
-      <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl">{title}</h1> {/* Responsive title sizes */}
+        <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl">
+          {title}
+        </h1>{" "}
+        {/* Responsive title sizes */}
       </div>
       <div className="icon-container">
         <div className="icons flex flex-row">
-         {/* Burger menu button with conditional white box */}
-         <div className="md:hidden bg-white h-6 mt-0.5 mr-3"> {/* White box only on smaller screens */}
+          {/* Burger menu button with conditional white box */}
+          <div className="md:hidden bg-white h-6 mt-0.5 mr-3">
+            {" "}
+            {/* White box only on smaller screens */}
             <button onClick={toggleBurgerMenu} className="md:hidden">
               <FaBars size={25} className="text-violet-700 cursor-pointer" />
             </button>
@@ -83,7 +93,10 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             </Link>
           </div>
           <div className="profile md:ml-3 mr-6 md:flex md:items-center md:justify-center md:relative hidden">
-            <FaUser size={42} className="rounded-full border border-gray-400 p-2" />
+            <FaUser
+              size={42}
+              className="rounded-full border border-gray-400 p-2"
+            />
             <FaCaretDown
               size={20}
               className="ml-2 cursor-pointer"
@@ -113,10 +126,16 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {/* Burger Menu Content (shown only when burgerMenuVisible is true) */}
         {burgerMenuVisible && (
           <div className="absolute top-16 right-0 bg-white shadow-lg rounded-md w-48">
-            <Link href="/notification" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <Link
+              href="/notification"
+              className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+            >
               Notifications
             </Link>
-            <Link href="/editprofile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <Link
+              href="/editprofile"
+              className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+            >
               Settings
             </Link>
             <button
