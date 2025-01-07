@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 192.168.254.111 --port 3000",
+    "build": "next build",
     "start": "next start --hostname 192.168.254.111 --port 3000",
-    "lint": "next lint",
-    "build": "tsc --noEmitOnError false && next build"
+    "lint": "next lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

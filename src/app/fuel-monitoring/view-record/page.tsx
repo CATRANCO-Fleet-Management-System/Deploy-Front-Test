@@ -47,7 +47,7 @@ const ViewRecord = () => {
   const [viewData, setViewData] = useState(null);
   const [editData, setEditData] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [historyData, setHistoryData] = useState([]);
+  const [historyData, setHistoryData] = useState<FuelLog[]>([]);
 
   const fetchLogs = async () => {
     try {
