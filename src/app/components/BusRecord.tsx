@@ -15,6 +15,7 @@ interface BusBoxProps {
   CRNumber: string;
   plateNumber: string;
   thirdLBI: string;
+  comprehensiveInsurance?: string;
   ci: string;
   assignedDriver: string;
   assignedPAO: string;
@@ -156,12 +157,10 @@ const BusRecord: React.FC<BusBoxProps> = ({
             <td className="border p-2 font-bold">Third LBI:</td>
             <td className="border p-2">{thirdLBI}</td>
           </tr>
-          {ci && (
-            <tr>
-              <td className="border p-2 font-bold">Comprehensive Insurance:</td>
-              <td className="border p-2">{ci}</td>
-            </tr>
-          )}
+          <tr>
+            <td className="border p-2 font-bold">Comprehensive Insurance:</td>
+            <td className="border p-2">{ci}</td>
+          </tr>
           <tr>
             <td className="border p-2 font-bold">Assigned Driver:</td>
             <td className="border p-2">{assignedDriver}</td>
@@ -241,6 +240,7 @@ const BusRecord: React.FC<BusBoxProps> = ({
           vehicle_id={vehicle_id}
           onClose={handleModalClose}
           onSubmit={(updatedBus) => handleUpdate(updatedBus)} // Pass the handleUpdate function here
+          refreshData={fetchOrCreateAssignment} // Add refreshData prop here
         />
       )}
 

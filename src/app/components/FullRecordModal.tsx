@@ -10,13 +10,18 @@ interface FullRecordModalProps {
     plateNumber: string;
     thirdLBI: string;
     comprehensiveInsurance?: string;
+    ci: string;
     assignedDriver: string;
     assignedPAO: string;
     route?: string;
   };
 }
 
-const FullRecordModal: React.FC<FullRecordModalProps> = ({ isOpen, onClose, busDetails }) => {
+const FullRecordModal: React.FC<FullRecordModalProps> = ({
+  isOpen,
+  onClose,
+  busDetails,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -36,29 +41,38 @@ const FullRecordModal: React.FC<FullRecordModalProps> = ({ isOpen, onClose, busD
         {/* General Information */}
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-blue-600">General Information</h3>
+            <h3 className="text-lg font-semibold text-blue-600">
+              General Information
+            </h3>
             <div className="grid grid-cols-2 gap-4 mt-4 text-gray-700">
               <p>
-                <span className="font-medium">Bus Number:</span> {busDetails.busNumber}
+                <span className="font-medium">Bus Number:</span>{" "}
+                {busDetails.busNumber}
               </p>
               <p>
-                <span className="font-medium">Plate Number:</span> {busDetails.plateNumber}
+                <span className="font-medium">Plate Number:</span>{" "}
+                {busDetails.plateNumber}
               </p>
               <p>
-                <span className="font-medium">OR Number:</span> {busDetails.ORNumber}
+                <span className="font-medium">OR Number:</span>{" "}
+                {busDetails.ORNumber}
               </p>
               <p>
-                <span className="font-medium">CR Number:</span> {busDetails.CRNumber}
+                <span className="font-medium">CR Number:</span>{" "}
+                {busDetails.CRNumber}
               </p>
             </div>
           </div>
 
           {/* Insurance Details */}
           <div>
-            <h3 className="text-lg font-semibold text-blue-600">Insurance Details</h3>
+            <h3 className="text-lg font-semibold text-blue-600">
+              Insurance Details
+            </h3>
             <div className="mt-4 text-gray-700">
               <p>
-                <span className="font-medium">Third Party Liability:</span> {busDetails.thirdLBI}
+                <span className="font-medium">Third Party Liability:</span>{" "}
+                {busDetails.thirdLBI}
               </p>
               {busDetails.comprehensiveInsurance && (
                 <p>
@@ -74,10 +88,12 @@ const FullRecordModal: React.FC<FullRecordModalProps> = ({ isOpen, onClose, busD
             <h3 className="text-lg font-semibold text-blue-600">Personnel</h3>
             <div className="mt-4 text-gray-700">
               <p>
-                <span className="font-medium">Assigned Driver:</span> {busDetails.assignedDriver}
+                <span className="font-medium">Assigned Driver:</span>{" "}
+                {busDetails.assignedDriver}
               </p>
               <p>
-                <span className="font-medium">Assigned PAO:</span> {busDetails.assignedPAO}
+                <span className="font-medium">Assigned PAO:</span>{" "}
+                {busDetails.assignedPAO}
               </p>
             </div>
           </div>
