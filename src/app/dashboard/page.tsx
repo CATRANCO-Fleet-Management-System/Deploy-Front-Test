@@ -172,7 +172,7 @@ const DashboardHeader: React.FC = () => {
           <MapProvider>
             <DispatchMap
               busData={busData}
-              pathData={[]}
+              pathData={{}}
               onBusClick={(busNumber) => {
                 const busDetails = busData.find(
                   (bus) => bus.number === busNumber
