@@ -224,6 +224,12 @@ const BusRecordDisplay = () => {
             const { driver, conductor } = getAssignedProfiles(
               record.vehicle_id
             );
+            const assignment = vehicleAssignments.find(
+              (assignment) => assignment.vehicle_id === record.vehicle_id
+            );
+            const assignmentId = assignment
+              ? assignment.vehicle_assignment_id
+              : "";
 
             return (
               <BusRecord
@@ -238,6 +244,7 @@ const BusRecordDisplay = () => {
                 assignedDriver={driver}
                 assignedPAO={conductor}
                 route={record.route || "Not Assigned"}
+                assignmentId={assignmentId} // Add this line
                 onDelete={() => handleDelete(record.vehicle_id)} // Update this line
                 onUpdate={handleEditBus}
               />
