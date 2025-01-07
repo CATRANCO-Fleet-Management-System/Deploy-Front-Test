@@ -90,14 +90,19 @@ const MaintenanceManagement = () => {
         );
       }
 
+      const maintenanceId = Number(id); // Convert to number here
+      if (isNaN(maintenanceId)) {
+        throw new Error("Invalid ID");
+      }
+
       const updatedRecord = await toggleMaintenanceSchedulingStatus(
-        id,
+        maintenanceId,
         formData
       );
 
       setRecords((prev) =>
         prev.map((record) =>
-          record.maintenance_scheduling_id === id
+          record.maintenance_scheduling_id === maintenanceId
             ? {
                 ...record,
                 maintenance_status: updatedRecord.schedule.maintenance_status,
@@ -109,7 +114,6 @@ const MaintenanceManagement = () => {
       setIsViewProofModalOpen(false); // Close the modal after successful update
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        // Now you can safely access Axios-specific properties
         console.error(
           "Error returning to active:",
           error.response?.data || error.message || error
