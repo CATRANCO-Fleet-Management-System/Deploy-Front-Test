@@ -30,6 +30,9 @@ const DashboardHeader: React.FC = () => {
   const [busesInMaintenance, setBusesInMaintenance] = useState(0);
   const [currentEmployees, setCurrentEmployees] = useState(0);
   const [busData, setBusData] = useState<BusData[]>([]);
+  const [activeMaintenanceRecords, setActiveMaintenanceRecords] = useState<
+    MaintenanceRecord[]
+  >([]);
   const [selectedBusDetails, setSelectedBusDetails] = useState<BusData | null>(
     null
   );
@@ -41,9 +44,8 @@ const DashboardHeader: React.FC = () => {
         const vehicles = await getAllVehicles();
         setBusesInOperation(vehicles.length);
 
-        // Assuming the response is an array, directly use its length
         const maintenance = await getAllActiveMaintenanceScheduling();
-        setBusesInMaintenance(maintenance.length); // No `.data`, just `maintenance.length`
+        setBusesInMaintenance(maintenance.data.length);
 
         const profiles = await getAllProfiles();
         setCurrentEmployees(profiles.length);
