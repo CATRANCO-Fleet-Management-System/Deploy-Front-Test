@@ -3,6 +3,14 @@ import { getAllProfiles } from "@/app/services/userProfile";
 import { getAllVehicles } from "@/app/services/vehicleService";
 import { createVehicleAssignment } from "@/app/services/vehicleAssignService";
 
+interface AssignBusPersonnelModalProps {
+  onClose: () => void;
+  refreshData: () => void;
+  onAssign: (newAssignment: any) => void;
+  vehicleId: string;
+  preSelectedVehicle?: string;
+}
+
 const AssignBusPersonnelModal = ({
   onClose,
   refreshData,
