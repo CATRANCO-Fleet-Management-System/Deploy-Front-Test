@@ -8,19 +8,13 @@ import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
 import Pagination from "../components/Pagination";
 
-// Define the FeedbackLog interface for typing the data
-interface FeedbackLog {
+// Define the type for the feedback record
+interface FeedbackRecord {
   feedback_logs_id: string;
-  phone_number: string | null;
+  phone_number: string;
   rating: number;
   comments: string;
-  vehicle_id: string;
   created_at: string;
-}
-
-// Define the response type for fetchAllFuelLogs
-interface FeedbackLogsResponse {
-  data: FeedbackLog[];
 }
 
 const FeedbackRecordDisplay = () => {
@@ -29,17 +23,21 @@ const FeedbackRecordDisplay = () => {
   const [itemsPerPage] = useState(4);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
-  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackLog[]>([]); // Set initial state to FeedbackLog[]
+  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        // Ensure the response is typed correctly
-        const response: FeedbackLogsResponse = await fetchAllFuelLogs(); // Assuming fetchAllFuelLogs returns an object with a data property
-        console.log("Fetched Feedback Logs:", response); // Debug response
-        setFeedbackRecords(response.data || []); // Set feedback records correctly
+        const response = await fetchAllFuelLogs();
+        console.log("Fetched Feedback Logs:", response); // Log the full response
+
+        if (Array.isArray(response.data)) {
+          setFeedbackRecords(response.data); // Use response.data, which is the array
+        } else {
+          console.error("Unexpected response format:", response); // Just in case, but shouldn't happen
+        }
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
@@ -47,6 +45,7 @@ const FeedbackRecordDisplay = () => {
         setLoading(false);
       }
     };
+
     fetchFeedbackLogs();
   }, []);
 
@@ -72,11 +71,14 @@ const FeedbackRecordDisplay = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const filteredRecords = feedbackRecords.filter(
-    (record) =>
-      record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.phone_number?.includes(searchTerm)
-  );
+  const filteredRecords = Array.isArray(feedbackRecords)
+    ? feedbackRecords.filter((record) => {
+        return (
+          record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.phone_number?.includes(searchTerm)
+        );
+      })
+    : [];
 
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
   const paginatedRecords = filteredRecords.slice(

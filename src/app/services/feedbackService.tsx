@@ -1,4 +1,5 @@
-import axios from 'axios';
+// feedbackService.js
+import axios from "axios";
 
 // Define the base API URL
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -7,15 +8,24 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
+
+// Define the type for the feedback record
+export interface FeedbackRecord {
+  feedback_logs_id: string;
+  phone_number: string;
+  rating: number;
+  comments: string;
+  created_at: string;
+}
 
 // Add interceptors for token handling
 api.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,7 +39,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('Response Error:', error.response?.data || error.message);
+    console.error("Response Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -40,10 +50,10 @@ api.interceptors.response.use(
  */
 export const createFeedbackLog = async (feedbackData) => {
   try {
-    const response = await api.post('/user/feedback', feedbackData);
+    const response = await api.post("/user/feedback", feedbackData);
     return response.data;
   } catch (error) {
-    console.error('Error creating feedback log:', error);
+    console.error("Error creating feedback log:", error);
     throw error.response ? error.response.data : error;
   }
 };
@@ -55,10 +65,10 @@ export const createFeedbackLog = async (feedbackData) => {
  */
 export const generateOTP = async (otpData) => {
   try {
-    const response = await api.post('/user/otp/generate', otpData);
+    const response = await api.post("/user/otp/generate", otpData);
     return response.data;
   } catch (error) {
-    console.error('Error generating OTP:', error);
+    console.error("Error generating OTP:", error);
     throw error.response ? error.response.data : error;
   }
 };
@@ -71,10 +81,13 @@ export const generateOTP = async (otpData) => {
  */
 export const verifyPhoneNumber = async (feedbackLogsId, verificationData) => {
   try {
-    const response = await api.post(`/user/feedback/${feedbackLogsId}/verify-phone`, verificationData);
+    const response = await api.post(
+      `/user/feedback/${feedbackLogsId}/verify-phone`,
+      verificationData
+    );
     return response.data;
   } catch (error) {
-    console.error('Error verifying phone number:', error);
+    console.error("Error verifying phone number:", error);
     throw error.response ? error.response.data : error;
   }
 };
@@ -85,17 +98,17 @@ export const verifyPhoneNumber = async (feedbackLogsId, verificationData) => {
  * Fetch all fuel logs.
  * @returns {Promise<Object[]>} - An array of fuel logs.
  */
-export const fetchAllFuelLogs = async () => {
+export const fetchAllFuelLogs = async (): Promise<{
+  data: FeedbackRecord[];
+}> => {
   try {
-    const response = await api.get('/user/admin/feedbacks/all');
-    console.log('Fetched Fuel Logs:', response.data); // Debugging log
-    return response.data;
+    const response = await api.get("/user/admin/feedbacks/all");
+    return response.data; // We expect response.data to be the array of feedback records.
   } catch (error) {
-    console.error('Error fetching all fuel logs:', error);
+    console.error("Error fetching all fuel logs:", error);
     throw error.response ? error.response.data : error;
   }
 };
-
 /**
  * Fetch a single fuel log by ID.
  * @param {number} id - The ID of the fuel log.
@@ -104,7 +117,7 @@ export const fetchAllFuelLogs = async () => {
 export const fetchFuelLogById = async (id) => {
   try {
     const response = await api.get(`/user/admin/feedbacks/${id}`);
-    console.log('Fetched Fuel Log:', response.data); // Debugging log
+    console.log("Fetched Fuel Log:", response.data); // Debugging log
     return response.data;
   } catch (error) {
     console.error(`Error fetching fuel log with ID ${id}:`, error);

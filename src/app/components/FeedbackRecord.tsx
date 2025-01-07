@@ -20,13 +20,9 @@ const FeedbackRecord: React.FC<FeedbackRecordProps> = ({
     const totalStars = 5;
     return Array.from({ length: totalStars }, (_, i) =>
       i < rating ? (
-        <span key={i} className="text-yellow-500">
-          &#9733;
-        </span>
+        <span key={i} className="text-yellow-500">&#9733;</span>
       ) : (
-        <span key={i} className="text-gray-300">
-          &#9734;
-        </span>
+        <span key={i} className="text-gray-300">&#9734;</span>
       )
     );
   };
