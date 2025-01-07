@@ -33,7 +33,6 @@ const DashboardHeader: React.FC = () => {
   const [selectedBusDetails, setSelectedBusDetails] = useState<BusData | null>(
     null
   );
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false); // Add notification state
 
   // Fetch Static Data
   useEffect(() => {
@@ -48,10 +47,6 @@ const DashboardHeader: React.FC = () => {
 
         const profiles = await getAllProfiles();
         setCurrentEmployees(profiles.length);
-
-        // Show success notification after fetching data
-        setShowSuccessNotification(true);
-        setTimeout(() => setShowSuccessNotification(false), 3000); // Hide notification after 3 seconds
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -149,13 +144,6 @@ const DashboardHeader: React.FC = () => {
   return (
     <Layout>
       <Header title="Dashboard" />
-
-      {/* Success Notification */}
-      {showSuccessNotification && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-          <p className="text-sm font-medium">Successfully Logged In</p>
-        </div>
-      )}
 
       <section className="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 bg-slate-200">
         <div className="flex-1">
