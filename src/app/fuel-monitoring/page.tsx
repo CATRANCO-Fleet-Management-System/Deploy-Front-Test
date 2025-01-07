@@ -9,7 +9,7 @@ import Header from "../components/Header";
 import Pagination from "../components/Pagination";
 import { fetchAllFuelLogs } from "@/app/services/fuellogsService";
 import { getAllVehicles } from "@/app/services/vehicleService";
-import { getAllMaintenanceScheduling } from "@/app/services/maintenanceService";
+import { getAllMaintenanceScheduling } from "../services/maintenanceService";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { groupByTimeInterval } from "../helper/fuel-helper";

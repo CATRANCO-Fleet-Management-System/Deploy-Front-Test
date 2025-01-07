@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getAllVehicles } from "@/app/services/vehicleService";
+import { getAllVehicles } from "../services/vehicleService";
 import { getNextMaintenanceNumber } from "../services/maintenanceService";
 
 const MaintenanceAddModal = ({ isOpen, onClose, onSave }) => {
