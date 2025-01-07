@@ -39,7 +39,8 @@ const HistoryModalForBus = ({ isOpen, onClose, history = [] }) => {
     doc.setFontSize(16);
     doc.text("Bus Records History", 14, 15);
     doc.setFont("helvetica", "normal");
-    doc.autoTable({
+    doc.setFont("helvetica", "normal");
+    (doc as any).autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 25,
