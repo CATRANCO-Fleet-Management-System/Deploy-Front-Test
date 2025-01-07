@@ -184,8 +184,6 @@ const AddPage = () => {
                 }
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
-                selectsRange={false} // Ensuring it's not a range picker
-                selectsMultiple={false} // Avoids the need for multiple date selection
               />
             </div>
             <div className="col-span-1">
