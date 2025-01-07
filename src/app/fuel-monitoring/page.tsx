@@ -7,7 +7,7 @@ import "chart.js/auto";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Pagination from "../components/Pagination";
-import { fetchAllFuelLogs } from "@/app/services/fuellogsService";
+import { fetchAllFuelLogs } from "../services/fuellogsService";
 import { getAllVehicles } from "@/app/services/vehicleService";
 import { getAllMaintenanceScheduling } from "../services/maintenanceService";
 import jsPDF from "jspdf";
