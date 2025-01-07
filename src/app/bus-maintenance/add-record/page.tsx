@@ -181,12 +181,11 @@ const AddPage = () => {
                 selected={maintenanceDate}
                 onChange={(date: Date | null) =>
                   setMaintenanceDate(date ?? new Date())
-                } // Ensure that the date is of type Date or null
+                }
                 className="border border-gray-500 p-3 rounded-md w-full mt-1"
                 dateFormat="MM/dd/yyyy"
-                selectsRange={false}
-                selectsStart={false}
-                selectsEnd={false}
+                selectsRange={false} // Ensuring it's not a range picker
+                selectsMultiple={false} // Avoids the need for multiple date selection
               />
             </div>
             <div className="col-span-1">
