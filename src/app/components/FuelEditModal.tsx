@@ -17,8 +17,8 @@ const FuelEditModal = ({
     fuelPrice: "",
     fuel_liters_quantity: "",
     total_expense: "",
-    odometerProof: null,
-    fuelReceiptProof: null,
+    odometerProof: selectedFuelLog?.odometer_proof || null, // Retain previous proof if available
+    fuelReceiptProof: selectedFuelLog?.fuel_receipt_proof || null, // Retain previous proof if available
   });
 
   useEffect(() => {
@@ -32,8 +32,8 @@ const FuelEditModal = ({
           fuel_liters_quantity: selectedFuelLog.fuel_liters_quantity || "",
           total_expense:
             selectedFuelLog.total_expense?.replace(/[^0-9.]/g, "") || "",
-          odometerProof: null,
-          fuelReceiptProof: null,
+          odometerProof: selectedFuelLog.odometer_proof || null, // Set existing proof
+          fuelReceiptProof: selectedFuelLog.fuel_receipt_proof || null, // Set existing proof
         });
       }
     }
@@ -66,6 +66,7 @@ const FuelEditModal = ({
       [name]: file,
     }));
   };
+
   const handleSubmit = async () => {
     if (formRef.current && formRef.current.reportValidity()) {
       setIsSubmitting(true);
@@ -132,9 +133,7 @@ const FuelEditModal = ({
                 className="w-full border border-gray-300 p-2 rounded"
                 required
               />
-              <label className="block font-medium mt-4">
-                Distance Traveled (KM)
-              </label>
+              <label className="block font-medium mt-4">Distance Traveled (KM)</label>
               <input
                 type="number"
                 name="distanceTraveled"
@@ -165,9 +164,7 @@ const FuelEditModal = ({
                 className="w-full border border-gray-300 p-2 rounded"
                 required
               />
-              <label className="block font-medium mt-4">
-                Fuel Quantity (L)
-              </label>
+              <label className="block font-medium mt-4">Fuel Quantity (L)</label>
               <input
                 type="number"
                 name="fuel_liters_quantity"
@@ -187,9 +184,7 @@ const FuelEditModal = ({
                 disabled
                 className="w-full border border-gray-300 p-2 rounded"
               />
-              <label className="block font-medium mt-4">
-                Distance (Odometer) Proof
-              </label>
+              <label className="block font-medium mt-4">Distance (Odometer) Proof</label>
               <input
                 type="file"
                 name="odometerProof"
@@ -197,9 +192,7 @@ const FuelEditModal = ({
                 className="w-full border border-gray-300 p-2 rounded"
                 accept="image/*"
               />
-              <label className="block font-medium mt-4">
-                Fuel Receipt Proof
-              </label>
+              <label className="block font-medium mt-4">Fuel Receipt Proof</label>
               <input
                 type="file"
                 name="fuelReceiptProof"
@@ -234,3 +227,4 @@ const FuelEditModal = ({
 };
 
 export default FuelEditModal;
+

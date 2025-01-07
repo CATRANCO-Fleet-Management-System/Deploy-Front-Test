@@ -159,9 +159,8 @@ const FuelMonitoring = () => {
   const handlePrint = async () => {
     const chartElement = document.querySelector(
       ".chart-container"
-    ) as HTMLElement; // Cast to HTMLElement
-
-    if (!chartElement) return;
+    ) as HTMLElement | null;
+    if (!chartElement) return; // Early return if chartElement is not found
 
     try {
       const canvas = await html2canvas(chartElement);
