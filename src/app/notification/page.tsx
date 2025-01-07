@@ -44,11 +44,16 @@ const DashboardHeader = () => {
   useEffect(() => {
     const fetchActiveMaintenance = async () => {
       try {
-        const response: MaintenanceResponse =
-          await getAllActiveMaintenanceScheduling();
-        setMaintenanceRecords(response.data || []); // Ensure data exists
+        const response = await getAllActiveMaintenanceScheduling();
+        // Check if the response contains a 'data' property before trying to access it
+        if (response && Array.isArray(response.data)) {
+          setMaintenanceRecords(response.data);
+        } else {
+          setMaintenanceRecords([]); // If no valid data, set to an empty array
+        }
       } catch (error) {
         console.error("Error fetching active maintenance records:", error);
+        setMaintenanceRecords([]); // Set to an empty array on error as well
       }
     };
 
