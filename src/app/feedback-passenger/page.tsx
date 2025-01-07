@@ -1,7 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { createFeedbackLog, generateOTP, verifyPhoneNumber } from "../services/feedbackService";
+import {
+  createFeedbackLog,
+  generateOTP,
+  verifyPhoneNumber,
+} from "../services/feedbackService";
 import { getAllVehicles } from "../services/vehicleService";
 
 const FeedbackForm: React.FC = () => {
@@ -58,7 +62,10 @@ const FeedbackForm: React.FC = () => {
     }
     try {
       setLoading(true);
-      await generateOTP({ phone_number: phoneNumber, feedback_logs_id: feedbackLogsId });
+      await generateOTP({
+        phone_number: phoneNumber,
+        feedback_logs_id: feedbackLogsId,
+      });
       setCurrentStep("verification");
     } catch (error) {
       alert("Failed to generate OTP. Please try again.");
@@ -75,7 +82,10 @@ const FeedbackForm: React.FC = () => {
     }
     try {
       setLoading(true);
-      await verifyPhoneNumber(feedbackLogsId, { phone_number: phoneNumber, otp: verificationCode });
+      await verifyPhoneNumber(feedbackLogsId?.toString() || "", {
+        phone_number: phoneNumber,
+        otp: verificationCode,
+      });
       setCurrentStep("thankYou");
     } catch (error) {
       alert("Invalid verification code. Please try again.");
@@ -93,7 +103,10 @@ const FeedbackForm: React.FC = () => {
         {currentStep === "initial" && (
           <div style={styles.container}>
             <h2 style={styles.title}>Welcome to TransitTrack Feedback</h2>
-            <button onClick={() => setCurrentStep("feedback")} style={styles.submitButton}>
+            <button
+              onClick={() => setCurrentStep("feedback")}
+              style={styles.submitButton}
+            >
               Send Feedback
             </button>
           </div>
@@ -157,7 +170,10 @@ const FeedbackForm: React.FC = () => {
               placeholder="Enter your phone number"
               style={styles.input}
             />
-            <button onClick={handlePhoneInputSubmit} style={styles.submitButton}>
+            <button
+              onClick={handlePhoneInputSubmit}
+              style={styles.submitButton}
+            >
               {loading ? "Sending OTP..." : "Next"}
             </button>
           </div>
@@ -173,7 +189,10 @@ const FeedbackForm: React.FC = () => {
               placeholder="Enter the verification code"
               style={styles.input}
             />
-            <button onClick={handleVerificationSubmit} style={styles.submitButton}>
+            <button
+              onClick={handleVerificationSubmit}
+              style={styles.submitButton}
+            >
               {loading ? "Verifying..." : "Verify"}
             </button>
           </div>
@@ -182,7 +201,10 @@ const FeedbackForm: React.FC = () => {
         {currentStep === "thankYou" && (
           <div style={styles.thankYouContainer}>
             <h2 style={styles.thankYouTitle}>Thank you for your feedback!</h2>
-            <button onClick={() => setCurrentStep("initial")} style={styles.submitButton}>
+            <button
+              onClick={() => setCurrentStep("initial")}
+              style={styles.submitButton}
+            >
               Done
             </button>
           </div>
@@ -194,105 +216,104 @@ const FeedbackForm: React.FC = () => {
 
 const styles = {
   container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '500px',
-    height: 'auto',
-    padding: '40px',
-    background: '#ffffff',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "500px",
+    height: "auto",
+    padding: "40px",
+    background: "#ffffff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    textAlign: "center",
   },
   logo: {
-    maxWidth: '150%',
-    height: 'auto',
+    maxWidth: "150%",
+    height: "auto",
   },
   backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: '10px',
-    background: 'none',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
+    alignSelf: "flex-start",
+    marginBottom: "10px",
+    background: "none",
+    border: "none",
+    fontSize: "20px",
+    cursor: "pointer",
   },
   title: {
-    marginBottom: '20px',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#333',
+    marginBottom: "20px",
+    fontSize: "24px",
+    fontWeight: "bold",
+    color: "#333",
   },
   dropdown: {
-    marginBottom: '20px',
-    textAlign: 'left',
-    width: '100%',
+    marginBottom: "20px",
+    textAlign: "left",
+    width: "100%",
   },
   ratingSection: {
-    marginBottom: '20px',
-    textAlign: 'left',
-    width: '100%',
+    marginBottom: "20px",
+    textAlign: "left",
+    width: "100%",
   },
   stars: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: '10px',
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "10px",
   },
   commentsSection: {
-    marginBottom: '10px',
-    textAlign: 'left',
-    width: '100%',
+    marginBottom: "10px",
+    textAlign: "left",
+    width: "100%",
   },
   textarea: {
-    width: '100%',
-    height: '100px',
-    padding: '10px',
-    marginBottom: '20px',
-    borderRadius: '5px',
-    border: '1px solid #cccccc',
+    width: "100%",
+    height: "100px",
+    padding: "10px",
+    marginBottom: "20px",
+    borderRadius: "5px",
+    border: "1px solid #cccccc",
   },
   submitButton: {
-    padding: '12px',
-    width: '100%',
-    backgroundColor: '#007BFF',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
+    padding: "12px",
+    width: "100%",
+    backgroundColor: "#007BFF",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
   },
   input: {
-    width: '100%',
-    padding: '12px',
-    marginBottom: '20px',
-    borderRadius: '5px',
-    border: '1px solid #cccccc', 
+    width: "100%",
+    padding: "12px",
+    marginBottom: "20px",
+    borderRadius: "5px",
+    border: "1px solid #cccccc",
   },
   thankYouContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '500px',
-    padding: '50px', 
-    background: '#ffffff', 
-    borderRadius: '12px', 
-    boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
-    textAlign: 'center',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "500px",
+    padding: "50px",
+    background: "#ffffff",
+    borderRadius: "12px",
+    boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+    textAlign: "center",
   },
   thankYouTitle: {
-    fontSize: '28px', 
-    fontWeight: 'bold',
-    marginBottom: '20px',
-    color: '#333',
+    fontSize: "28px",
+    fontWeight: "bold",
+    marginBottom: "20px",
+    color: "#333",
   },
   feedbackLink: {
-    marginTop: '15px',
-    color: '#007BFF',
-    textDecoration: 'underline',
-    cursor: 'pointer',
+    marginTop: "15px",
+    color: "#007BFF",
+    textDecoration: "underline",
+    cursor: "pointer",
   },
 };
 
 export default FeedbackForm;
-

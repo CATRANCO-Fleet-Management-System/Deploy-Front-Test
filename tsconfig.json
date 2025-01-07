@@ -12,12 +12,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "suppressImplicitAnyIndexErrors": true, // Suppress errors for implicit "any" in index signatures
-    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
-    "forceConsistentCasingInFileNames": true, // Enforce consistent casing for file names
-    "strictNullChecks": false, // Allow null and undefined types
-    "noImplicitAny": false, // Allow variables with implicit "any" type
-    "noImplicitThis": false, // Allow usage of "this" without strict type-checking
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
     "plugins": [
       {
         "name": "next"
@@ -29,5 +29,5 @@
     "target": "ES2017"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "src/app"]
 }
