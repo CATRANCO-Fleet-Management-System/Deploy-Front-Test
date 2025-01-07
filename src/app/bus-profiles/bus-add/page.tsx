@@ -15,11 +15,12 @@ const BusAdd = () => {
   const [TPLValidity, setTPLValidity] = useState(new Date());
   const [CIValidity, setCIValidity] = useState(new Date());
   const [DatePurchased, setDatePurchased] = useState(new Date());
-  
+
   // State for input fields
   const [busNumber, setBusNumber] = useState("");
   const [officialReceipt, setOfficialReceipt] = useState("");
-  const [certificateOfRegistration, setCertificateOfRegistration] = useState("");
+  const [certificateOfRegistration, setCertificateOfRegistration] =
+    useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [engineNumber, setEngineNumber] = useState("");
   const [chasisNumber, setChasisNumber] = useState("");
@@ -28,11 +29,10 @@ const BusAdd = () => {
   const [comprehensiveInsurance, setComprehensiveInsurance] = useState("");
   const [supplier, setSupplier] = useState("");
 
-
-  const formatDate = (date) => {
+  const formatDate = (date: Date | null): string | null => {
     if (!date) return null; // Handle null cases
-    return date.toISOString().slice(0, 19).replace('T', ' '); // Converts to 'YYYY-MM-DD HH:MM:SS'
-};
+    return date.toISOString().slice(0, 19).replace("T", " "); // Converts to 'YYYY-MM-DD HH:MM:SS'
+  };
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -106,7 +106,10 @@ const BusAdd = () => {
 
         <section className="right w-full overflow-y-hidden">
           <div className="forms-container ml-14">
-            <form onSubmit={handleSubmit} className="output flex flex-row space-x-2 mt-20">
+            <form
+              onSubmit={handleSubmit}
+              className="output flex flex-row space-x-2 mt-20"
+            >
               <div className="forms flex w-11/12 bg-white h-140 rounded-lg border-1 border-gray-300">
                 <div className="1st-row flex-col m-5 ml-14 w-96 space-y-4 mt-10">
                   <h1>Bus Number</h1>
@@ -131,7 +134,9 @@ const BusAdd = () => {
                     type="text"
                     placeholder="CR #"
                     value={certificateOfRegistration}
-                    onChange={(e) => setCertificateOfRegistration(e.target.value)} // Update state
+                    onChange={(e) =>
+                      setCertificateOfRegistration(e.target.value)
+                    } // Update state
                   />
                   <h1>Plate Number</h1>
                   <Input

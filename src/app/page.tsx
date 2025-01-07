@@ -2,11 +2,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "./components/loadingAnimations";
-
+import { app, analytics } from "../../firebase-config"; 
 export default function LoadingPage() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("Firebase initialized:", app); // Optional: Verify Firebase initialization
     const timer = setTimeout(() => {
       router.push("/login");
     }, 3000);
