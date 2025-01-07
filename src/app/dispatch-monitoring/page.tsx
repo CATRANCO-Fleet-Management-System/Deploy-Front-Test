@@ -18,7 +18,8 @@ interface BusData {
   speed: number;
   status: string;
   time: string;
-  dispatch_logs_id: string | null; // Added dispatch_logs_id to track dispatch state
+  dispatch_logs_id: string | null;
+  name: string; 
 }
 
 const DispatchMonitoring: React.FC = () => {
@@ -43,7 +44,8 @@ const DispatchMonitoring: React.FC = () => {
         number: vehicle.vehicle_id,
         status: "idle", // Default status if no dispatch data is provided
         route: "", // Default route
-        dispatch_logs_id: null, // Default dispatch log ID
+        dispatch_logs_id: null,
+        name: vehicle.name || "Unnamed",
       }));
 
       // Save the mapped vehicle data to localStorage
