@@ -13,7 +13,7 @@ interface AddBusRecordModalProps {
 const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
   onClose,
   refreshData,
-  onSubmit, // Destructure the onSubmit prop
+  onSubmit, 
 }) => {
   const [busNumber, setBusNumber] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
@@ -85,9 +85,24 @@ const AddBusRecordModal: React.FC<AddBusRecordModalProps> = ({
         refreshData={refreshData}
         onAssign={(newAssignment) => {
           refreshData(); // Refresh or dynamically update assignments
-          handleAddVehicleAssignment(newAssignment); // Update parent state
         }}
-        preSelectedVehicle={busNumber}
+        vehicleId={busNumber}  // Change to vehicleId
+      />
+    );
+  }
+  
+  return (
+    <AssignBusPersonnelModal
+      onClose={onClose}
+      refreshData={refreshData}
+      onAssign={(newAssignment) => {
+        refreshData(); // Refresh or dynamically update assignments
+      }}
+      vehicleId={busNumber}  // Change to vehicleId
+    />
+  );
+}
+
       />
     );
   }

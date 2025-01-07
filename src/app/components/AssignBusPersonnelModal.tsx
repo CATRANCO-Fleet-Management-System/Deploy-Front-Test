@@ -7,7 +7,8 @@ const AssignBusPersonnelModal = ({
   onClose,
   refreshData,
   onAssign,
-  vehicleId, // Change preSelectedVehicle to vehicleId
+  vehicleId,
+  preSelectedVehicle,
 }) => {
   const [selectedVehicle, setSelectedVehicle] = useState(vehicleId || "");
   const [drivers, setDrivers] = useState([]);
