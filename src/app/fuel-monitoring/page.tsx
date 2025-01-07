@@ -163,7 +163,8 @@ const FuelMonitoring = () => {
     if (!chartElement) return; // Early return if chartElement is not found
 
     try {
-      const canvas = await html2canvas(chartElement);
+      // Ensure chartElement is treated as an HTMLElement
+      const canvas = await html2canvas(chartElement as HTMLElement);
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("landscape");
       const pageWidth = pdf.internal.pageSize.getWidth();
