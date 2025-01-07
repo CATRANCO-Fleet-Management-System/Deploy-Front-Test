@@ -280,6 +280,7 @@ const BusRecordDisplay = () => {
           refreshData={fetchData}
           onAssign={handleAddVehicleAssignment}
           vehicleId={selectedVehicleId}
+          preSelectedVehicle={selectedVehicleId} 
         />
       )}
 
