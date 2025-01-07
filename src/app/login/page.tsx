@@ -11,18 +11,23 @@ const Spinner = () => (
   <div className="loader-border border-t-4 border-blue-500 border-solid w-8 h-8 rounded-full animate-spin"></div>
 );
 
+interface FormData {
+  username: string;
+  password: string;
+}
+
 export default function AuthPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
   });
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for show/hide password
   const router = useRouter();
 
   // Handle form field changes
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -31,7 +36,7 @@ export default function AuthPage() {
 
   // Validate login form
   const validateLoginForm = () => {
-    const errors = {};
+    const errors: { [key: string]: string } = {};
     if (!formData.username) errors.username = "Username is required";
     if (!formData.password) errors.password = "Password is required";
     return errors;

@@ -62,16 +62,14 @@ const FuelEditModal = ({
     const { name, files } = e.target;
     const file = files[0];
 
-    // Validate file type (optional)
-    if (file && !file.type.startsWith("image/")) {
-      alert("Please select a valid image file.");
-      return;
+    // Remove the file type validation check
+    // If file exists, update the state
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: file,
+      }));
     }
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: file,
-    }));
   };
 
   const handleSubmit = async () => {
