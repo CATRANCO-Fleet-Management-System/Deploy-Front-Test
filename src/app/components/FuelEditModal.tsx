@@ -98,7 +98,7 @@ const FuelEditModal = ({
           formDataToSubmit
         );
         console.log("Fuel log updated:", response);
-        onUpdate(response.fuel_log);
+        onUpdate();
         onClose();
       } catch (error) {
         console.error("Failed to update fuel log:", error);
