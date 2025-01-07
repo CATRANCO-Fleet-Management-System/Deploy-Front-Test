@@ -94,17 +94,16 @@ const FeedbackForm: React.FC = () => {
   };
 
   return (
-    <section
-      className="h-screen w-full flex justify-center items-center"
-      style={{ background: "linear-gradient(135deg, #e0f7fa, #d1c4e9)" }}
-    >
+    <section className="h-screen w-full flex justify-center items-center bg-gradient-to-br from-teal-100 to-indigo-100">
       <div className="w-full h-full flex flex-col justify-center items-center">
         {currentStep === "initial" && (
-          <div style={styles.container}>
-            <h2 style={styles.title}>Welcome to TransitTrack Feedback</h2>
+          <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-semibold mb-5">
+              Welcome to TransitTrack Feedback
+            </h2>
             <button
               onClick={() => setCurrentStep("feedback")}
-              style={styles.submitButton}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Send Feedback
             </button>
@@ -112,14 +111,16 @@ const FeedbackForm: React.FC = () => {
         )}
 
         {currentStep === "feedback" && (
-          <div style={styles.container}>
-            <h2 style={styles.title}>Give Feedback</h2>
-            <div style={styles.dropdown}>
-              <label>Select Bus Number</label>
+          <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-semibold mb-5">Give Feedback</h2>
+            <div className="mb-5 w-full">
+              <label className="block mb-2 text-gray-700">
+                Select Bus Number
+              </label>
               <select
                 value={busNumber}
                 onChange={(e) => setBusNumber(e.target.value)}
-                style={styles.input}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
               >
                 <option value="">Select Bus Number</option>
                 {buses.map((bus) => (
@@ -129,17 +130,17 @@ const FeedbackForm: React.FC = () => {
                 ))}
               </select>
             </div>
-            <div style={styles.ratingSection}>
-              <label>How was your experience?</label>
-              <div style={styles.stars}>
+            <div className="mb-5">
+              <label className="block mb-2 text-gray-700">
+                How was your experience?
+              </label>
+              <div className="flex justify-center space-x-2 text-2xl">
                 {[1, 2, 3, 4, 5].map((index) => (
                   <span
                     key={index}
-                    style={{
-                      cursor: "pointer",
-                      fontSize: "30px",
-                      color: rating >= index ? "#FFD700" : "#CCCCCC",
-                    }}
+                    className={`cursor-pointer ${
+                      rating >= index ? "text-yellow-500" : "text-gray-400"
+                    }`}
                     onClick={() => setRating(index)}
                   >
                     ★
@@ -151,27 +152,30 @@ const FeedbackForm: React.FC = () => {
               value={comments}
               onChange={(e) => setComments(e.target.value)}
               placeholder="Your comments..."
-              style={styles.textarea}
+              className="w-full px-4 py-2 mb-5 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             />
-            <button onClick={handleSubmitFeedback} style={styles.submitButton}>
+            <button
+              onClick={handleSubmitFeedback}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
               {loading ? "Submitting..." : "Submit Feedback"}
             </button>
           </div>
         )}
 
         {currentStep === "phoneInput" && (
-          <div style={styles.container}>
-            <h2 style={styles.title}>Phone Number</h2>
+          <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-semibold mb-5">Phone Number</h2>
             <input
               type="text"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="Enter your phone number"
-              style={styles.input}
+              className="w-full px-4 py-2 mb-5 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             />
             <button
               onClick={handlePhoneInputSubmit}
-              style={styles.submitButton}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               {loading ? "Sending OTP..." : "Next"}
             </button>
@@ -179,18 +183,18 @@ const FeedbackForm: React.FC = () => {
         )}
 
         {currentStep === "verification" && (
-          <div style={styles.container}>
-            <h2 style={styles.title}>Verify Phone Number</h2>
+          <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-semibold mb-5">Verify Phone Number</h2>
             <input
               type="text"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
               placeholder="Enter the verification code"
-              style={styles.input}
+              className="w-full px-4 py-2 mb-5 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             />
             <button
               onClick={handleVerificationSubmit}
-              style={styles.submitButton}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               {loading ? "Verifying..." : "Verify"}
             </button>
@@ -198,11 +202,13 @@ const FeedbackForm: React.FC = () => {
         )}
 
         {currentStep === "thankYou" && (
-          <div style={styles.thankYouContainer}>
-            <h2 style={styles.thankYouTitle}>Thank you for your feedback!</h2>
+          <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-semibold mb-5">
+              Thank you for your feedback!
+            </h2>
             <button
               onClick={() => setCurrentStep("initial")}
-              style={styles.submitButton}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Done
             </button>
@@ -211,36 +217,6 @@ const FeedbackForm: React.FC = () => {
       </div>
     </section>
   );
-};
-
-// Typing the style object explicitly as React.CSSProperties
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    display: "flex",
-    flexDirection: "column", // this is valid now
-    alignItems: "center",
-    justifyContent: "center",
-    width: "500px",
-    height: "auto",
-    padding: "40px",
-    background: "#ffffff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    textAlign: "center",
-  },
-  thankYouContainer: {
-    display: "flex",
-    flexDirection: "column", // this is valid now
-    alignItems: "center",
-    justifyContent: "center",
-    width: "500px",
-    padding: "50px",
-    background: "#ffffff",
-    borderRadius: "12px",
-    boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-    textAlign: "center",
-  },
-  // other styles...
 };
 
 export default FeedbackForm;

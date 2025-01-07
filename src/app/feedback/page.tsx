@@ -1,47 +1,30 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import Header from "../components/Header";
 import Confirmpopup from "../components/Confirmpopup";
+import { FaSearch } from "react-icons/fa";
 import FeedbackRecord from "../components/FeedbackRecord";
 import { fetchAllFuelLogs } from "../services/feedbackService";
 import Pagination from "../components/Pagination";
 
-interface FeedbackRecord {
-  feedback_logs_id: string;
-  phone_number: string;
-  rating: number;
-  comments: string;
-  created_at: string;
-}
-
 const FeedbackRecordDisplay = () => {
-  const [feedbackRecords, setFeedbackRecords] = useState<FeedbackRecord[]>([]); // Use FeedbackRecord[] instead of FuelLogsResponse["data"]
-  const [loading, setLoading] = useState(true);
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
+  const [feedbackRecords, setFeedbackRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  interface FuelLogsResponse {
-    data: FeedbackRecord[];
-  }
-
-  const fetchAllFuelLogs = async (): Promise<FuelLogsResponse> => {
-    const response = await fetch("/api/fuel-logs");
-    if (!response.ok) {
-      throw new Error("Failed to fetch fuel logs");
-    }
-    return response.json();
-  };
   useEffect(() => {
     const fetchFeedbackLogs = async () => {
       try {
         setLoading(true);
-        const response: FuelLogsResponse = await fetchAllFuelLogs();
-        console.log("Fetched Feedback Logs:", response); // Debug the response
-        setFeedbackRecords(response.data); // Use the `data` property
+        const logs = await fetchAllFuelLogs(); // Use the correct service
+        console.log("Fetched Feedback Logs:", logs); // Debug response
+        setFeedbackRecords(logs.data || []); // Set feedback records
       } catch (error) {
         console.error("Error fetching feedback logs:", error);
         alert("Failed to fetch feedback records. Please try again.");
@@ -49,7 +32,6 @@ const FeedbackRecordDisplay = () => {
         setLoading(false);
       }
     };
-
     fetchFeedbackLogs();
   }, []);
 
@@ -75,7 +57,7 @@ const FeedbackRecordDisplay = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const filteredRecords = (feedbackRecords || []).filter(
+  const filteredRecords = feedbackRecords.filter(
     (record) =>
       record.comments?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.phone_number?.includes(searchTerm)
