@@ -61,7 +61,7 @@ const HistoryModalForBus = ({ isOpen, onClose, history = [] }) => {
           </button>
         </div>
         {history && history.length > 0 ? (
-          <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-96"> 
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
               <thead>
                 <tr>

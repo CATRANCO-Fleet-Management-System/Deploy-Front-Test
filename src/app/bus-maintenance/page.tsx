@@ -395,11 +395,13 @@ const MaintenanceManagement = () => {
       </div>
 
       {/* Pagination Component */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      <div className="pagination-container mb-[46%]">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
 
       {/* Modals */}
       <MaintenanceAddModal

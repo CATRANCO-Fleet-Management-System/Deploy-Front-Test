@@ -127,7 +127,7 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
               </Marker>
 
               {/* Polyline for the bus */}
-              {busPath.length > 0 && (
+              {/* {busPath.length > 0 && (
                 <Polyline
                   path={busPath} // Use the path specific to this bus
                   options={{
@@ -135,7 +135,7 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
                     strokeWeight: 4,
                   }}
                 />
-              )}
+              )} */}
             </React.Fragment>
           );
         })}

@@ -220,20 +220,11 @@ const BusRecord: React.FC<BusBoxProps> = ({
 
       {/* Modals */}
       <FullRecordModal
-        isOpen={isFullRecordModalOpen}
-        onClose={closeFullRecordModal}
-        busDetails={{
-          busNumber,
-          ORNumber,
-          CRNumber,
-          plateNumber,
-          thirdLBI,
-          ci,
-          assignedDriver,
-          assignedPAO,
-          route,
-        }}
-      />
+  isOpen={isFullRecordModalOpen}
+  onClose={closeFullRecordModal}
+  vehicleId={vehicle_id} // Pass vehicle_id instead of busDetails
+/>
+
 
       {isEditBusModalOpen && (
         <EditBusRecordModal

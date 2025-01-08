@@ -30,12 +30,16 @@ const BusRecordDisplay = () => {
   interface BusRecordType {
     vehicle_id: string;
     plate_number: string;
+    engine_number: string;
+    chasis_number: string;
     or_id: string;
     cr_id: string;
+    third_pli_policy_no: string;
     third_pli: string;
-    ci: string | null;
+    ci: string;
+    supplier: string;
     route: string | null;
-    date_purchased: Date | string | null;
+    date_purchased: Date | string;
   }
 
   const [busRecords, setBusRecords] = useState<BusRecordType[]>([]);
@@ -239,7 +243,7 @@ const BusRecordDisplay = () => {
                 CRNumber={record.cr_id}
                 plateNumber={record.plate_number}
                 thirdLBI={record.third_pli}
-                ci={record.ci || "N/A"}
+                ci={record.ci}
                 assignedDriver={driver}
                 assignedPAO={conductor}
                 route={record.route || "Not Assigned"}
@@ -250,11 +254,13 @@ const BusRecordDisplay = () => {
             );
           })}
         </div>
+        <div className="pagination-container mb-[46%]">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
+        </div>
       </div>
       {isDeletePopupOpen && (
         <Confirmpopup
