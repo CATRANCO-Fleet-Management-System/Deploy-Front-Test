@@ -125,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         </div>
         {/* Burger Menu Content (shown only when burgerMenuVisible is true) */}
         {burgerMenuVisible && (
-          <div className="absolute top-16 right-0 bg-white shadow-lg rounded-md w-48">
+          <div className="absolute top-16 right-0 bg-white shadow-lg rounded-md w-48 z-50">
             <Link
               href="/notification"
               className="block px-4 py-2 text-gray-800 hover:bg-gray-100"

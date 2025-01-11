@@ -389,7 +389,7 @@ const DispatchMonitoring: React.FC = () => {
             {loading ? (
               <div className="text-center mt-8">Loading map...</div>
             ) : (
-              <div className="w-full h-64 sm:h-96 lg:h-[500px]">
+              <div className="sm:h-96 lg:h-[500px] border-2 border-green-400">
                 <DispatchMap
                   busData={busData}
                   pathData={pathData} // Now pathData is an object with bus numbers as keys
@@ -415,19 +415,20 @@ const DispatchMonitoring: React.FC = () => {
               </div>
             )}
           </MapProvider>
+        
 
-          <div className="flex space-x-4 mb-5 -mt-4">
+          <div className="flex flex-wrap justify-start space-x-2 space-y-2 sm:space-y-0 mb-5 mt-8 sm:mt-100">
             {["all", "idle", "on road", "on alley"].map((status) => (
               <button
                 key={status}
-                className={`px-6 py-2 rounded-md text-lg font-semibold transition-transform duration-300 ease-in-out shadow-md ${
+                className={`px-4 py-2 rounded-md text-sm sm:text-lg font-semibold transition-transform duration-300 ease-in-out shadow-md ${
                   activeButton === status
                     ? "transform scale-110 border-2 border-blue-700 shadow-lg"
                     : "hover:shadow-lg"
                 } ${
                   status === "all"
                     ? "bg-blue-500 text-white"
-                    : filterButtons(status) // No need for dispatch_logs_id here
+                    : filterButtons(status)
                 }`}
                 onClick={() => setActiveButton(status)}
               >
@@ -470,7 +471,7 @@ const DispatchMonitoring: React.FC = () => {
                     className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(vehicle.status, vehicle.dispatch_logs_id)}`}
                   >
                     <FaBus size={24} />
-                    <div className="flex flex-col text-sm sm:text-base">
+                    <div className="flex flex-col text-xs sm:text-sm md:text-base">
                       <span className="font-bold">Vehicle ID: {vehicle.number}</span>
                       <span>Status: {vehicle.status}</span>
                     </div>
