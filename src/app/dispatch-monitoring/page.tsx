@@ -50,9 +50,6 @@ const DispatchMonitoring: React.FC = () => {
         name: vehicle.name || "Unnamed",
       }));
 
-      // Save the mapped vehicle data to localStorage
-      localStorage.setItem("busData", JSON.stringify(mappedVehicles));
-
       // Update refs and state
       busDataRef.current = mappedVehicles;
       setBusData(mappedVehicles);
@@ -62,19 +59,9 @@ const DispatchMonitoring: React.FC = () => {
     }
   };
 
-  // On initial load, check for offline data in localStorage
   useEffect(() => {
-    const storedBusData = localStorage.getItem("busData");
-
-    if (storedBusData) {
-      const parsedData = JSON.parse(storedBusData);
-      busDataRef.current = parsedData;
-      setBusData(parsedData);
-      setLoading(false); // Set loading to false since offline data is available
-    } else {
-      fetchVehicleAssignments(); // If no offline data, fetch it
-    }
-  }, [selectedBus]); // Make sure fetchVehicleAssignments is called again when selectedBus changes
+    fetchVehicleAssignments();
+  }, [selectedBus]);
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000);

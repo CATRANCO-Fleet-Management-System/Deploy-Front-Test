@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { getAllProfiles } from "@/app/services/userProfile";
+import { getOffDutyUserProfiles } from "@/app/services/userProfile";
 import { getAllVehicles } from "@/app/services/vehicleService";
 import { updateVehicleAssignment } from "@/app/services/vehicleAssignService";
 
 interface Profile {
-  profile: {
-    user_profile_id: string;
-    first_name: string;
-    last_name: string;
-    position: string;
-  };
+  user_profile_id: string;
+  first_name: string;
+  last_name: string;
+  position: string;
+}
+
+interface Vehicle {
+  vehicle_id: string;
+  name: string; // Or any other relevant fields
 }
 
 interface EditPersonnelModalProps {
   assignmentId: string;
-  vehicleId: string; // Vehicle ID is passed here
+  vehicleId: string; 
   initialDriver: string;
   initialPAO: string;
   onClose: () => void;
@@ -35,22 +38,19 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
   const [selectedPAO, setSelectedPAO] = useState(initialPAO);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const [vehicles, setVehicles] = useState<any[]>([]); // Define the type of vehicle data
-  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(
-    vehicleId
-  );
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(vehicleId);
 
   useEffect(() => {
     const fetchProfilesAndVehicles = async () => {
       setLoading(true);
       try {
-        const profiles = await getAllProfiles();
+        const profiles = await getOffDutyUserProfiles();
         const driverProfiles = profiles.filter(
-          (profile) => profile.profile.position === "driver"
+          (profile) => profile.position === "driver"
         );
         const paoProfiles = profiles.filter(
-          (profile) =>
-            profile.profile.position === "passenger_assistant_officer"
+          (profile) => profile.position === "passenger_assistant_officer"
         );
         const vehicleData = await getAllVehicles();
 
@@ -58,13 +58,12 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
         setPaos(paoProfiles);
         setVehicles(vehicleData);
 
-        // Ensure the selected vehicle exists
-        if (vehicleData && vehicleData.length > 0) {
+        if (vehicleData.length > 0) {
           const currentVehicle = vehicleData.find(
             (vehicle) => vehicle.vehicle_id === vehicleId
           );
           if (currentVehicle) {
-            setSelectedVehicle(vehicleId); // Update the selected vehicle if it exists
+            setSelectedVehicle(vehicleId);
           }
         }
       } catch (fetchError) {
@@ -76,7 +75,7 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
     };
 
     fetchProfilesAndVehicles();
-  }, [vehicleId]); // Ensure this fetches the correct data based on the vehicleId passed
+  }, [vehicleId]);
 
   const handleSubmit = async () => {
     if (!selectedDriver) {
@@ -107,8 +106,8 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
       });
 
       if (response?.message === "Vehicle Assignment Updated Successfully") {
-        onUpdate(selectedDriver, selectedPAO); // Pass updated values back to parent
-        onClose(); // Close modal
+        onUpdate(selectedDriver, selectedPAO);
+        onClose();
       } else {
         throw new Error(response?.message || "Update failed.");
       }
@@ -138,10 +137,10 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
             <option value="">Select a Driver</option>
             {drivers.map((driver) => (
               <option
-                key={driver.profile.user_profile_id}
-                value={driver.profile.user_profile_id}
+                key={driver.user_profile_id}
+                value={driver.user_profile_id}
               >
-                {`${driver.profile.first_name} ${driver.profile.last_name}`}
+                {`${driver.first_name} ${driver.last_name}`}
               </option>
             ))}
           </select>
@@ -158,10 +157,10 @@ const EditPersonnel: React.FC<EditPersonnelModalProps> = ({
             <option value="">Select a PAO</option>
             {paos.map((pao) => (
               <option
-                key={pao.profile.user_profile_id}
-                value={pao.profile.user_profile_id}
+                key={pao.user_profile_id}
+                value={pao.user_profile_id}
               >
-                {`${pao.profile.first_name} ${pao.profile.last_name}`}
+                {`${pao.first_name} ${pao.last_name}`}
               </option>
             ))}
           </select>
