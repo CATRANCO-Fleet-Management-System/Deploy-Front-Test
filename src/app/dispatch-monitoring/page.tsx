@@ -8,10 +8,11 @@ import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 import { FaBus } from "react-icons/fa";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
-import { startAlley, getAllOnAlley, getAllOnRoad, startDispatch, endAlley, deleteRecord } from "../services/dispatchService";
+import { startAlley, getAllOnAlley, getAllOnRoad, startDispatch, endAlley, deleteRecord, endDispatch } from "../services/dispatchService";
 import { MapProvider } from "@/providers/MapProvider";
 import AlleyModal from "../components/AlleyModal";
 import DispatchModal from "../components/DispatchModal";
+import StaticLocationsData from "../components/StaticLocationsData";
 
 interface VehicleAssignmentData {
   number: string;
@@ -193,6 +194,27 @@ const DispatchMonitoring: React.FC = () => {
           localStorage.setItem("busData", JSON.stringify(updatedBusDataArray));
           return updatedBusDataArray;
         });
+
+        const matchedLocation = StaticLocationsData.find((loc) =>
+          loc.coordinates.some(
+            (coord) =>
+              Math.abs(coord.lat - location.latitude) < 0.0001 &&
+              Math.abs(coord.lng - location.longitude) < 0.0001
+          )
+        );
+        
+        console.log("Matched Location:", matchedLocation);
+        
+        if (matchedLocation && dispatch_log?.dispatch_logs_id && dispatch_log.status === "on road") {
+          endDispatch(dispatch_log.dispatch_logs_id).then(() => {
+            console.log(`Dispatch ended for vehicle: ${vehicle_id}`);
+            setPathData((prevPaths) => {
+              const updatedPaths = { ...prevPaths };
+              delete updatedPaths[vehicle_id];
+              return updatedPaths;
+            });
+          });
+        }
       });
   
     return () => {
