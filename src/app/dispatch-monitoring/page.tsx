@@ -389,7 +389,7 @@ const DispatchMonitoring: React.FC = () => {
             {loading ? (
               <div className="text-center mt-8">Loading map...</div>
             ) : (
-              <div className="sm:h-96 lg:h-[500px] border-2 border-green-400">
+              <div className="sm:h-96 lg:h-[500px] border-2">
                 <DispatchMap
                   busData={busData}
                   pathData={pathData} // Now pathData is an object with bus numbers as keys
