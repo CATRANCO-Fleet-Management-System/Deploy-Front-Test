@@ -45,6 +45,7 @@ const DashboardHeader: React.FC = () => {
   const [selectedBusDetails, setSelectedBusDetails] = useState<BusData | null>(
     null
   );
+  const [pathData, setPathData] = useState<{ [busNumber: string]: { lat: number; lng: number }[] }>({});
 
   // Fetch Static Data
   useEffect(() => {
@@ -145,6 +146,14 @@ const DashboardHeader: React.FC = () => {
           ];
         }
       });
+
+      setPathData((prevPaths) => ({
+        ...prevPaths,
+        [vehicle_id]: [
+          ...(prevPaths[vehicle_id] || []),
+          { lat: location.latitude, lng: location.longitude }, // Updated keys to 'lat' and 'lng'
+        ],
+      }));
     });
 
     return () => {
@@ -185,7 +194,7 @@ const DashboardHeader: React.FC = () => {
           <MapProvider>
             <DispatchMap
               busData={busData}
-              pathData={{}}
+              pathData={pathData}
               onBusClick={(busNumber) => {
                 const busDetails = busData.find(
                   (bus) => bus.number === busNumber
