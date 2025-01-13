@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 
+interface VehicleAssignmentData {
+  vehicle_assignment_id: number;
+  number: string;
+  status: string;
+}
+
 interface DispatchModalProps {
   isOpen: boolean;
   vehicleData: VehicleAssignmentData | null;
