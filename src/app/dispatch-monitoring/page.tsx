@@ -28,7 +28,7 @@ interface VehicleAssignmentData {
   route: string;
   dispatch_logs_id: string | null;
   name: string;
-  vehicle_assignment_id: number; // Change to number
+  vehicle_assignment_id: number;
 }
 
 interface BusData {
@@ -233,6 +233,7 @@ const DispatchMonitoring: React.FC = () => {
         ) {
           endDispatch(dispatch_log.dispatch_logs_id).then(() => {
             console.log(`Dispatch ended for vehicle: ${vehicle_id}`);
+            fetchVehicleAssignments();
             setPathData((prevPaths) => {
               const updatedPaths = { ...prevPaths };
               delete updatedPaths[vehicle_id];
@@ -432,10 +433,8 @@ const DispatchMonitoring: React.FC = () => {
                       setPathData((prev) => ({
                         ...prev,
                         [busNumber]: [
-                          {
-                            lat: clickedBus.latitude,
-                            lng: clickedBus.longitude,
-                          },
+                          ...(prev[busNumber] || []), // Preserve existing path data
+                          { lat: clickedBus.latitude, lng: clickedBus.longitude }, // Add new point
                         ],
                       }));
                     }

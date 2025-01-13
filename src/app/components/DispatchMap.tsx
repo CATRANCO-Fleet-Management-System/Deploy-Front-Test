@@ -99,6 +99,24 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
     fitMapBounds();
   }, [mapRef.current]);
 
+  const generateUniqueColor = (busNumber: string) => {
+    // A simple color generator based on bus number (or another unique property)
+    const colors = [
+      "#FF0000", // Red
+      "#00FF00", // Green
+      "#0000FF", // Blue
+      "#FFFF00", // Yellow
+      "#FF00FF", // Magenta
+      "#00FFFF", // Cyan
+      "#FFA500", // Orange
+      "#800080", // Purple
+    ];
+    const index = parseInt(busNumber, 10) % colors.length;
+    return colors[index];
+  };
+
+  
+
   return (
     <div className="relative w-full">
       <GoogleMap
@@ -112,10 +130,13 @@ const DispatchMap: React.FC<DispatchMapProps> = ({
         {localBusData.map((bus) => {
           const busPath = pathData[bus.number] || [];
 
-          // Determine polyline color based on bus status
+          // Determine polyline color based on bus status and assign unique colors for "on road"
           let polylineColor = "gray"; // Default color for idle status
-          if (bus.status === "on alley") polylineColor = "orange";
-          if (bus.status === "on road") polylineColor = "green";
+          if (bus.status === "on road") {
+            polylineColor = generateUniqueColor(bus.number);
+          } else if (bus.status === "on alley") {
+            polylineColor = "orange";
+          }
 
           return (
             <React.Fragment key={bus.number}>
