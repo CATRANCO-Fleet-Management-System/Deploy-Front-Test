@@ -9,7 +9,10 @@ import AddBusRecordModal from "../components/AddBusRecordModal";
 import AssignBusPersonnelModal from "../components/AssignBusPersonnelModal";
 import Pagination from "../components/Pagination";
 import { getAllVehicles, deleteVehicle } from "../services/vehicleService";
-import { getAllVehicleAssignments, deleteVehicleAssignment } from "../services/vehicleAssignService";
+import {
+  getAllVehicleAssignments,
+  deleteVehicleAssignment,
+} from "../services/vehicleAssignService";
 import HistoryModalForBus from "../components/HistoryModalForBus";
 
 const BusRecordDisplay = () => {
@@ -18,7 +21,9 @@ const BusRecordDisplay = () => {
   const itemsPerPage = 3;
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
-  const [deleteAssignmentId, setDeleteAssignmentId] = useState<string | null>(null);
+  const [deleteAssignmentId, setDeleteAssignmentId] = useState<string | null>(
+    null
+  );
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAssignPersonnelModalOpen, setIsAssignPersonnelModalOpen] =
     useState(false);
@@ -90,36 +95,41 @@ const BusRecordDisplay = () => {
         setBusRecords((prev) =>
           prev.filter((record) => record.vehicle_id !== deleteRecordId)
         );
-  
+
         // Call the delete APIs for both vehicle and assignment
         const [vehicleResponse, assignmentResponse] = await Promise.all([
           deleteVehicle(deleteRecordId),
           deleteVehicleAssignment(deleteAssignmentId),
         ]);
-  
+
         // Log both responses to inspect them
         console.log("Vehicle Response:", vehicleResponse);
         console.log("Assignment Response:", assignmentResponse);
-  
+
         // Check the message content for success
         if (
-          vehicleResponse?.message === 'Vehicle Deleted Successfully' &&
-          assignmentResponse?.message === 'Vehicle Assignment Deleted Successfully'
+          vehicleResponse?.message === "Vehicle Deleted Successfully" &&
+          assignmentResponse?.message ===
+            "Vehicle Assignment Deleted Successfully"
         ) {
           console.log("Vehicle and assignment deleted successfully.");
         } else {
-          console.log("Vehicle or assignment deletion failed.", vehicleResponse, assignmentResponse);
+          console.log(
+            "Vehicle or assignment deletion failed.",
+            vehicleResponse,
+            assignmentResponse
+          );
           alert("An error occurred while deleting the vehicle or assignment.");
           await fetchData(); // Re-fetch data if necessary
         }
       } catch (error) {
         // Log the error details
         console.error("Error deleting vehicle and/or assignment:", error);
-  
+
         if (error.response) {
           console.log("Error response data:", error.response.data);
         }
-  
+
         alert("An error occurred while deleting the vehicle or assignment.");
         await fetchData();
       } finally {
@@ -129,8 +139,7 @@ const BusRecordDisplay = () => {
         setIsDeletePopupOpen(false);
       }
     }
-  };  
-  
+  };
 
   const cancelDelete = () => {
     setDeleteRecordId(null);
@@ -269,7 +278,7 @@ const BusRecordDisplay = () => {
                 ci={record.ci}
                 assignedDriver={driver}
                 assignedPAO={conductor}
-                route={record.route || "Not Assigned"}update
+                route={record.route || "Not Assigned"}
                 assignmentId={assignmentId} // Add this line
                 onDelete={() => handleDelete(record.vehicle_id, assignmentId)} // Update this line
                 onUpdate={handleEditBus}
@@ -278,11 +287,11 @@ const BusRecordDisplay = () => {
           })}
         </div>
         <div className="pagination-container mb-[46%]">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
       {isDeletePopupOpen && (
@@ -309,7 +318,7 @@ const BusRecordDisplay = () => {
           refreshData={fetchData}
           onAssign={handleAddVehicleAssignment}
           vehicleId={selectedVehicleId}
-          preSelectedVehicle={selectedVehicleId} 
+          preSelectedVehicle={selectedVehicleId}
         />
       )}
 
