@@ -9,7 +9,7 @@ export default function Sidebar2() {
 
     const menuItems = [
         { href: "/editprofile", icon: <FaPen size={25} />, label: "Edit Profile" },
-        { href: "/notification", icon: <FaBell size={25} />, label: "Notification" },
+        { href: "/notification", icon: <FaBell size={25} />, label: "Notifications" },
     ];
 
     const isActive = (href) => pathname.startsWith(href);

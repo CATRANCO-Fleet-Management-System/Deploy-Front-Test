@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAllProfiles } from "@/app/services/userProfile";
+import { getOffDutyUserProfiles } from "@/app/services/userProfile";
 import { getAllVehicles } from "@/app/services/vehicleService";
 import { createVehicleAssignment } from "@/app/services/vehicleAssignService";
 
@@ -32,16 +32,19 @@ const AssignBusPersonnelModal = ({
     const fetchProfilesAndVehicles = async () => {
       setLoading(true);
       try {
-        const profiles = await getAllProfiles();
+        // Fetch profiles of users who are off-duty
+        const profiles = await getOffDutyUserProfiles();
+        console.log("Fetched profiles:", profiles);  // Log the profiles to inspect
+        
         const driverProfiles = profiles.filter(
-          (profile) => profile.profile.position === "driver"
+          (profile) => profile.position === "driver"
         );
         const paoProfiles = profiles.filter(
           (profile) =>
-            profile.profile.position === "passenger_assistant_officer"
+            profile.position === "passenger_assistant_officer"
         );
         const vehicleData = await getAllVehicles();
-
+  
         setDrivers(driverProfiles);
         setPaos(paoProfiles);
         setVehicles(vehicleData);
@@ -52,10 +55,10 @@ const AssignBusPersonnelModal = ({
         setLoading(false);
       }
     };
-
+  
     fetchProfilesAndVehicles();
   }, []);
-
+  
   const handleDoneClick = async () => {
     if (!selectedDriver || !selectedPAO || !selectedVehicle) {
       setError("Please select a driver, PAO, and vehicle.");
@@ -129,13 +132,13 @@ const AssignBusPersonnelModal = ({
                 }}
                 className="h-10 text-lg border border-gray-300 rounded-md p-2 w-full"
               >
-                <option value="">Select a Driver</option>
+                <option value="">Select a Driver</option>1
                 {drivers.map((driver) => (
                   <option
-                    key={driver.profile.user_profile_id}
-                    value={driver.profile.user_profile_id}
+                    key={driver.user_profile_id}
+                    value={driver.user_profile_id}
                   >
-                    {`${driver.profile.first_name} ${driver.profile.last_name}`}
+                    {`${driver.first_name} ${driver.last_name}`}
                   </option>
                 ))}
               </select>
@@ -159,10 +162,10 @@ const AssignBusPersonnelModal = ({
                 <option value="">Select a PAO</option>
                 {paos.map((pao) => (
                   <option
-                    key={pao.profile.user_profile_id}
-                    value={pao.profile.user_profile_id}
+                    key={pao.user_profile_id}
+                    value={pao.user_profile_id}
                   >
-                    {`${pao.profile.first_name} ${pao.profile.last_name}`}
+                    {`${pao.first_name} ${pao.last_name}`}
                   </option>
                 ))}
               </select>

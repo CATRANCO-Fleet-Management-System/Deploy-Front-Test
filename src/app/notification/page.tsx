@@ -67,7 +67,7 @@ const DashboardHeader = () => {
       <Sidebar2 />
 
       <section className="right w-full bg-slate-200 overflow-y-hidden">
-        <Header title="Dashboard" />
+        <Header title="Notifications" />
 
         <div className="content flex flex-col h-full">
           <div className="Notifications mt-10">

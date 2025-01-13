@@ -76,6 +76,8 @@ export const deleteVehicleAssignment = async (id) => {
     const response = await api.delete(`/user/admin/assignments/delete/${id}`);
     return response.data;
   } catch (error) {
+    // Log full error for debugging
+    console.error("Error deleting assignment:", error.response?.data || error);
     throw (
       error.response?.data ||
       `An error occurred while deleting assignment ID: ${id}.`

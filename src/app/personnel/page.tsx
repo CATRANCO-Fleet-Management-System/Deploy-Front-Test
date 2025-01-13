@@ -241,12 +241,13 @@ const Personnel = () => {
                 ))}
               </div>
             </div>
-
+            <div className="pagination-container mb-[46%]">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />
+            </div>
           </div>
         </div>
         {activeButton === "drivers" ? (

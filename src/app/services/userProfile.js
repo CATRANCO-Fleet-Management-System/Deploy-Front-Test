@@ -118,3 +118,14 @@ export const deleteProfile = async (id) => {
     throw error.response ? error.response.data : error;
   }
 };
+
+// Get User Profiles by Status
+export const getOffDutyUserProfiles = async () => {
+  try {
+    const response = await api.get(`/user/admin/profiles/user_profiles/off_duty`);
+    return response.data;
+  } catch (error) {
+    console.error(`Get profiles by status error: ${status}`, error);
+    throw error.response ? error.response.data : error;
+  }
+};
