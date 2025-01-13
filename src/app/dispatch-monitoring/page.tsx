@@ -28,7 +28,7 @@ interface VehicleAssignmentData {
   route: string;
   dispatch_logs_id: string | null;
   name: string;
-  vehicle_assignment_id: string;
+  vehicle_assignment_id: number; // Change to number
 }
 
 interface BusData {
