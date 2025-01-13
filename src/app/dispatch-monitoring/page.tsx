@@ -8,7 +8,15 @@ import Pusher from "pusher-js";
 import Echo from "laravel-echo";
 import { FaBus } from "react-icons/fa";
 import { getAllVehicleAssignments } from "../services/vehicleAssignService";
-import { startAlley, getAllOnAlley, getAllOnRoad, startDispatch, endAlley, deleteRecord, endDispatch } from "../services/dispatchService";
+import {
+  startAlley,
+  getAllOnAlley,
+  getAllOnRoad,
+  startDispatch,
+  endAlley,
+  deleteRecord,
+  endDispatch,
+} from "../services/dispatchService";
 import { MapProvider } from "@/providers/MapProvider";
 import AlleyModal from "../components/AlleyModal";
 import DispatchModal from "../components/DispatchModal";
@@ -39,7 +47,9 @@ const DispatchMonitoring: React.FC = () => {
   const busDataRef = useRef<BusData[]>([]);
   const pathDataRef = useRef<{ lat: number; lng: number }[]>([]);
   const [busData, setBusData] = useState<BusData[]>([]);
-  const [vehicleAssignmentData, setVehicleAssignmentData] = useState<VehicleAssignmentData[]>([]); // Renamed state
+  const [vehicleAssignmentData, setVehicleAssignmentData] = useState<
+    VehicleAssignmentData[]
+  >([]); // Renamed state
   const vehicleAssignmentDataRef = useRef<VehicleAssignmentData[]>([]);
   const [pathData, setPathData] = useState<{
     [busNumber: string]: { lat: number; lng: number }[];
@@ -49,60 +59,71 @@ const DispatchMonitoring: React.FC = () => {
   const [activeButton, setActiveButton] = useState<string>("all");
   const [isAlleyModalOpen, setIsAlleyModalOpen] = useState(false);
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
-  const [modalVehicleData, setModalVehicleData] = useState<VehicleAssignmentData | null>(null);
+  const [modalVehicleData, setModalVehicleData] =
+    useState<VehicleAssignmentData | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
 
   const fetchVehicleAssignments = async () => {
     try {
       console.log("Fetching vehicle assignments...");
-  
+
       // Fetch all vehicle assignments
       const vehicleAssignments = await getAllVehicleAssignments();
-  
+
       // Fetch "on alley" or "on road" status and their associated dispatch_logs_id
       const onAlley = await getAllOnAlley();
       const onRoad = await getAllOnRoad();
-  
+
       // Create a mapping of vehicle_id to dispatch_logs_id for easier lookup
-      const alleyDispatchLogsMap = new Map(onAlley.map(vehicle => [vehicle.vehicle_assignments.vehicle.vehicle_id, vehicle.dispatch_logs_id]));
-      const roadDispatchLogsMap = new Map(onRoad.map(vehicle => [vehicle.vehicle_assignments.vehicle.vehicle_id, vehicle.dispatch_logs_id]));
-  
+      const alleyDispatchLogsMap = new Map(
+        onAlley.map((vehicle) => [
+          vehicle.vehicle_assignments.vehicle.vehicle_id,
+          vehicle.dispatch_logs_id,
+        ])
+      );
+      const roadDispatchLogsMap = new Map(
+        onRoad.map((vehicle) => [
+          vehicle.vehicle_assignments.vehicle.vehicle_id,
+          vehicle.dispatch_logs_id,
+        ])
+      );
+
       // Map vehicle assignments with fetched statuses and dispatch_logs_id
       const mappedVehicles = vehicleAssignments.map((vehicle: any) => {
         let status = "idle";
         let dispatch_logs_id = null;
-  
+
         // Check if the vehicle is on alley
         if (alleyDispatchLogsMap.has(vehicle.vehicle_id)) {
           status = "on alley";
           dispatch_logs_id = alleyDispatchLogsMap.get(vehicle.vehicle_id);
-        } 
+        }
         // Check if the vehicle is on road
         else if (roadDispatchLogsMap.has(vehicle.vehicle_id)) {
           status = "on road";
           dispatch_logs_id = roadDispatchLogsMap.get(vehicle.vehicle_id);
         }
-  
+
         return {
           number: vehicle.vehicle_id,
           status: status,
-          route: "", 
+          route: "",
           dispatch_logs_id: dispatch_logs_id, // Set the correct dispatch_logs_id
           name: vehicle.name || "Unnamed",
           vehicle_assignment_id: vehicle.vehicle_assignment_id,
         };
       });
-  
+
       // Update refs and state
-      vehicleAssignmentDataRef.current = mappedVehicles; 
+      vehicleAssignmentDataRef.current = mappedVehicles;
       setVehicleAssignmentData(mappedVehicles);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching vehicle assignments:", error);
     }
-  };  
-  
+  };
+
   useEffect(() => {
     fetchVehicleAssignments();
   }, []);
@@ -135,18 +156,18 @@ const DispatchMonitoring: React.FC = () => {
         disableStats: true,
       }),
     });
-  
+
     const channel = echo.channel("flespi-data");
-  
+
     channel
       .subscribed(() => {
         console.log("Subscribed to flespi-data channel");
       })
       .listen("FlespiDataReceived", (event: any) => {
         const { vehicle_id, location, dispatch_log } = event;
-  
+
         console.log("Real Time Data:", event);
-  
+
         // Update pathData without clearing other tracker data
         setPathData((prev) => {
           const newPathData = {
@@ -159,13 +180,13 @@ const DispatchMonitoring: React.FC = () => {
           console.log("Updated pathData:", newPathData);
           return newPathData;
         });
-  
+
         // Update busData
         setBusData((prevBusData) => {
           const updatedBusData = new Map(
             prevBusData.map((bus) => [bus.number, bus])
           );
-  
+
           const updatedBus = updatedBusData.get(vehicle_id) || {
             number: vehicle_id,
             latitude: null,
@@ -177,7 +198,7 @@ const DispatchMonitoring: React.FC = () => {
             name: "Unnamed",
             route: "",
           };
-  
+
           updatedBusData.set(vehicle_id, {
             ...updatedBus,
             latitude: location.latitude,
@@ -188,7 +209,7 @@ const DispatchMonitoring: React.FC = () => {
             dispatch_logs_id: dispatch_log?.dispatch_logs_id || null,
             route: dispatch_log?.route || "",
           });
-  
+
           const updatedBusDataArray = Array.from(updatedBusData.values());
           busDataRef.current = updatedBusDataArray; // Update ref here
           localStorage.setItem("busData", JSON.stringify(updatedBusDataArray));
@@ -202,10 +223,14 @@ const DispatchMonitoring: React.FC = () => {
               Math.abs(coord.lng - location.longitude) < 0.0001
           )
         );
-        
+
         console.log("Matched Location:", matchedLocation);
-        
-        if (matchedLocation && dispatch_log?.dispatch_logs_id && dispatch_log.status === "on road") {
+
+        if (
+          matchedLocation &&
+          dispatch_log?.dispatch_logs_id &&
+          dispatch_log.status === "on road"
+        ) {
           endDispatch(dispatch_log.dispatch_logs_id).then(() => {
             console.log(`Dispatch ended for vehicle: ${vehicle_id}`);
             setPathData((prevPaths) => {
@@ -216,18 +241,18 @@ const DispatchMonitoring: React.FC = () => {
           });
         }
       });
-  
+
     return () => {
       echo.leaveChannel("flespi-data");
       console.log("Unsubscribed from flespi-data channel");
     };
-  }, []);  
+  }, []);
 
   const getButtonColor = (status: string, dispatch_logs_id: string | null) => {
     if (!dispatch_logs_id) {
       return "bg-gray-300 text-black"; // idle state
     }
-  
+
     switch (status) {
       case "on alley":
         return "bg-orange-400 text-black"; // For on alley
@@ -256,62 +281,65 @@ const DispatchMonitoring: React.FC = () => {
         return "bg-gray-300 text-black"; // Default color
     }
   };
-  
 
   const handleAlleyConfirm = (selectedRoute: string) => {
     if (!selectedRoute.trim()) {
       console.error("No route selected.");
       return;
     }
-  
+
     if (!modalVehicleData?.vehicle_assignment_id) {
       console.error("Vehicle assignment ID is missing.");
       return;
     }
-  
+
     // Proceed with the dispatch route confirmation logic
     console.log(`Route selected: ${selectedRoute}`);
-    console.log(`Vehicle Assignment ID: ${modalVehicleData.vehicle_assignment_id}`);
-    
+    console.log(
+      `Vehicle Assignment ID: ${modalVehicleData.vehicle_assignment_id}`
+    );
+
     fetchVehicleAssignments();
-    
+
     // Example of dispatch service logic
     startAlley({
       route: selectedRoute,
       vehicle_assignment_id: modalVehicleData.vehicle_assignment_id,
     })
-    .then(() => {
-      console.log("Alley started successfully!");
-      // Optionally close the modal here
-      setIsAlleyModalOpen(false);
-    })
-    .catch((error) => {
-      console.error(
-        error.response?.data?.message || "Failed to start alley.",
-        error.response?.data?.errors || {}
-      );
-    });
-  };  
+      .then(() => {
+        console.log("Alley started successfully!");
+        // Optionally close the modal here
+        setIsAlleyModalOpen(false);
+      })
+      .catch((error) => {
+        console.error(
+          error.response?.data?.message || "Failed to start alley.",
+          error.response?.data?.errors || {}
+        );
+      });
+  };
 
   const handleDispatchConfirm = async (selectedRoute: string) => {
     if (!selectedRoute.trim()) {
       console.error("No route selected.");
       return;
     }
-  
+
     if (!modalVehicleData?.vehicle_assignment_id) {
       console.error("Vehicle assignment ID is missing.");
       return;
     }
-  
+
     // Proceed with the dispatch route confirmation logic
     console.log(`Route selected: ${selectedRoute}`);
-    console.log(`Vehicle Assignment ID: ${modalVehicleData.vehicle_assignment_id}`);
-  
+    console.log(
+      `Vehicle Assignment ID: ${modalVehicleData.vehicle_assignment_id}`
+    );
+
     try {
       // End the alley first
       await endAlley(modalVehicleData.dispatch_logs_id);
-  
+
       // After ending the alley, start the dispatch
       const data = {
         route: selectedRoute,
@@ -320,28 +348,31 @@ const DispatchMonitoring: React.FC = () => {
       await startDispatch(data);
 
       fetchVehicleAssignments();
-  
+
       console.log("Dispatch started successfully!");
       // Optionally close the modal here
       setIsAlleyModalOpen(false);
     } catch (error) {
       console.error(
-        error.response?.data?.message || "Failed to end alley or start dispatch.",
+        error.response?.data?.message ||
+          "Failed to end alley or start dispatch.",
         error.response?.data?.errors || {}
       );
     }
   };
 
-  const handleDeleteDispatchLogs = () => {
-    if (!selectedVehicle?.dispatch_logs_id) {
+  const handleDeleteDispatchLogs = (vehicle: any) => {
+    if (!vehicle?.dispatch_logs_id) {
       console.error("Dispatch log ID not found.");
       return;
     }
-  
+
     // Call delete function
-    deleteRecord(selectedVehicle.dispatch_logs_id)
+    deleteRecord(vehicle.dispatch_logs_id)
       .then(() => {
-        console.log(`Successfully deleted dispatch log for Vehicle ID: ${selectedVehicle.number}`);
+        console.log(
+          `Successfully deleted dispatch log for Vehicle ID: ${vehicle.number}`
+        );
         setShowDeleteConfirmation(false); // Optionally close the modal after deletion
       })
       .catch((error) => {
@@ -352,8 +383,8 @@ const DispatchMonitoring: React.FC = () => {
       });
 
     fetchVehicleAssignments();
-  };  
-  
+  };
+
   const handleCancelDelete = () => {
     setShowDeleteConfirmation(false); // Close the modal if cancel
   };
@@ -361,24 +392,23 @@ const DispatchMonitoring: React.FC = () => {
   const handleLongPress = (vehicle) => {
     const pressDuration = 3000; // 2 seconds
     let pressTimer: any;
-  
+
     const onMouseDown = () => {
       pressTimer = setTimeout(() => {
         setSelectedVehicle(vehicle); // Set the vehicle data to be deleted
         setShowDeleteConfirmation(true); // Show confirmation modal after 2 seconds
       }, pressDuration);
     };
-  
+
     const onMouseUp = () => {
       clearTimeout(pressTimer); // If mouse is released before 2 seconds, cancel the delete action
     };
-  
+
     return {
       onMouseDown,
       onMouseUp,
     };
   };
-  
 
   return (
     <Layout>
@@ -415,7 +445,6 @@ const DispatchMonitoring: React.FC = () => {
               </div>
             )}
           </MapProvider>
-        
 
           <div className="flex flex-wrap justify-start space-x-2 space-y-2 sm:space-y-0 mb-5 mt-8 sm:mt-100">
             {["all", "idle", "on road", "on alley"].map((status) => (
@@ -468,11 +497,16 @@ const DispatchMonitoring: React.FC = () => {
                     }}
                     onMouseDown={onMouseDown}
                     onMouseUp={onMouseUp}
-                    className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(vehicle.status, vehicle.dispatch_logs_id)}`}
+                    className={`w-full p-4 rounded-lg flex items-center space-x-4 shadow-md ${getButtonColor(
+                      vehicle.status,
+                      vehicle.dispatch_logs_id
+                    )}`}
                   >
                     <FaBus size={24} />
                     <div className="flex flex-col text-xs sm:text-sm md:text-base">
-                      <span className="font-bold">Vehicle ID: {vehicle.number}</span>
+                      <span className="font-bold">
+                        Vehicle ID: {vehicle.number}
+                      </span>
                       <span>Status: {vehicle.status}</span>
                     </div>
                   </button>
@@ -484,7 +518,9 @@ const DispatchMonitoring: React.FC = () => {
           {showDeleteConfirmation && (
             <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg">
-                <h2 className="text-xl font-semibold">Are you sure you want to cancel this?</h2>
+                <h2 className="text-xl font-semibold">
+                  Are you sure you want to cancel this?
+                </h2>
                 <div className="mt-4 flex justify-between">
                   <button
                     onClick={() => handleDeleteDispatchLogs(selectedVehicle)}
@@ -502,26 +538,26 @@ const DispatchMonitoring: React.FC = () => {
               </div>
             </div>
           )}
-      </div>
-    </section>
+        </div>
+      </section>
 
-    {/* Alley Modal */}
-    <AlleyModal
-      isOpen={isAlleyModalOpen}
-      vehicleData={modalVehicleData}
-      onClose={() => setIsAlleyModalOpen(false)}
-      onConfirm={handleAlleyConfirm}
-      availableRoutes={["Canitoan", "Silver Creek", "Cogon"]}
-    />
+      {/* Alley Modal */}
+      <AlleyModal
+        isOpen={isAlleyModalOpen}
+        vehicleData={modalVehicleData}
+        onClose={() => setIsAlleyModalOpen(false)}
+        onConfirm={handleAlleyConfirm}
+        availableRoutes={["Canitoan", "Silver Creek", "Cogon"]}
+      />
 
-    {/* Alley Modal */}  
-    <DispatchModal 
-      isOpen={isDispatchModalOpen}
-      vehicleData={modalVehicleData}
-      onClose={() => setIsDispatchModalOpen(false)}
-      onConfirm={handleDispatchConfirm}
-      availableRoutes={["Canitoan", "Silver Creek", "Cogon"]}
-    />     
+      {/* Alley Modal */}
+      <DispatchModal
+        isOpen={isDispatchModalOpen}
+        vehicleData={modalVehicleData}
+        onClose={() => setIsDispatchModalOpen(false)}
+        onConfirm={handleDispatchConfirm}
+        availableRoutes={["Canitoan", "Silver Creek", "Cogon"]}
+      />
     </Layout>
   );
 };
