@@ -4,9 +4,9 @@ import {
   createFeedbackLog,
   generateOTP,
   verifyPhoneNumber,
-} from "../services/feedbackService";
+} from "../../services/feedbackService";
 
-import { getAllVehicles } from "../services/vehicleService";
+import { getAllVehicles } from "../../services/vehicleService";
 
 const FeedbackForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState("initial");
@@ -18,22 +18,6 @@ const FeedbackForm: React.FC = () => {
   const [feedbackLogsId, setFeedbackLogsId] = useState<number | null>(null);
   const [buses, setBuses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  // Fetch available buses
-  useEffect(() => {
-    const fetchBuses = async () => {
-      try {
-        setLoading(true);
-        const busList = await getAllVehicles();
-        setBuses(busList);
-      } catch (error) {
-        alert("Failed to fetch bus list. Please refresh the page.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBuses();
-  }, []);
 
   // Submit feedback data
   const handleSubmitFeedback = async () => {
@@ -115,21 +99,9 @@ const FeedbackForm: React.FC = () => {
           <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-lg text-center">
             <h2 className="text-2xl font-semibold mb-5">Give Feedback</h2>
             <div className="mb-5 w-full">
-              <label className="block mb-2 text-gray-700">
-                Select Bus Number
+              <label className="block mb-2 text-gray-700 text-lg font-bold">
+                Bus 002
               </label>
-              <select
-                value={busNumber}
-                onChange={(e) => setBusNumber(e.target.value)}
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-              >
-                <option value="">Select Bus Number</option>
-                {buses.map((bus) => (
-                  <option key={bus.vehicle_id} value={bus.vehicle_id}>
-                    {bus.plate_number || `Bus ${bus.vehicle_id}`}
-                  </option>
-                ))}
-              </select>
             </div>
             <div className="mb-5">
               <label className="block mb-2 text-gray-700">
